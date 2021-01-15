@@ -64,13 +64,6 @@ char*       make_response(char* req) {
 	return nullptr;
 }
 
-size_t      strlen_kek(char* buff) {
-	size_t pos = 0;
-	while (buff[pos] != '\n')
-		pos++;
-	return pos;
-}
-
 char*       parse_request_http(int fd, char* buff) {
 	std::istringstream is(buff);
 	size_t  pos = 0;
