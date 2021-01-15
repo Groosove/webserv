@@ -88,23 +88,63 @@ char*       parse_request_http(int fd, char* buff) {
 // buff на считыание и на отправку + client_fd будет массивом
 // если считал из фд, а там 0, то чел ушел!
 int     main(int ac, char** av) {
+
 	int socket_fd, client, port = 8080, max_fd, ret, kek = 1;
 	char* buff = (char*)calloc(4097, 1);
 	char* request_buffer, *response_buffer;
 	fd_set read_fd, write_fd, cp_read_fd, cp_write_fd;
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t addr_len = sizeof(client_addr);
+
+
+	/*
+	 * Создание сокета
+	 * 1. Семейстов адресации
+	 * АF_INET - для взаимодействия по сети с помощью TCP/IP
+	 * AF_UNIX - для взаимодействия сокетов внутри машины
+	 *
+	 * 2. Задание типа взаимодействия
+	 * SOCK_STREAM - потоковое взаимодействие -> константа значение
+	 * SOCK_DGRAM - дейтагарммное взаимодействие -> отправка пакетов любого размера
+	 *
+	 * 3. Использоумей протокол (можно указать просто 0)
+	 * IPPROTO_TCP - TCP
+	 * IPPROTO_UDP - UDP
+	 *
+	 * Возращает -1 в случае ошибки
+	 */
+
 	if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		std::cerr << "Can`t create socket" << std::endl;
 	}
+
+
+	// Хуйня чтобы порт не зацикливался
 	setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &kek, sizeof(int));
+
+	/*
+	 * Инициализация сервера
+	 * sin_family - Тип сокета
+	 * sin_port - Порт сокета
+	 * sin_addr - Адрес ip сокета
+	 */
+
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	/*
+	 * Связывание сокета с адресом
+	 * 1. socket_fd - дескриптор сокета
+	 * 2. server_addr - сервер с конкретным адресом
+	 * 3. Размер струкруты сервера в байтах
+	 */
+
 	if (bind(socket_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
 		std::cout << "Bind failed" << std::endl;
 		return 0;
 	}
+
 	if (listen(socket_fd, 0) == -1) {
 		std::cout << "Listen failed!" << std::endl;
 		return 0;

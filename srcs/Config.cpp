@@ -41,6 +41,7 @@ const char*     Config::RunFailedException::what(void) const throw() {
 
 // Constr
 Config::Config() {}
+
 Config::Config(const char* av): _path(std::string(av)) {
 	std::cout << "Server start... " << std::endl;
 }
