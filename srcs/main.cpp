@@ -45,12 +45,52 @@
 #include <sys/select.h>
 #include <cstdlib>
 #include <fcntl.h>
+#include <map>
+#include <string>
+#include <sstream>
+
+std::string    headers[12] = {
+		"Method",
+		"Host",
+		"Connection",
+		"Upgrade-Insecure-Requests",
+		"User-Agent",
+		"Accept",
+		"Accept-Encoding",
+		"Accept-Language"
+};
+
+char*       make_response(char* req) {
+	return nullptr;
+}
+
+size_t      strlen_kek(char* buff) {
+	size_t pos = 0;
+	while (buff[pos] != '\n')
+		pos++;
+	return pos;
+}
+
+char*       parse_request_http(int fd, char* buff) {
+	std::istringstream is(buff);
+	size_t  pos = 0;
+	std::string line;
+	std::map<std::string, std::string> map;
+
+	while (std::getline(is, line)) {
+		if ((pos = line.find(':')) != std::string::npos)
+			map[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
+		pos = 0;
+	}
+	return NULL;
+}
 
 // buff на считыание и на отправку + client_fd будет массивом
 // если считал из фд, а там 0, то чел ушел!
 int     main(int ac, char** av) {
 	int socket_fd, client, port = 8080, max_fd, ret, kek = 1;
 	char* buff = (char*)calloc(4097, 1);
+	char* request_buffer, *response_buffer;
 	fd_set read_fd, write_fd, cp_read_fd, cp_write_fd;
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t addr_len = sizeof(client_addr);
@@ -74,34 +114,36 @@ int     main(int ac, char** av) {
 	FD_ZERO(&write_fd);
 	FD_SET(socket_fd, &read_fd);
 	FD_SET(socket_fd, &write_fd);
-//	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
+	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
+	std::cout << "++++++Waiting new Connect++++++" << std::endl;
 	for (;;) {
 		cp_read_fd = read_fd;
 		cp_write_fd = write_fd;
-		if (select(max_fd + 1, &cp_read_fd, &cp_write_fd, NULL, (struct timeval*)0) <= 0) {
-			std::cout << "KEKEKEKEK" << std::endl;
+		if (select(max_fd + 1, &cp_read_fd, &cp_write_fd, NULL, (struct timeval*)0) <= 0)
 			continue;
-		}
 		if (FD_ISSET(socket_fd, &cp_read_fd)) {
 			if ((client = accept(socket_fd, (struct sockaddr *) &client_addr, &addr_len)) > 0) {
 				FD_SET(client, &read_fd);
 				FD_SET(client, &write_fd);
 				if (client > max_fd)
 					max_fd = client;
-				std::cout << "COOL!" << std::endl;
+				std::cout << "++++++New user id added!++++++" << std::endl;
 			}
 		}
 		for (int i = 0; i <= max_fd; ++i) {
 			if (FD_ISSET(i, &cp_read_fd)) {
 				ret = recv(i, buff, 4097, 0);
 				if (ret == 0) {
-					std::cout << "USER DISCONNECT!" << std::endl;
+					std::cout << "++++++USER DISCONNECT!++++++" << std::endl;
 					FD_CLR(i, &read_fd);
 					FD_CLR(i, &write_fd);
 					close(i);
 				}
-				else
-					NULL;
+				else {
+					request_buffer = parse_request_http(i, buff); // если файловый дескриптор, готов на чтение и у нас уже пришел запрос, то мы начинаем парсить этот запрос
+//					response_buffer = make_response(request_buffer);
+//					NULL;
+				}
 			}
 		}
 		for (int i = 0; i <= max_fd; ++i) {
