@@ -1,0 +1,8 @@
+//
+// Created by Shonna Jakku on 2/4/21.
+//
+
+#ifndef WEBSERV_VIRTUALSERVER_HPP
+#define WEBSERV_VIRTUALSERVER_HPP
+
+#endif //WEBSERV_VIRTUALSERVER_HPP
