@@ -17,6 +17,7 @@ void WebServer::parseConfigFile(std::ifstream &config_name) {
 }
 
 WebServer::WebServer(const char *config_name) {
+	std::cout << config_name << std::endl;
 	std::ifstream file_config(config_name);
 	if (file_config.is_open())
 		parseConfigFile(file_config);
