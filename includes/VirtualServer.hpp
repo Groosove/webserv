@@ -9,6 +9,7 @@
 #pragma once
 #include "Location.hpp"
 
+#include "fstream"
 class VirtualServer {
 private:
 	std::string						_host;
@@ -17,11 +18,9 @@ private:
 	std::vector<std::string>		_error_page;
 	std::map<std::string, Location>	_location;
 	int								_socket;
-
-	void		parseConfigFile();
 public:
-	explicit VirtualServer(const std::string& config_name = "default.conf");
-	~VirtualServer();
+	explicit VirtualServer(std::ifstream &file);
+	~VirtualServer() {};
 
 	inline const std::string& 	getHost() const	{ return _host; }
 	inline const std::string& 	getPort() const	{ return _port; }

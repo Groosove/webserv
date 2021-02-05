@@ -7,3 +7,7 @@
 //
 
 #include "VirtualServer.hpp"
+
+VirtualServer::VirtualServer(std::ifstream &config_name) {
+
+}
