@@ -1,8 +1,18 @@
 //
-// Created by Shonna Jakku on 2/4/21.
+// Created on 2/4/21 by.
+// Shonna Jakku
+// Fenix Lavon
+// Freely Kathryn
+//  Copyright (c) 2021 RaevkaTuliskiyPryanikNogotochki All rights reserved.
 //
 
-#ifndef WEBSERV_WEBSERVER_HPP
-#define WEBSERV_WEBSERVER_HPP
+#pragma once
 
-#endif //WEBSERV_WEBSERVER_HPP
+#include "VirtualServer.hpp"
+class WebServer {
+private:
+	std::vector<VirtualServer>	_virtual_server;
+public:
+	explicit WebServer();
+	~WebServer();
+};

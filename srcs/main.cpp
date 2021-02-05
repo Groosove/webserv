@@ -1,47 +1,17 @@
-//#include "Config.hpp"
 //
-//int     main(int ac, char** av) {
-//	if (ac == 2) {
-//		Config *sever = new Config(av[1]);
-//		try {
-//			server->start();
-//			sever->stop();
-//		}
-//		catch (const std::exception& e) {
-//			std::cout << e.what() << std::endl;
-//		}
-//	}
-//	else
-//		std::cerr << "Please try: ./WebServer <something path>" << std::endl;
-//	return 0;
-//}
-
-
-
-//int     server_fd;
+// Created on 2/4/21 by.
+// Shonna Jakku
+// Fenix Lavon
+// Freely Kathryn
+//  Copyright (c) 2021 RaevkaTuliskiyPryanikNogotochki All rights reserved.
 //
-//	if (ac != 2) {
-//		std::cerr << "Please try: ./WebServer <something path>" << std::endl;
-//	return 0;
-//	}
-///* открываем сокет для нашей системы
-// * A socket is the mechanism that most popular operating systems provide to give programs access to the network.
-// * It allows messages to be sent and received between applications (unrelated processes) on different networked machines.
-// */
-//		if ((server_fd = socket(AF_NET, SOCK_STREAM, 0)) < 0) {
-//			std::cerr << "Can`t create socket" << std::endl;
-//		}
-//	}
-//	catch(const std::exception& e) {
-//	std::cerr << e.what() << std::endl;
-//}
 
 #include <sys/socket.h>
 #include <iostream>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <sys/types.h>
+#include <sys/types.h>l
 #include <sys/select.h>
 #include <cstdlib>
 #include <fcntl.h>
@@ -81,14 +51,11 @@ char*       parse_request_http(int fd, char* buff) {
 // buff на считыание и на отправку + client_fd будет массивом
 // если считал из фд, а там 0, то чел ушел!
 int     main(int ac, char** av) {
-
 	int socket_fd, client, port = 8080, max_fd, ret, kek = 1;
 	char* buff = (char*)calloc(4097, 1);
-	char* request_buffer, *response_buffer;
 	fd_set read_fd, write_fd, cp_read_fd, cp_write_fd;
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t addr_len = sizeof(client_addr);
-
 
 	/*
 	 * Создание сокета
