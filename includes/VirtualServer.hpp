@@ -1,5 +1,5 @@
 //
-// Created on 2/4/21 by.
+// Created on 2/4/21 by
 // Shonna Jakku
 // Fenix Lavon
 // Freely Kathryn
@@ -23,8 +23,8 @@ public:
 	explicit VirtualServer(const std::string& config_name = "default.conf");
 	~VirtualServer();
 
-	inline const std::string& 	getHost() const { return _host; }
-	inline const std::string& 	getPort() const { return _port; }
+	inline const std::string& 	getHost() const	{ return _host; }
+	inline const std::string& 	getPort() const	{ return _port; }
 	inline const std::string& 	getServerName() const { return _server_name; }
 	inline int 					getSocket() const { return _socket; }
 };

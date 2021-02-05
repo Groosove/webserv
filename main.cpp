@@ -1,3 +1,4 @@
+#include <climits>
 //
 // Created on 2/4/21 by.
 // Shonna Jakku
@@ -11,28 +12,13 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <sys/types.h>l
+#include <sys/types.h>
 #include <sys/select.h>
 #include <cstdlib>
 #include <fcntl.h>
 #include <map>
 #include <string>
 #include <sstream>
-
-std::string    headers[12] = {
-		"Method",
-		"Host",
-		"Connection",
-		"Upgrade-Insecure-Requests",
-		"User-Agent",
-		"Accept",
-		"Accept-Encoding",
-		"Accept-Language"
-};
-
-char*       make_response(char* req) {
-	return nullptr;
-}
 
 char*       parse_request_http(int fd, char* buff) {
 	std::istringstream is(buff);
@@ -45,7 +31,7 @@ char*       parse_request_http(int fd, char* buff) {
 			map[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
 		pos = 0;
 	}
-	return NULL;
+	return nullptr;
 }
 
 // buff на считыание и на отправку + client_fd будет массивом
@@ -116,7 +102,7 @@ int     main(int ac, char** av) {
 	FD_SET(socket_fd, &write_fd);
 	fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 	std::cout << "++++++Waiting new Connect++++++" << std::endl;
-	for (;;) {
+	while (true) {
 		cp_read_fd = read_fd;
 		cp_write_fd = write_fd;
 		if (select(max_fd + 1, &cp_read_fd, &cp_write_fd, NULL, (struct timeval*)0) <= 0)
@@ -138,9 +124,10 @@ int     main(int ac, char** av) {
 					FD_CLR(i, &read_fd);
 					FD_CLR(i, &write_fd);
 					close(i);
+					break;
 				}
 				else {
-					request_buffer = parse_request_http(i, buff); // если файловый дескриптор, готов на чтение и у нас уже пришел запрос, то мы начинаем парсить этот запрос
+//					request_buffer = parse_request_http(i, buff); // если файловый дескриптор, готов на чтение и у нас уже пришел запрос, то мы начинаем парсить этот запрос
 //					response_buffer = make_response(request_buffer);
 //					NULL;
 				}
@@ -148,7 +135,9 @@ int     main(int ac, char** av) {
 		}
 		for (int i = 0; i <= max_fd; ++i) {
 			if (FD_ISSET(i, &cp_write_fd)) {
+				send(i, "Server", 6, 0);
 				send(i, buff, strlen(buff), 0);
+
 			}
 		}
 		bzero(buff, 4097);
