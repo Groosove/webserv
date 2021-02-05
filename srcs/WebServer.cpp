@@ -8,12 +8,11 @@
 
 #include "WebServer.hpp"
 
-void WebServer::parseConfigFile(std::ifstream &file) {
+void WebServer::parseConfigFile(std::ifstream &config_name) {
 	std::string buf;
-	while (std::getline(file, buf)) {
-		std::cout  << buf << std::endl;
+	while (std::getline(config_name, buf)) {
 		if (buf.find("server", 0) != std::string::npos)
-			_virtual_server.push_back(VirtualServer(file));
+			_virtual_server.push_back(VirtualServer(config_name));
 	}
 }
 

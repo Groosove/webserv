@@ -9,5 +9,8 @@
 #include "VirtualServer.hpp"
 
 VirtualServer::VirtualServer(std::ifstream &config_name) {
-
+	std::string buf;
+	while (std::getline(config_name, buf)) {
+		std::cout  << buf << std::endl;
+	}
 }
