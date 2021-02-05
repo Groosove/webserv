@@ -1,5 +1,5 @@
 //
-// Created on 2/4/21 by.
+// Created on 2/4/21 by
 // Shonna Jakku
 // Fenix Lavon
 // Freely Kathryn

@@ -1,5 +1,5 @@
 //
-// Created on 2/4/21 by.
+// Created on 2/4/21 by
 // Shonna Jakku
 // Fenix Lavon
 // Freely Kathryn
@@ -12,7 +12,9 @@
 class WebServer {
 private:
 	std::vector<VirtualServer>	_virtual_server;
+	bool						_status;
 public:
 	explicit WebServer();
 	~WebServer();
+	void	handle();
 };
