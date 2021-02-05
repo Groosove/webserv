@@ -30,7 +30,7 @@ private:
 	size_t						_request_limits;
 public:
 	explicit Location();
-	~Location();
+	~Location() {};
 
 	void parseLocation();
 };
