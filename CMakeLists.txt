@@ -5,10 +5,14 @@ set(CMAKE_CXX_STANDARD 98)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
 
 include_directories(
-        includes
+		utils_function/
+        includes/
         srcs/
         .)
 
+set(UTILS
+		utils_function/ft_strtrim.cpp
+		utils_function/ft_strchr.cpp)
 #set(INCLUDES
 #        includes/WebServer.hpp
 #        includes/VirtualServer.hpp
@@ -28,4 +32,4 @@ set(FILES
         srcs/Client.cpp
         srcs/CGI.cpp)
 
-add_executable(WebServ ${FILES} )
+add_executable(WebServ ${UTILS} ${FILES} )

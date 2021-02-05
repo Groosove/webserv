@@ -8,8 +8,9 @@
 
 #pragma once
 #include "Location.hpp"
-
 #include "fstream"
+#include "utils.hpp"
+
 class VirtualServer {
 private:
 	std::string						_host;
@@ -17,6 +18,7 @@ private:
 	std::string						_server_name;
 	std::vector<std::string>		_error_page;
 	std::map<std::string, Location>	_location;
+	std::map<std::string, std::string> _parametr;
 	int								_socket;
 
 	void							_parseServerParam(const std::string& buf);
@@ -24,10 +26,10 @@ public:
 	explicit VirtualServer(std::ifstream &file);
 	~VirtualServer() {};
 
-	inline void					setHost(const std::string& host) { _host = host; }
-	inline void					setPort(const std::string& port) { _port = port; }
-	inline void					setServerName(const std::string& server_name) { _server_name = server_name;}
-	inline void					setSocket(int socket) { _socket = socket; }
+	void	setHost(const std::string& host);
+	void	setPort(const std::string& port);
+	void	setServerName(const std::string& server_name);
+	void	setSocket(int socket);
 
 	inline const std::string& 	getHost() const	{ return _host; }
 	inline const std::string& 	getPort() const	{ return _port; }
