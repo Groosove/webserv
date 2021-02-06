@@ -23,7 +23,7 @@ void VirtualServer::_parseServerParam(const std::string& buf) {
 VirtualServer::VirtualServer(std::ifstream &config_name) {
 	std::string buf;
 	while (std::getline(config_name, buf)) {
-		if (buf.find("server:", 0) != std::string::npos || buf.empty())
+		if (buf.find("server:", 0) != std::string::npos)
 			break;
 		if (buf.find("location:", 0) == std::string::npos)
 			_parseServerParam(buf);
