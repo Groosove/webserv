@@ -38,5 +38,49 @@ std::vector<VirtualServer> WebServer::getVirtualServer() {
 }
 
 void WebServer::handle(VirtualServer &virtualServer) {
+	int 	max_fd;
+	int 	ret;
+	fd_set 	read_fd, write_fd, cp_read_fd, cp_write_fd;
 
+	max_fd = virtualServer.getSocket();
+	FD_ZERO(&read_fd);
+	FD_ZERO(&write_fd);
+	FD_SET(virtualServer.getSocket(), &read_fd);
+	FD_SET(virtualServer.getSocket(), &write_fd);
+	std::cout << "++++++Waiting new Connect++++++" << std::endl;
+	while (_status) {
+		cp_read_fd = read_fd;
+		cp_write_fd = write_fd;
+		if (select(max_fd + 1, &cp_read_fd, &cp_write_fd, nullptr, (struct timeval*)nullptr) <= 0)
+			continue;
+		if (FD_ISSET(virtualServer.getSocket(), &cp_read_fd)) {
+			if ((client = accept(virtualServer.getSocket(), (struct sockaddr *) &client_addr, &addr_len)) > 0) {
+				FD_SET(client, &read_fd);
+				FD_SET(client, &write_fd);
+				if (client > max_fd)
+					max_fd = client;
+				std::cout << "++++++New user id added!++++++" << std::endl;
+			}
+		}
+		for (size_t i = 0; i <= max_fd; ++i) {
+			if (FD_ISSET(i, &cp_read_fd)) {
+				ret = recv(i, buff, 4097, 0);
+				if (ret == 0) {
+					std::cout << "++++++USER DISCONNECT!++++++" << std::endl;
+					FD_CLR(i, &read_fd);
+					FD_CLR(i, &write_fd);
+					close(i);
+					break;
+				}
+			}
+		}
+		for (size_t i = 0; i <= max_fd; ++i) {
+			if (FD_ISSET(i, &cp_write_fd)) {
+				send(i, "Server", 6, 0);
+				send(i, buff, strlen(buff), 0);
+
+			}
+		}
+		bzero(buff, 4097);
+	}
 }
