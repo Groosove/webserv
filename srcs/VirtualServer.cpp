@@ -79,7 +79,7 @@ void VirtualServer::preparationParams() {
 
 	_server_addr.sin_family = AF_INET;
 	_server_addr.sin_port = htons((uint16_t )std::stoi(_port));
-	_server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	_server_addr.sin_addr.s_addr = inet_addr(_host.c_str());
 
 	/*
 	 * Связывание сокета с адресом

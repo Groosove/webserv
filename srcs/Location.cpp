@@ -28,6 +28,8 @@ Location::Location(std::ifstream &config_name) {
 	}
 	std::cout << "KEK: " << _root << std::endl;
 	std::cout << "KEK: " << _index << std::endl;
+	std::cout << "KEK: " << _autoindex << std::endl;
+	std::cout << "KEK: " << _request_limits << std::endl;
 	std::cout << "KEK: " << *_allow_methods.begin() << std::endl;
 }
 
