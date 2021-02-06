@@ -37,7 +37,7 @@ std::vector<VirtualServer> WebServer::getVirtualServer() {
 	return std::vector<VirtualServer>(_virtual_server);
 }
 
-void WebServer::handle(VirtualServer &virtualServer) {
+void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
 	int 	max_fd;
 	int 	ret;
 	fd_set 	read_fd, write_fd, cp_read_fd, cp_write_fd;
