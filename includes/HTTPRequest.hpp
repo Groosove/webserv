@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include "utils.hpp"
 
 class HTTPRequest {
 private:

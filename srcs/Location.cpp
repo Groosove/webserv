@@ -40,7 +40,7 @@ void Location::setRequestLimits(const std::string &body_size) {
 void Location::setAutoIndex(const std::string &autoindex) {
 	if (autoindex.find("on", 0) != std::string::npos)
 		_autoindex = true;
-	if (autoindex.find("of", 0) != std::string::npos)
+	if (autoindex.find("off", 0) != std::string::npos)
 		_autoindex = false;
 }
 

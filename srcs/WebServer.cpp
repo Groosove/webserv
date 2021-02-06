@@ -41,6 +41,10 @@ void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести 
 	int 	max_fd;
 	int 	ret;
 	fd_set 	read_fd, write_fd, cp_read_fd, cp_write_fd;
+	int client;
+	sockaddr_in client_addr;
+	socklen_t addr_len;
+	char *buff;
 
 	max_fd = virtualServer.getSocket();
 	FD_ZERO(&read_fd);
@@ -69,7 +73,7 @@ void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести 
 					std::cout << "++++++USER DISCONNECT!++++++" << std::endl;
 					FD_CLR(i, &read_fd);
 					FD_CLR(i, &write_fd);
-					close(i);
+//					close(i);
 					break;
 				}
 			}

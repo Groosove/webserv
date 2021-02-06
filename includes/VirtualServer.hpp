@@ -44,6 +44,7 @@ public:
 	void	setServerName(const std::string& server_name);
 	void	setSocket(int socket);
 
+	std::string	getArgument(const std::string &dst, int start);
 	inline const std::string& 	getHost() const	{ return _host; }
 	inline const std::string& 	getPort() const	{ return _port; }
 	inline const std::string& 	getServerName() const { return _server_name; }

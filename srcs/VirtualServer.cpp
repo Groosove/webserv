@@ -8,14 +8,19 @@
 
 #include "VirtualServer.hpp"
 // TODO накидать сплит для парсера строк
+
+std::string VirtualServer::getArgument(const std::string &dst, int start) {
+	return ft_strtrim(dst.substr(start + 1, dst.length()), " \t");
+}
+// TODO А это на что похоже? Я немного не понял суть таска.
 void VirtualServer::_parseServerParam(const std::string& buf) {
-	size_t i = 0;
+	size_t i;
 	if ((i = buf.find("host:", 0, 5)) != std::string::npos)
-		setHost(buf.substr(i + 5,  buf.length()));
+		setHost(getArgument(buf, ft_strchr(buf, ':')));
 	else if ((i = buf.find("port:", 0, 5)) != std::string::npos)
-		setPort(buf.substr(i + 5, buf.length()));
+		setPort(getArgument(buf, ft_strchr(buf, ':')));
 	else if ((i = buf.find("server_name:", 0, 12)) != std::string::npos)
-		setServerName(buf.substr(i + 12, buf.length()));
+		setServerName(getArgument(buf, ft_strchr(buf, ':')));
 	else
 		_error_page.push_back(buf);
 }
@@ -28,10 +33,7 @@ VirtualServer::VirtualServer(std::ifstream &config_name) {
 		if (buf.find("location:", 0) == std::string::npos)
 			_parseServerParam(buf);
 		else {
-			size_t index = 0;
-			while (buf[index] != ':')
-				++index;
-			buf.erase(0, index + 1);
+			buf.erase(0, ft_strchr(buf, ':') + 1);
 			_location.insert(std::make_pair(ft_strtrim(buf, " \t"), Location(config_name)));
 		}
 	}
@@ -41,12 +43,12 @@ VirtualServer::VirtualServer(std::ifstream &config_name) {
 }
 
 void VirtualServer::setHost(const std::string &host) {
-	_host = ft_strtrim(host, " \t");
+	_host = host;
 	_parametr.insert(std::make_pair("host", _host));
 }
 
 void VirtualServer::setPort(const std::string &port) {
-	_port = ft_strtrim(port, " \t");
+	_port = port;
 	_parametr.insert(std::make_pair("port", _port));
 }
 
@@ -56,7 +58,7 @@ void VirtualServer::setSocket(int socket) {
 }
 
 void VirtualServer::setServerName(const std::string &server_name) {
-	_server_name = ft_strtrim(server_name, " \t");
+	_server_name = server_name;
 	_parametr.insert(std::make_pair("server_name", _server_name));
 }
 

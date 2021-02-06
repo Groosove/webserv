@@ -9,7 +9,7 @@
 
 int	ft_strchr(const std::string& str, int ch)
 {
-	size_t	index;
+	int	index;
 
 	index = -1;
 	while (str[++index] != 0)

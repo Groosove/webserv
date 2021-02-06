@@ -12,7 +12,9 @@ include_directories(
 
 set(UTILS
 		utils_function/ft_strtrim.cpp
-		utils_function/ft_strchr.cpp)
+		utils_function/ft_strchr.cpp
+		utils_function/ft_compare.cpp
+		)
 #set(INCLUDES
 #        includes/WebServer.hpp
 #        includes/VirtualServer.hpp
