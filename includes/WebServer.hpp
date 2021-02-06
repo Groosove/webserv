@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "HTTPRequest.hpp"
 #include "VirtualServer.hpp"
 #include "sys/socket.h"
 #include "sys/select.h"
