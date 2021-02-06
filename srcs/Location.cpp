@@ -21,10 +21,25 @@ Location::Location(std::ifstream &config_name) {
 			setIndex(buf.substr(i + 6, buf.length()));
 		else if ((i = buf.find("allow_methods:", 0, 14)) != std::string::npos)
 			setAllowMethods(buf.substr(i + 14, buf.length()));
+		else if ((i = buf.find("autoindex:", 0, 10)) != std::string::npos)
+			setAutoIndex(buf.substr(i + 10, buf.length()));
+		else if ((i = buf.find("limits_client_body_size", 0, 24)) !=  std::string::npos)
+			setRequestLimits(buf.substr(i + 24, buf.length()));
 	}
 	std::cout << "KEK: " << _root << std::endl;
 	std::cout << "KEK: " << _index << std::endl;
 	std::cout << "KEK: " << *_allow_methods.begin() << std::endl;
+}
+
+void Location::setRequestLimits(const std::string &body_size) {
+	_request_limits = std::stoi(ft_strtrim(body_size, " \t"));
+}
+
+void Location::setAutoIndex(const std::string &autoindex) {
+	if (autoindex.find("on", 0) != std::string::npos)
+		_autoindex = true;
+	if (autoindex.find("of", 0) != std::string::npos)
+		_autoindex = false;
 }
 
 void Location::setRoot(const std::string &root) {

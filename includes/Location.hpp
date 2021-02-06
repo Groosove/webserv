@@ -33,6 +33,8 @@ public:
 	explicit Location(std::ifstream& config_name);
 	~Location() {};
 
+	void	setRequestLimits(const std::string& body_size);
+	void	setAutoIndex(const std::string& autoindex);
 	void	setRoot(const std::string& root);
 	void	setIndex(const std::string& index);
 	void	setAllowMethods(const std::string& allow_methods);
