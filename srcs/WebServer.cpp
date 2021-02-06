@@ -24,17 +24,19 @@ WebServer::WebServer(const char *config_name) {
 		std::cerr << "File doesn't open!" << std::endl;
 }
 
-void WebServer::handle() {
-	while (_status) {
-
-	}
-}
-
 void WebServer::createVirtualServer() {
 	for (size_t i = 0; i < _virtual_server.size(); ++i) {
 //		check_valid_virtual_server(); // TODO написать валидацию серверов, для того чтобы не запускать рандомный сервер, напишем потом!
 		_virtual_server[i].initSocket();
 		_virtual_server[i].preparationParams();
+		handle(_virtual_server[i]);
 	}
-	handle();
+}
+
+std::vector<VirtualServer> WebServer::getVirtualServer() {
+	return std::vector<VirtualServer>(_virtual_server);
+}
+
+void WebServer::handle(VirtualServer &virtualServer) {
+
 }

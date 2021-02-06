@@ -93,7 +93,8 @@ void VirtualServer::preparationParams() {
 		std::cout << "Bind failed" << std::endl;
 		return ;
 	}
-
+	// делаем файловый дескриптор сокета неблокирующимся
+	fcntl(_socket, F_SETFL, O_NONBLOCK);
 	// начинаем слушать порт
 	if (listen(_socket, 0) == -1) {
 		std::cout << "Listen failed!" << std::endl;

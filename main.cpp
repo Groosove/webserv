@@ -152,4 +152,15 @@ int main(int ac, char** av) {
 	WebServer webServer(av[1]);
 
 	webServer.createVirtualServer();
+	std::vector<VirtualServer>::iterator it_begin;
+	std::vector<VirtualServer>::iterator it_end;
+	it_begin = webServer.getVirtualServer().begin();
+	it_end = webServer.getVirtualServer().end();
+
+	for (; it_begin != it_end; ++it_begin) {
+		std::cout << "SERVER: " << (*it_begin).getHost() << std::endl;
+		std::cout << "SERVER: " << (*it_begin).getPort() << std::endl;
+		std::cout << "SERVER: " << (*it_begin).getServerName() << std::endl;
+		std::cout << "SERVER: " << (*it_begin).getSocket() << std::endl;
+	}
 }
