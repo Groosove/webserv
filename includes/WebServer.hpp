@@ -21,4 +21,5 @@ public:
 	explicit WebServer(const char *config_name = "default.conf");
 	~WebServer() {};
 	void	handle();
+	void	createVirtualServer();
 };

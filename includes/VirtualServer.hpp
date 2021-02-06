@@ -11,6 +11,12 @@
 #include "fstream"
 #include "utils.hpp"
 
+// Инклюды для инициализации сокета и работы с ним и структурой socket_addr
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/_endian.h>
+
 class VirtualServer {
 private:
 	std::string						_host;
@@ -19,12 +25,18 @@ private:
 	std::vector<std::string>		_error_page;
 	std::map<std::string, Location>	_location;
 	std::map<std::string, std::string> _parametr;
+
 	int								_socket;
+	struct sockaddr_in 				_server_addr;
+
 
 	void							_parseServerParam(const std::string& buf);
 public:
 	explicit VirtualServer(std::ifstream &file);
 	~VirtualServer() {};
+
+	void							initSocket(void);
+	void							preparationParams(void);
 
 	void	setHost(const std::string& host);
 	void	setPort(const std::string& port);

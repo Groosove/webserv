@@ -150,4 +150,6 @@
 
 int main(int ac, char** av) {
 	WebServer webServer(av[1]);
+
+	webServer.createVirtualServer();
 }
