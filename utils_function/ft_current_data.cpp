@@ -9,62 +9,81 @@
 #include <sys/time.h>
 #include <ctime>
 
-void ft_get_year(tm &timeinfo, long time, int& leap_count) {
+void ft_get_year(tm &timeinfo, long &time) {
 	int year = 1970;
-	int dayCount = time / 3600 / 24;
-	for (; dayCount >= 365; ++year) {
-		if (year % 4 == 0) {
-			dayCount -= 366;
-			++leap_count;
-		}
+	for (; time >= 365; ++year)
+		time -= (year % 4 == 0) ? 366 : 365;
+	timeinfo.tm_year = year - 1900;
+	bool leap = timeinfo.tm_year % 4 == 0;
+	int number_month = 1;
+	while (time >= 28 || (time >= 29 && leap)) {
+		if (number_month == 2)
+			time -= (leap) ? 29 : 28;
+		else if (number_month <= 8)
+			time -= (number_month % 2 != 0) ? 31 : 30;
 		else
-			dayCount -= 365;
+			time -= (number_month % 2 != 0) ? 30 : 31;
+		++number_month;
 	}
-	timeinfo.tm_year = year;
+	timeinfo.tm_mon = number_month - 1;
+	timeinfo.tm_mday = time + 1;
 }
 
-void ft_get_month(tm &timeinfo, long time, int& leap_count) {
-	int year = 1970;
-	int months = 0;
-	int dayCount = (time / 3600 / 24) - leap_count;
-	dayCount -= (timeinfo.tm_year - 1970) * 365;
-	std::cout << dayCount << std::endl;
+int ft_get_day_of_week(tm &timeinfo) {
+	int last_number = timeinfo.tm_year % 100;
+	int year_code = (6 + last_number + last_number / 4) % 7;
+	int month = timeinfo.tm_mon;
+	int month_code;
+	if (month == 1 || month == 10)
+		month_code = 1;
+	else if (month == 5)
+		month_code = 2;
+	else if (month == 8)
+		month_code = 3;
+	else if (month == 2 || month == 3 || month == 11)
+		month_code = 4;
+	else if (month == 6)
+		month_code = 5;
+	else if (month == 12 || month == 9)
+		month_code = 6;
+	else if (month == 7 || month == 4)
+		month_code = 0;
+	int day_of_week = (timeinfo.tm_mday + month_code + year_code) % 7;
+	if (day_of_week == 0 || day_of_week == 1)
+		day_of_week = (day_of_week == 0) ? 8 : 9;
+	return day_of_week - 2;
 }
 
-void ft_get_day(tm &timeinfo, long time) {
-
-}
-
-void ft_get_day_of_week(tm &timeinfo, long time) {
-
-}
-
-void ft_get_hour(tm &timeinfo, long time) {
-
-}
-
-void ft_get_minute(tm &timeinfo, long time) {
-
-}
-
-void ft_get_second(tm &timeinfo, long time) {
-
+void ft_get_sec_minute_hour(tm &timeinfo, long &time) {
+	long tmp = time;
+	while (tmp - 3600 >= 0) { tmp -= 3600; }
+	timeinfo.tm_min = tmp / 60;
+	timeinfo.tm_sec = tmp % 60;
+	time = (time - (timeinfo.tm_sec + timeinfo.tm_min * 60)) / 3600; // Время в часах
+	timeinfo.tm_hour = time % 24 + 3;
+	time = (time - (timeinfo.tm_hour - 3)) / 24;
 }
 
 void ft_get_time(tm& timeinfo, long time) {
-	int leap_count = 0;
-	ft_get_year(timeinfo, time, leap_count);
-	ft_get_month(timeinfo, time, leap_count);
-	std::cout << "Leap Year Count: " << leap_count << std::endl;
+	ft_get_sec_minute_hour(timeinfo, time);
+	ft_get_year(timeinfo, time);
+	timeinfo.tm_wday = ft_get_day_of_week(timeinfo);
 	std::cout << "Year: "<< timeinfo.tm_year << std::endl;
-
+	std::cout << "Month: "<< timeinfo.tm_mon << std::endl;
+	std::cout << "Day: "<< timeinfo.tm_mday << std::endl;
+	std::cout << "Day of week: "<< timeinfo.tm_wday << std::endl;
+	std::cout << "Hour: "<< timeinfo.tm_hour << std::endl;
+	std::cout << "Minute: "<< timeinfo.tm_min << std::endl;
+	std::cout << "Second: "<< timeinfo.tm_sec << std::endl;
 }
 
 int main() {
 	struct timeval time;
 	struct tm timeinfo;
-
+	char buff[100];
 
 	gettimeofday(&time, NULL);
 	ft_get_time(timeinfo, time.tv_sec + (time.tv_usec / 1000000));
+	strftime(buff, 100, "%a, %Y-%m-%d %X", &timeinfo);
+	std::cout << buff;
 }
