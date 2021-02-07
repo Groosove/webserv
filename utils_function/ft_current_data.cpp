@@ -13,7 +13,7 @@ void ft_get_year(tm &timeinfo, long &time) {
 	int year = 1970;
 	for (; time >= 365; ++year)
 		time -= (year % 4 == 0) ? 366 : 365;
-	timeinfo.tm_year = year - 1900;
+	timeinfo.tm_year = year;
 	bool leap = timeinfo.tm_year % 4 == 0;
 	int number_month = 1;
 	while (time >= 28 || (time >= 29 && leap)) {
@@ -32,7 +32,7 @@ void ft_get_year(tm &timeinfo, long &time) {
 int ft_get_day_of_week(tm &timeinfo) {
 	int last_number = timeinfo.tm_year % 100;
 	int year_code = (6 + last_number + last_number / 4) % 7;
-	int month = timeinfo.tm_mon;
+	int month = timeinfo.tm_mon + 1;
 	int month_code;
 	if (month == 1 || month == 10)
 		month_code = 1;
@@ -50,8 +50,8 @@ int ft_get_day_of_week(tm &timeinfo) {
 		month_code = 0;
 	int day_of_week = (timeinfo.tm_mday + month_code + year_code) % 7;
 	if (day_of_week == 0 || day_of_week == 1)
-		day_of_week = (day_of_week == 0) ? 8 : 9;
-	return day_of_week - 2;
+		day_of_week = (day_of_week == 0) ? 6 : 0;
+	return day_of_week;
 }
 
 void ft_get_sec_minute_hour(tm &timeinfo, long &time) {
@@ -68,13 +68,7 @@ void ft_get_time(tm& timeinfo, long time) {
 	ft_get_sec_minute_hour(timeinfo, time);
 	ft_get_year(timeinfo, time);
 	timeinfo.tm_wday = ft_get_day_of_week(timeinfo);
-	std::cout << "Year: "<< timeinfo.tm_year << std::endl;
-	std::cout << "Month: "<< timeinfo.tm_mon << std::endl;
-	std::cout << "Day: "<< timeinfo.tm_mday << std::endl;
-	std::cout << "Day of week: "<< timeinfo.tm_wday << std::endl;
-	std::cout << "Hour: "<< timeinfo.tm_hour << std::endl;
-	std::cout << "Minute: "<< timeinfo.tm_min << std::endl;
-	std::cout << "Second: "<< timeinfo.tm_sec << std::endl;
+	timeinfo.tm_year -= 1900;
 }
 
 int main() {
