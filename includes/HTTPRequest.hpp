@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 #include <sstream>
 #include "utils.hpp"
 
@@ -23,7 +24,8 @@ private:
 public:
 	explicit HTTPRequest(const std::string& buf);
 	~HTTPRequest();
-	std::map<std::string, std::string>	parse_request_http(const std::string& buf);
+	std::map<std::string, std::string>		parse_request_http(const std::string& buf);
+	void								parseFirstLine(const std::string& line);
 
 	void								setRequestParams(std::map<std::string, std::string> request_params);
 

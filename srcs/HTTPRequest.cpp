@@ -20,19 +20,31 @@ std::map<std::string, std::string> HTTPRequest::parse_request_http(const std::st
 	std::string line;
 
 	while (std::getline(is, line)) { // TODO: Сюда нужно вкинуть аргументы. Всё-таки нужно только с мапой её парсить, потому что заносить миллиард переменных - пиздец плохо
+		parseFirstLine(line);
 		if ((pos = line.find(':')) != std::string::npos) {
-			_request_params[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
 			if (ft_compare(std::string(line, 0, pos), "Host"))
 				setHostUrl(std::string(line, pos + 2, std::string::npos));
-			else if (ft_compare(std::string(line, 0, pos), "Host"))
-				setMethod(std::string(line, pos + 2, std::string::npos));
-			else if (ft_compare(std::string(line, 0, pos), "Host"))
-				setPath(std::string(line, pos + 2, std::string::npos));
-			else if (ft_compare(std::string(line, 0, pos), "Host"))
-				setVersionHTTP(std::string(line, pos + 2, std::string::npos));
+			else
+				_request_params[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
 		}
 	}
 	return _request_params;
+}
+
+void HTTPRequest::parseFirstLine(const std::string& line) {
+	std::vector<std::string>			vect = ft_parse_spaces(line);
+	size_t 								count = 0;
+	std::vector<std::string>::iterator	it_begin = vect.begin();
+	std::vector<std::string>::iterator	it_end = vect.end();
+
+	for (; it_begin != it_end; ++it_begin, ++count) {
+		if (count == 0)
+			setMethod(*it_begin);
+		else if (count == 1)
+			setPath(*it_begin);
+		else
+			setVersionHTTP(*it_begin);
+	}
 }
 
 void HTTPRequest::setHostUrl(const std::string &host_url) {
@@ -70,3 +82,4 @@ const std::string & HTTPRequest::getMethod() {
 const std::string & HTTPRequest::getVersionHTTP() {
 	return _version_http;
 }
+

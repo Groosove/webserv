@@ -38,13 +38,11 @@ std::vector<VirtualServer> WebServer::getVirtualServer() {
 }
 
 void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
-	int 	max_fd;
-	int 	ret;
-	fd_set 	read_fd, write_fd, cp_read_fd, cp_write_fd;
-	int client;
-	sockaddr_in client_addr;
-	socklen_t addr_len;
-	char *buff;
+	int					max_fd, ret, client;
+	struct sockaddr_in	client_addr;
+	socklen_t 			addr_len = sizeof(client_addr);
+	fd_set 				read_fd, write_fd, cp_read_fd, cp_write_fd;
+	char* 				buff = (char*)calloc(4097, 1);
 
 	max_fd = virtualServer.getSocket();
 	FD_ZERO(&read_fd);
@@ -52,7 +50,7 @@ void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести 
 	FD_SET(virtualServer.getSocket(), &read_fd);
 	FD_SET(virtualServer.getSocket(), &write_fd);
 	std::cout << "++++++Waiting new Connect++++++" << std::endl;
-	while (_status) {
+	while (true) {
 		cp_read_fd = read_fd;
 		cp_write_fd = write_fd;
 		if (select(max_fd + 1, &cp_read_fd, &cp_write_fd, nullptr, (struct timeval*)nullptr) <= 0)
@@ -80,7 +78,6 @@ void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести 
 		}
 		for (size_t i = 0; i <= max_fd; ++i) {
 			if (FD_ISSET(i, &cp_write_fd)) {
-				send(i, "Server", 6, 0);
 				send(i, buff, strlen(buff), 0);
 
 			}

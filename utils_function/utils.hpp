@@ -8,8 +8,9 @@
 #pragma once
 #include <iostream>
 
-std::string	ft_strtrim(const std::string &s1, const std::string& set);
-int			ft_strchr(const std::string& str, int ch);
+std::string					ft_strtrim(const std::string &s1, const std::string& set);
+int							ft_strchr(const std::string& str, int ch);
+std::vector<std::string>	ft_parse_spaces(const std::string& line);
 
 
 template <class InputIterator>
