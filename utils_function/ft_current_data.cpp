@@ -14,20 +14,13 @@ int ft_get_day_of_week(tm &timeinfo) {
 	int year_code = (6 + last_number + last_number / 4) % 7;
 	int month = timeinfo.tm_mon + 1;
 	int month_code;
-	if (month == 1 || month == 10)
-		month_code = 1;
-	else if (month == 5)
-		month_code = 2;
-	else if (month == 8)
-		month_code = 3;
-	else if (month == 2 || month == 3 || month == 11)
-		month_code = 4;
-	else if (month == 6)
-		month_code = 5;
-	else if (month == 12 || month == 9)
-		month_code = 6;
-	else if (month == 7 || month == 4)
-		month_code = 0;
+	if (month == 1 || month == 10)		month_code = 1;
+	else if (month == 5) 				month_code = 2;
+	else if (month == 8)				month_code = 3;
+	else if (month == 6)				month_code = 5;
+	else if (month == 12 || month == 9)	month_code = 6;
+	else if (month == 7 || month == 4)	month_code = 0;
+	else								month_code = 4;
 	int day_of_week = (timeinfo.tm_mday + month_code + year_code) % 7;
 	if (day_of_week == 0 || day_of_week == 1)
 		day_of_week = (day_of_week == 0) ? 6 : 0;
@@ -36,13 +29,13 @@ int ft_get_day_of_week(tm &timeinfo) {
 
 void ft_get_date(tm &timeinfo, long time) {
 	long tmp = time;
+	int year = 1970;
 	while (tmp - 3600 >= 0) { tmp -= 3600; }
 	timeinfo.tm_min = tmp / 60;
 	timeinfo.tm_sec = tmp % 60;
-	time = (time - (timeinfo.tm_sec + timeinfo.tm_min * 60)) / 3600; // Время в часах
+	time = ((time - (timeinfo.tm_sec + timeinfo.tm_min * 60)) / 3600); // Время в часах
 	timeinfo.tm_hour = time % 24 + 3;
 	time = (time - (timeinfo.tm_hour - 3)) / 24;
-	int year = 1970;
 	for (; time >= 365; ++year)
 		time -= (year % 4 == 0) ? 366 : 365;
 	timeinfo.tm_year = year;
