@@ -21,7 +21,7 @@ private:
 public:
 	explicit WebServer(const char *config_name = "default.conf");
 	~WebServer() {};
-	void						handle(VirtualServer& virtualServer);
+	void						handle();
 	void						createVirtualServer();
 	std::vector<VirtualServer>	getVirtualServer();
 };
