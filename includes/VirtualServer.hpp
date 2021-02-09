@@ -7,6 +7,7 @@
 //
 
 #pragma once
+#include "HTTPRequest.hpp"
 #include "Location.hpp"
 #include "fstream"
 #include "utils.hpp"
@@ -30,12 +31,12 @@ private:
 	int								_socket;
 	struct sockaddr_in 				_server_addr;
 
-
 	void							_parseServerParam(const std::string& buf);
 public:
 	explicit VirtualServer(std::ifstream &file);
 	~VirtualServer() {};
 
+	HTTPRequest*					_request_params;
 	void							initSocket(void);
 	void							preparationParams(void);
 

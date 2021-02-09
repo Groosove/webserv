@@ -19,7 +19,8 @@ std::map<std::string, std::string> HTTPRequest::parse_request_http(const std::st
 	size_t  pos;
 	std::string line;
 
-	while (std::getline(is, line)) { // TODO: Сюда нужно вкинуть аргументы. Всё-таки нужно только с мапой её парсить, потому что заносить миллиард переменных - пиздец плохо
+
+	while (std::getline(is, line)) {
 		parseFirstLine(line);
 		if ((pos = line.find(':')) != std::string::npos) {
 			if (ft_compare(std::string(line, 0, pos), "Host"))

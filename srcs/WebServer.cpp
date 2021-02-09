@@ -67,6 +67,7 @@ void WebServer::handle(VirtualServer &virtualServer) { // TODO разнести 
 		for (size_t i = 0; i <= max_fd; ++i) {
 			if (FD_ISSET(i, &cp_read_fd)) {
 				ret = recv(i, buff, 4097, 0);
+				virtualServer._request_params->parse_request_http(buff);
 				if (ret == 0) {
 					std::cout << "++++++USER DISCONNECT!++++++" << std::endl;
 					FD_CLR(i, &read_fd);

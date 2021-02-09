@@ -7,12 +7,11 @@
 //
 
 #include "VirtualServer.hpp"
-// TODO накидать сплит для парсера строк
 
 std::string VirtualServer::getArgument(const std::string &dst, int start) {
 	return ft_strtrim(dst.substr(start + 1, dst.length()), " \t");
 }
-// TODO А это на что похоже? Я немного не понял суть таска.
+
 void VirtualServer::_parseServerParam(const std::string& buf) {
 	size_t i;
 	if ((i = buf.find("host:", 0, 5)) != std::string::npos)
