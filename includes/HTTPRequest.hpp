@@ -22,9 +22,9 @@ private:
 	std::string							_version_http;
 	std::string							_host_url;
 public:
-	explicit HTTPRequest(const std::string& buf);
+	explicit HTTPRequest(char *buf);
 	~HTTPRequest();
-	std::map<std::string, std::string>		parse_request_http(const std::string& buf);
+	std::map<std::string, std::string>		parse_request_http(char * buf);
 	void									parseFirstLine(const std::string& line);
 
 	void								setRequestParams(std::map<std::string, std::string> request_params);

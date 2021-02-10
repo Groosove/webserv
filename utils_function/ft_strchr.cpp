@@ -19,3 +19,16 @@ int	ft_strchr(const std::string& str, int ch)
 		return (index);
 	return (-1);
 }
+
+int	ft_strchr(const char *str, int ch)
+{
+	int	index;
+
+	index = -1;
+	while (str[++index] != 0)
+		if (str[index] == ch)
+			return (index);
+	if (str[index] == ch)
+		return (index);
+	return (-1);
+}
