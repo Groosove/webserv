@@ -8,16 +8,18 @@
 
 #include "HTTPRequest.hpp"
 
-HTTPRequest::HTTPRequest(const std::string &buf) {
+HTTPRequest::HTTPRequest(char *buf) {
 	_request_params = parse_request_http(buf);
 }
 
 HTTPRequest::~HTTPRequest() {}
 
-std::map<std::string, std::string> HTTPRequest::parse_request_http(const std::string &buf) {
-	std::istringstream is(buf);
+std::map<std::string, std::string> HTTPRequest::parse_request_http(char *buf) {
+	char **request = ft_split(buf, '\n');
 	size_t  pos;
+	size_t	index = 0;
 	std::string line;
+<<<<<<< HEAD
 
 	std::getline(is, line);
 
@@ -33,6 +35,27 @@ std::map<std::string, std::string> HTTPRequest::parse_request_http(const std::st
 	std::cout << _path << std::endl;
 	std::cout << _version_http << std::endl;
 	std::cout << _host_url << std::endl;
+=======
+	while (request[index] != nullptr) {
+		if (ft_strchr(request[index], ':') == -1)
+			parseFirstLine(line);
+		else if ((pos = ft_strchr(request[index], ':')) != (size_t)-1) {
+			if (ft_compare(request[index], "Host", 4)) {
+				std::cout << "LOL:" << request[index] << std::endl;
+//  				setHostUrl(a);
+				std::cout << "BOOM" << std::endl;
+			}
+			else {
+				std::cout << "DO" << std::endl;
+//				_request_params[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
+			}
+		}
+		index++;
+	}
+	std::cout << "KEK: " << _method << std::endl;
+	std::cout << "KEK: " << _path << std::endl;
+	std::cout << "KEK: " << _version_http << std::endl;
+>>>>>>> ccc2759a1c05915ded787446b0ed898876627e1f
 	return _request_params;
 }
 
@@ -46,14 +69,22 @@ void HTTPRequest::parseFirstLine(const std::string& line) {
 		std::cout << "KEK: " << *it_begin << std::endl;
 	}
 	for (; it_begin != it_end; ++it_begin, ++count) {
-		if (count == 0)
+		if (count == 0) {
 			setMethod(*it_begin);
+<<<<<<< HEAD
 		else if (count == 1) {
 			std::cout << "KEK" << std::endl;
 			setPath(*it_begin);
 		}
 		else {
 			std::cout << "KEK" << std::endl;
+=======
+		}
+		else if (count == 1) {
+			setPath(*it_begin);
+		}
+		else
+>>>>>>> ccc2759a1c05915ded787446b0ed898876627e1f
 			setVersionHTTP(*it_begin);
 		}
 	}

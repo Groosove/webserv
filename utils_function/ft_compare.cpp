@@ -14,6 +14,14 @@ bool ft_compare(const std::string &dst, const std::string& src) {
 	return true;
 }
 
+bool ft_compare(const char *dst, const char * src) {
+	for (size_t i = 0; dst[i] || src[i]; ++i) {
+		if (dst[i] != src[i])
+			return false;
+	}
+	return true;
+}
+
 template <class InputIterator>
 bool ft_compare(InputIterator first, InputIterator last, const std::string& src,
 		typename std::enable_if<std::__is_input_iterator<InputIterator>::value>::type*) {
