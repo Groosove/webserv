@@ -7,3 +7,23 @@
 //
 
 #pragma once
+
+#include "HTTPRequest.hpp"
+#include <iostream>
+#include <iterator>
+
+class HTTPResponse {
+private:
+	size_t 	_status_code;
+	char*	_buf_response;
+
+public:
+	explicit HTTPResponse();
+	~HTTPResponse();
+
+	void			generateRespose();
+
+
+	char*			getBuf() const;
+
+};

@@ -83,15 +83,17 @@ void WebServer::createVirtualServer() {
 //		check_valid_virtual_server(); // TODO написать валидацию серверов, для того чтобы не запускать рандомный сервер, напишем потом!
 		_virtual_server[i].initSocket();
 		_virtual_server[i].preparationParams();
+		handle(&_virtual_server[i]);
 	}
-	handle();
 }
 
 std::vector<VirtualServer> WebServer::getVirtualServer() {
 	return std::vector<VirtualServer>(_virtual_server);
 }
 
-void WebServer::handle() { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
+
+
+void WebServer::handle(VirtualServer* virtualServer) { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
 	int							max_fd, ret, client;
 	struct sockaddr_in			client_addr;
 	socklen_t 					addr_len = sizeof(client_addr);
@@ -105,19 +107,19 @@ void WebServer::handle() { // TODO разнести тело цикла по м�
 
 	bzero(&temp, sizeof(temp));
 	// TODO в цикле добавлять фдшники каждого сервера в сет
-	max_fd = virtualServer.getSocket();
+	max_fd = virtualServer->getSocket();
 	FD_ZERO(&read_fd);
 	FD_ZERO(&write_fd);
-	FD_SET(virtualServer.getSocket(), &read_fd);
-	FD_SET(virtualServer.getSocket(), &write_fd);
+	FD_SET(virtualServer->getSocket(), &read_fd);
+	FD_SET(virtualServer->getSocket(), &write_fd);
 	std::cout << "++++++Waiting new Connect++++++" << std::endl;
 	_status = true;
 	while (_status) {
 		cp_read_fd = read_fd;
 		cp_write_fd = write_fd;
 		select(max_fd + 1, &cp_read_fd, &cp_write_fd, nullptr, nullptr); //TODO добавить цикл для проверки каждого сервера, фдешника в сетах ( строка ниже )
-		if (FD_ISSET(virtualServer.getSocket(), &cp_read_fd)) {
-			if ((client = accept(virtualServer.getSocket(), (struct sockaddr *) &client_addr,
+		if (FD_ISSET(virtualServer->getSocket(), &cp_read_fd)) {
+			if ((client = accept(virtualServer->getSocket(), (struct sockaddr *) &client_addr,
 								 &addr_len)) > 0) {
 				FD_SET(client, &read_fd);
 				FD_SET(client, &write_fd);
@@ -150,7 +152,7 @@ void WebServer::handle() { // TODO разнести тело цикла по м�
 					//тут ты пиздуешь в обработку или сначала смотришь есть ли тут \r\n
 					while (extract_message(&(begin->second.read_buff), &chunk))
 					{
-//						virtualServer._request_params->parse_request_http(std::string(chunk));
+						virtualServer[0]._request_params->parse_request_http(std::string(chunk));
 
 						std::cout << chunk << " 1 " << std::endl;
 						free(chunk);

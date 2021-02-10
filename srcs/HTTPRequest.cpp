@@ -19,16 +19,20 @@ std::map<std::string, std::string> HTTPRequest::parse_request_http(const std::st
 	size_t  pos;
 	std::string line;
 
+	std::getline(is, line);
 
-	while (std::getline(is, line)) {
-		parseFirstLine(line);
-		if ((pos = line.find(':')) != std::string::npos) {
-			if (ft_compare(std::string(line, 0, pos), "Host"))
-				setHostUrl(std::string(line, pos + 2, std::string::npos));
-			else
-				_request_params[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
-		}
-	}
+	parseFirstLine(line);
+//		if ((pos = line.find(':')) != std::string::npos) {
+//			if (ft_compare(std::string(line, 0, pos), "Host"))
+//				setHostUrl(std::string(line, pos + 2, std::string::npos));
+//			else
+//				_request_params[std::string(line, 0, pos)] = std::string(line, pos + 2, std::string::npos);
+//		}
+//	}
+	std::cout << _method << std::endl;
+	std::cout << _path << std::endl;
+	std::cout << _version_http << std::endl;
+	std::cout << _host_url << std::endl;
 	return _request_params;
 }
 
@@ -38,13 +42,20 @@ void HTTPRequest::parseFirstLine(const std::string& line) {
 	std::vector<std::string>::iterator	it_begin = vect.begin();
 	std::vector<std::string>::iterator	it_end = vect.end();
 
+	for (; it_begin != it_end; ++it_begin) {
+		std::cout << "KEK: " << *it_begin << std::endl;
+	}
 	for (; it_begin != it_end; ++it_begin, ++count) {
 		if (count == 0)
 			setMethod(*it_begin);
-		else if (count == 1)
+		else if (count == 1) {
+			std::cout << "KEK" << std::endl;
 			setPath(*it_begin);
-		else
+		}
+		else {
+			std::cout << "KEK" << std::endl;
 			setVersionHTTP(*it_begin);
+		}
 	}
 }
 

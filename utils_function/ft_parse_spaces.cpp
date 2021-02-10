@@ -15,10 +15,12 @@ std::vector<std::string>	ft_parse_spaces(const std::string& line) {
 	size_t 						tmp_pos = 0;
 
 	while (line[pos] != '\n' && line[pos]) {
-		if (line[pos] == '\r' || line[pos] == '\n' || line[pos] == '\t') {
+		if (line[pos] == ' ' || line[pos] == '\r') {
 			vect.push_back(line.substr(tmp_pos, pos));
+			pos++;
 			tmp_pos = pos;
 		}
+		pos++;
 	}
 	return vect;
 }
