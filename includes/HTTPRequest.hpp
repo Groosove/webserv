@@ -17,26 +17,26 @@
 class HTTPRequest {
 private:
 	std::map<std::string, std::string>	_request_params;
-	std::string							_method;
-	std::string							_path;
-	std::string							_version_http;
-	std::string							_host_url;
+	char *		_method;
+	char *		_path;
+	char *		_version_http;
+	char *		_host_url;
 public:
-	explicit HTTPRequest(char *buf);
+	explicit HTTPRequest(const char *buf);
 	~HTTPRequest();
-	std::map<std::string, std::string>		parse_request_http(char * buf);
-	void									parseFirstLine(const std::string& line);
+	std::map<std::string, std::string>		parse_request_http(const char * buf);
+	void									parseFirstLine(const char * line);
 
 	void								setRequestParams(std::map<std::string, std::string> request_params);
 
-	const std::string&					getMethod(void);
-	const std::string&					getPath(void);
-	const std::string&					getVersionHTTP(void);
-	const std::string&					getHostUrl(void);
+	const char *				getMethod(void) { return _method; };
+	const char *					getPath(void) {return _path; };
+	const char *				getVersionHTTP(void) { return _version_http; };
+	const char *					getHostUrl(void) { return _host_url; };
 
-	void								setMethod(const std::string& method);
-	void								setPath(const std::string& path);
-	void								setVersionHTTP(const std::string& version_http);
-	void								setHostUrl(const std::string& host_url);
+	void								setMethod(char * method);
+	void								setPath(char * path);
+	void								setVersionHTTP(char * version_http);
+	void								setHostUrl(char * host_url);
 
 };

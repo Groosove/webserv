@@ -90,16 +90,8 @@ void WebServer::createVirtualServer() {
 std::vector<VirtualServer> WebServer::getVirtualServer() {
 	return std::vector<VirtualServer>(_virtual_server);
 }
-
-<<<<<<< HEAD
-
-
 void WebServer::handle(VirtualServer* virtualServer) { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
 	int							max_fd, ret, client;
-=======
-void WebServer::handle() { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
-	int							max_fd = 0, ret, client;
->>>>>>> ccc2759a1c05915ded787446b0ed898876627e1f
 	struct sockaddr_in			client_addr;
 	socklen_t 					addr_len = sizeof(client_addr);
 	fd_set 						read_fd, write_fd, cp_read_fd, cp_write_fd;
@@ -112,33 +104,18 @@ void WebServer::handle() { // TODO разнести тело цикла по м�
 
 	bzero(&temp, sizeof(temp));
 	// TODO в цикле добавлять фдшники каждого сервера в сет
-<<<<<<< HEAD
 	max_fd = virtualServer->getSocket();
 	FD_ZERO(&read_fd);
 	FD_ZERO(&write_fd);
 	FD_SET(virtualServer->getSocket(), &read_fd);
 	FD_SET(virtualServer->getSocket(), &write_fd);
-=======
-	max_fd = _virtual_server[0].getSocket();
-	FD_ZERO(&read_fd);
-	FD_ZERO(&write_fd);
-	for (int i = 0; i < _virtual_server.size(); ++i) {
-		FD_SET(_virtual_server[i].getSocket(), &read_fd);
-		FD_SET(_virtual_server[i].getSocket(), &write_fd);
-	}
->>>>>>> ccc2759a1c05915ded787446b0ed898876627e1f
 	std::cout << "++++++Waiting new Connect++++++" << std::endl;
 	while (_status) {
 		cp_read_fd = read_fd;
 		cp_write_fd = write_fd;
 		select(max_fd + 1, &cp_read_fd, &cp_write_fd, nullptr, nullptr); //TODO добавить цикл для проверки каждого сервера, фдешника в сетах ( строка ниже )
-<<<<<<< HEAD
 		if (FD_ISSET(virtualServer->getSocket(), &cp_read_fd)) {
 			if ((client = accept(virtualServer->getSocket(), (struct sockaddr *) &client_addr,
-=======
-		for (int i = 0; i < _virtual_server.size() && FD_ISSET(_virtual_server[i].getSocket(), &cp_read_fd); ++i) {
-			if ((client = accept(_virtual_server[i].getSocket(), (struct sockaddr *) &client_addr,
->>>>>>> ccc2759a1c05915ded787446b0ed898876627e1f
 								 &addr_len)) > 0) {
 				FD_SET(client, &read_fd);
 				FD_SET(client, &write_fd);
@@ -171,12 +148,7 @@ void WebServer::handle() { // TODO разнести тело цикла по м�
 					//тут ты пиздуешь в обработку или сначала смотришь есть ли тут \r\n
 					while (extract_message(&(begin->second.read_buff), &chunk))
 					{
-<<<<<<< HEAD
-						virtualServer[0]._request_params->parse_request_http(std::string(chunk));
-
-=======
 						_virtual_server[0]._request_params->parse_request_http(chunk);
->>>>>>> ccc2759a1c05915ded787446b0ed898876627e1f
 						std::cout << chunk << " 1 " << std::endl;
 						free(chunk);
 						chunk = nullptr;

@@ -16,6 +16,9 @@ set(UTILS
 		utils_function/ft_compare.cpp
 		utils_function/ft_parse_spaces.cpp
 		utils_function/ft_split.cpp
+		utils_function/ft_substr.cpp
+		utils_function/ft_strlen.cpp
+		utils_function/ft_strdup.cpp
 		)
 #set(INCLUDES
 #        includes/WebServer.hpp
