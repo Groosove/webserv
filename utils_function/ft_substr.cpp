@@ -6,7 +6,7 @@
 //
 
 #include "utils.hpp"
-
+#include <cstdlib>
 char	*ft_substr(char *s, unsigned int start, size_t len)
 {
 	int				index;

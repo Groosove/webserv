@@ -8,39 +8,6 @@
 
 #include "VirtualServer.hpp"
 
-std::string VirtualServer::getArgument(const std::string &dst, int start) {
-	return ft_strtrim(dst.substr(start + 1, dst.length()), " \t");
-}
-
-void VirtualServer::_parseServerParam(const std::string& buf) {
-	size_t i;
-	if ((i = buf.find("host:", 0, 5)) != std::string::npos)
-		setHost(getArgument(buf, ft_strchr(buf, ':')));
-	else if ((i = buf.find("port:", 0, 5)) != std::string::npos)
-		setPort(getArgument(buf, ft_strchr(buf, ':')));
-	else if ((i = buf.find("server_name:", 0, 12)) != std::string::npos)
-		setServerName(getArgument(buf, ft_strchr(buf, ':')));
-	else
-		_error_page.push_back(buf);
-}
-
-VirtualServer::VirtualServer(std::ifstream &config_name) {
-	std::string buf;
-	while (std::getline(config_name, buf)) {
-		if (buf.find("server:", 0) != std::string::npos)
-			break;
-		if (buf.find("location:", 0) == std::string::npos)
-			_parseServerParam(buf);
-		else {
-			buf.erase(0, ft_strchr(buf, ':') + 1);
-			_location.insert(std::make_pair(ft_strtrim(buf, " \t"), Location(config_name)));
-		}
-	}
-	std::cout << "KEK: " << _host << std::endl;
-	std::cout << "KEK: " << _port << std::endl;
-	std::cout << "KEK: " << _server_name << std::endl;
-}
-
 void VirtualServer::setHost(const std::string &host) {
 	_host = host;
 	_parametr.insert(std::make_pair("host", _host));
@@ -102,3 +69,42 @@ void VirtualServer::preparationParams() {
 		return ;
 	}
 }
+
+const char* VirtualServer::treatmentRequest(const char* buf) {
+	_request = new HTTPRequest(buf);
+	if (std::string(_request->getMethod()).find("GET") != std::string::npos)
+		generateResponse(_request->getMethod());
+	return _complete_response.c_str();
+}
+
+void	VirtualServer::generateResponse(const char *method) {
+	std::map<std::string, Location>::iterator begin = _location.begin();
+	std::cout << begin->first << std::endl;
+	while (begin != _location.end()) {
+		if (begin->first.find((_request->getPath())) != std::string::npos) {
+			if (!begin->second.validationLocation(_request->getMethod()))
+				return;
+			else
+			{
+				_response = new HTTPResponse(_request->getMethod());
+				_complete_response.append(_response->getResponse());
+				addBodyToResponse(begin->second);
+				break ;
+			}
+		}
+		begin++;
+	}
+}
+
+void VirtualServer::addBodyToResponse(const Location& location) {
+	std::ifstream	thread(location.getRoot() + location.getIndex());
+	std::string		buf;
+
+	while(std::getline(thread, buf))
+		_complete_response.append(buf);
+
+	_complete_response.append("\r\n\r\n\r\n");
+	std::cout << "RESPONSE: " << _complete_response << std::endl;
+}
+
+

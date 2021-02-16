@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.17.3)
 project(WebServ)
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
 
 include_directories(
 		utils_function/
         includes/
         srcs/
+		utils_function/get_next_line
         .)
 
 set(UTILS
@@ -19,15 +20,10 @@ set(UTILS
 		utils_function/ft_substr.cpp
 		utils_function/ft_strlen.cpp
 		utils_function/ft_strdup.cpp
+		utils_function/ft_strjoin.cpp
+		utils_function/get_next_line/get_next_line.cpp
+		utils_function/get_next_line/get_next_line_utils.cpp
 		)
-#set(INCLUDES
-#        includes/WebServer.hpp
-#        includes/VirtualServer.hpp
-#        includes/Location.hpp
-#        includes/HTTPResponse.hpp
-#        includes/HTTPRequest.hpp
-#        includes/Client.hpp
-#        includes/CGI.hpp)
 
 set(FILES
         main.cpp
@@ -37,8 +33,7 @@ set(FILES
         srcs/HTTPRequest.cpp
         srcs/HTTPResponse.cpp
         srcs/Client.cpp
+		srcs/FileParser.cpp
         srcs/CGI.cpp)
 
 add_executable(WebServ ${UTILS} ${FILES} )
-
-add_executable(TestData utils_function/ft_current_data.cpp)

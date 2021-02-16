@@ -13,6 +13,11 @@
 #include <map>
 #include "utils.hpp"
 
+// Инклюды для проверки доступности директории, поиска файлов и stat
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+
 enum Method {
 	GET = 0,
 	POST,
@@ -29,14 +34,24 @@ private:
 	std::vector<std::string>	_allow_methods;
 	bool						_autoindex;
 	size_t						_request_limits;
+
 public:
-	explicit Location(std::ifstream& config_name);
+	Location() {};
 	~Location() {};
 
-	void	setRequestLimits(const std::string& body_size);
-	void	setAutoIndex(const std::string& autoindex);
-	void	setRoot(const std::string& root);
-	void	setIndex(const std::string& index);
-	void	setAllowMethods(const std::string& allow_methods);
-	void parseLocation();
+	void						setRequestLimits(const std::string& body_size);
+	void						setAutoIndex(const std::string& autoindex);
+	void						setRoot(const std::string& root);
+	void						setIndex(const std::string& index);
+	void						setAllowMethods(const std::string& allow_methods);
+
+	const std::string&				getRoot() const { return _root; }
+	const std::string&				getIndex() const { return _index; }
+	bool getAutoIndex() const { return _autoindex; }
+	size_t getRequestLimits() const { return _request_limits; }
+	std::vector<std::string>	getAllowMethods() { return _allow_methods; }
+
+	bool						validationLocation(const char* method);
+	bool						tryOpenDir();
+	bool						tryOpenFile();
 };

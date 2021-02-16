@@ -21,6 +21,7 @@ private:
 	char *		_path;
 	char *		_version_http;
 	char *		_host_url;
+	std::string _status_code;
 public:
 	explicit HTTPRequest(const char *buf);
 	~HTTPRequest();
@@ -29,14 +30,17 @@ public:
 
 	void								setRequestParams(std::map<std::string, std::string> request_params);
 
-	const char *				getMethod(void) { return _method; };
-	const char *					getPath(void) {return _path; };
-	const char *				getVersionHTTP(void) { return _version_http; };
-	const char *					getHostUrl(void) { return _host_url; };
+	const char *						getMethod(void) { return _method; };
+	const char *						getPath(void) {return _path; };
+	const char *						getVersionHTTP(void) { return _version_http; };
+	const char *						getHostUrl(void) { return _host_url; };
+	const std::string&					getStatusCode() { return _status_code; }
+	std::map<std::string, std::string>	getHeaders() { return _request_params; }
 
 	void								setMethod(char * method);
 	void								setPath(char * path);
 	void								setVersionHTTP(char * version_http);
 	void								setHostUrl(char * host_url);
+	void								setStatusCode(const std::string& status_code);
 
 };

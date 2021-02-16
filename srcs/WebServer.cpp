@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <unistd.h>
+#include <cstring>
 
 
 int extract_message(char **buf, char **msg)
@@ -62,20 +63,17 @@ typedef struct	s_client {
 	char *write_buff;
 }				t_client;
 
-void WebServer::parseConfigFile(std::ifstream &config_name) {
-	std::string buf;
-	while (std::getline(config_name, buf)) {
-		if (buf.find("server", 0) != std::string::npos)
-			_virtual_server.push_back(VirtualServer(config_name));
-	}
-}
-
 WebServer::WebServer(const char *config_name): _status(true) {
-	std::ifstream file_config(config_name);
-	if (file_config.is_open())
-		parseConfigFile(file_config);
+	std::vector<std::string> config;
+	int fd = open(config_name, O_RDONLY);
+	char *line = nullptr;
+	if (fd > 0)
+		while (get_next_line(fd, &line) > 0)
+			config.push_back(line);
 	else
 		std::cerr << "File doesn't open!" << std::endl;
+	FileParser _config(config);
+	_virtual_server = _config.getServer();
 }
 
 void WebServer::createVirtualServer() {
@@ -90,17 +88,18 @@ void WebServer::createVirtualServer() {
 std::vector<VirtualServer> WebServer::getVirtualServer() {
 	return std::vector<VirtualServer>(_virtual_server);
 }
+
 void WebServer::handle(VirtualServer* virtualServer) { // TODO разнести тело цикла по методам _virtual_server и накидать класс CLIENT;
-	int							max_fd, ret, client;
-	struct sockaddr_in			client_addr;
-	socklen_t 					addr_len = sizeof(client_addr);
-	fd_set 						read_fd, write_fd, cp_read_fd, cp_write_fd;
-	char* 						buff = (char*)calloc(4097, 1);
-	std::map< int, t_client > 	clients;
+	int									max_fd, ret, client;
+	struct sockaddr_in					client_addr;
+	socklen_t 							addr_len = sizeof(client_addr);
+	fd_set 								read_fd, write_fd, cp_read_fd, cp_write_fd;
+	char* 								buff = (char*)calloc(4097, 1);
+	std::map< int, t_client > 			clients;
 	std::map< int, t_client >::iterator begin;
 	std::map< int, t_client >::iterator end;
-	t_client 					temp;
-	char						*chunk = nullptr;
+	t_client 							temp;
+	char								*chunk = nullptr;
 
 	bzero(&temp, sizeof(temp));
 	// TODO в цикле добавлять фдшники каждого сервера в сет
@@ -148,7 +147,7 @@ void WebServer::handle(VirtualServer* virtualServer) { // TODO разнести 
 					//тут ты пиздуешь в обработку или сначала смотришь есть ли тут \r\n
 					while (extract_message(&(begin->second.read_buff), &chunk))
 					{
-						_virtual_server[0]._request_params->parse_request_http(chunk);
+						begin->second.write_buff = ft_strdup(virtualServer->treatmentRequest(chunk));
 						std::cout << chunk << " 1 " << std::endl;
 						free(chunk);
 						chunk = nullptr;

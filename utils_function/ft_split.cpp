@@ -6,7 +6,7 @@
 //
 
 #include "utils.hpp"
-
+#include <cstdlib>
 static int		ft_nbr_word(char *s, char c)
 {
 	int count;

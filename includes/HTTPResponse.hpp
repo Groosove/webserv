@@ -9,19 +9,29 @@
 #pragma once
 
 #include "HTTPRequest.hpp"
+#include "HTTPRequest.hpp"
 #include <iostream>
 #include <iterator>
 
+enum { count_status_code = 13, };
+
 class HTTPResponse {
 private:
-	size_t 	_status_code;
-	char*	_buf_response;
+	std::string 	_status_code;
+	std::string		_buf_response;
+	HTTPRequest*	_request_status;
 
 public:
-	explicit HTTPResponse();
+	explicit HTTPResponse(const char* method);
 	~HTTPResponse();
 
-	void			generateRespose();
+	static const std::string	message_phrases[count_status_code][2];
+
+	void			generateResponse();
+
+	static std::string				getMessagePhrase(const std::string& code);
+	inline const std::string&		getStatusCode() const { return (_status_code); }
+	const std::string&				getResponse() const { return _buf_response; }
 
 
 	char*			getBuf() const;

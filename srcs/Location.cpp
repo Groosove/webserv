@@ -9,28 +9,34 @@
 #include "Location.hpp"
 #include <iostream>
 #include <fstream>
+#include <fcntl.h>
+#include <unistd.h>
+#include "utils.hpp"
 
-Location::Location(std::ifstream &config_name) {
-	std::string buf;
-	size_t i;
-	while (std::getline(config_name, buf)) {
-		i = 0;
-		if ((i = buf.find("root:", 0, 5)) != std::string::npos)
-			setRoot(buf.substr(i + 5,  buf.length()));
-		else if ((i = buf.find("index:", 0, 6)) != std::string::npos)
-			setIndex(buf.substr(i + 6, buf.length()));
-		else if ((i = buf.find("allow_methods:", 0, 14)) != std::string::npos)
-			setAllowMethods(buf.substr(i + 14, buf.length()));
-		else if ((i = buf.find("autoindex:", 0, 10)) != std::string::npos)
-			setAutoIndex(buf.substr(i + 10, buf.length()));
-		else if ((i = buf.find("limits_client_body_size", 0, 24)) !=  std::string::npos)
-			setRequestLimits(buf.substr(i + 24, buf.length()));
+bool			ft_getline(int fd, std::string &line) {
+	static std::string	surplus = std::string();
+	char				buffer[513];
+	size_t 				bytes;
+
+	if (surplus.empty()) {
+		while ((bytes = read(fd, buffer, 512)) > 0) {
+			buffer[bytes] = '\0';
+			surplus.append(buffer);
+		}
+		if (!bytes && surplus.empty()) {
+			return (false);
+		}
 	}
-	std::cout << "KEK: " << _root << std::endl;
-	std::cout << "KEK: " << _index << std::endl;
-	std::cout << "KEK: " << _autoindex << std::endl;
-	std::cout << "KEK: " << _request_limits << std::endl;
-	std::cout << "KEK: " << *_allow_methods.begin() << std::endl;
+	std::string::size_type pos = surplus.find('\n');
+	if (pos == std::string::npos) {
+		line = surplus;
+		surplus.clear();
+	}
+	else {
+		line = surplus.substr(0, pos);
+		surplus = surplus.substr(pos + 1);
+	}
+	return (true);
 }
 
 void Location::setRequestLimits(const std::string &body_size) {
@@ -54,4 +60,47 @@ void Location::setIndex(const std::string &index) {
 
 void Location::setAllowMethods(const std::string &allow_methods) {
 	_allow_methods.insert(_allow_methods.begin(),ft_strtrim(allow_methods, " \t"));
+}
+
+bool Location::validationLocation(const char* method) {
+	std::vector<std::string>::iterator begin = _allow_methods.begin();
+	while (begin != _allow_methods.end()) { // проверка доступности метода
+		if ((*begin).find(method) != std::string::npos)
+			break;
+		else if (begin == _allow_methods.end() - 1 && (*begin).find(method) == std::string::npos)
+			return false;
+		begin++;
+	}
+	if (!tryOpenDir())
+		return false;
+	if (!tryOpenFile())
+		return false;
+	return true;
+}
+
+bool Location::tryOpenDir() {
+	DIR*			directory = opendir(_root.c_str()); // возможно стоит проверить директория ли это или нет через stat(_root, &dir); if (S_ISDIR(dir.st_mode));
+	struct dirent*	entry = nullptr;
+
+	if (directory) { // директория открылась или нет
+		while ((entry = readdir(directory)) != nullptr) { // бегаем по файлам директории пока они не закончатся
+			if (std::string(entry->d_name).find(_index) != std::string::npos) { // проверяем есть ли файал который мы ищем в этой директории
+				closedir(directory);
+				return true;
+			}
+		}
+	}
+	closedir(directory);
+	return false;
+}
+
+bool Location::tryOpenFile() {
+	struct stat file;
+
+	stat((_root + _index).c_str(), &file);
+	if (S_ISREG(file.st_mode)) { // проверка на то что это файл
+		if (file.st_mode & S_IRUSR) // проверка на что что этот файл доступен для чтения
+			return true;
+	}
+	return false;
 }

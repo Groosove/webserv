@@ -21,16 +21,14 @@ std::map<std::string, std::string> HTTPRequest::parse_request_http(const char * 
 	for (size_t i = 0; request[i] != nullptr; ++i) {
 		if (ft_strchr(request[i], ':') == -1 && request[i + 1] != nullptr)
 			parseFirstLine((request[i]));
-		else if ((pos = ft_strchr(request[i], ':')) != (size_t)-1) {
+		else if ((pos = ft_strchr(request[i], ':')) != (size_t) -1) {
 			if (ft_compare(request[i], "Host", 4))
 				setHostUrl(ft_substr(request[i], pos + 2, ft_strlen(request[i]) - 1));
 			else
-				result[ft_substr(request[i], 0, pos)] = ft_substr(request[i], pos + 2, ft_strlen(request[i]) - 1);
+				result[ft_substr(request[i], 0, pos)] = ft_substr(request[i], pos + 2,
+																  ft_strlen(request[i]) - 1);
 		}
 	}
-	std::cout << "KEK: " << _method << std::endl;
-	std::cout << "KEK: " << _path << std::endl;
-	std::cout << "KEK: " << _version_http << std::endl;
 	return result;
 }
 
@@ -64,5 +62,9 @@ void HTTPRequest::setVersionHTTP(char *version_http) {
 
 void HTTPRequest::setRequestParams(std::map<std::string, std::string> request_params) {
 	_request_params = request_params;
+}
+
+void HTTPRequest::setStatusCode(const std::string &status_code) {
+	_status_code = status_code;
 }
 
