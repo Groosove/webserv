@@ -10,10 +10,13 @@
 
 #include "FileParser.hpp"
 #include "VirtualServer.hpp"
+#include "Client.hpp"
 #include "sys/socket.h"
 #include "sys/select.h"
+
 class WebServer {
 private:
+	std::vector<Client*>		_clients;
 	std::vector<VirtualServer>	_virtual_server;
 	bool						_status;
 
@@ -21,9 +24,13 @@ private:
 public:
 	explicit WebServer(const char *config_name = "default.conf");
 	~WebServer() {};
-	void						handle(VirtualServer* virtualServer);
+	void						handle();
 	void						createVirtualServer();
+	void						initSocketSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
+	void						addClientSocketToSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
+	void						treatmentAccept(fd_set& read_fd);
+	void						searchSelectSocket(fd_set& write_fd, fd_set& read_fd);
+	void						readRequest();
 
-	void						initSocket();
 	std::vector<VirtualServer>	getVirtualServer();
 };
