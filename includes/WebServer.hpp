@@ -30,7 +30,7 @@ public:
 	void						addClientSocketToSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
 	void						treatmentAccept(fd_set& read_fd);
 	void						searchSelectSocket(fd_set& write_fd, fd_set& read_fd);
-	void						readRequest();
+	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);
 
 	std::vector<VirtualServer>	getVirtualServer();
 };
