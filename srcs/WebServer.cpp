@@ -143,15 +143,15 @@ void WebServer::handle(VirtualServer* virtualServer) { // TODO разнести 
 				}
 				else if (ret > 0)
 				{
-					begin->second.read_buff = str_join(begin->second.read_buff, buff);
-					//тут ты пиздуешь в обработку или сначала смотришь есть ли тут \r\n
-					while (extract_message(&(begin->second.read_buff), &chunk))
-					{
-						begin->second.write_buff = ft_strdup(virtualServer->treatmentRequest(chunk));
-						std::cout << chunk << " 1 " << std::endl;
-						free(chunk);
-						chunk = nullptr;
-					}
+//					begin->second.read_buff = str_join(begin->second.read_buff, buff);
+//					//тут ты пиздуешь в обработку или сначала смотришь есть ли тут \r\n
+//					while (extract_message(&(begin->second.read_buff), &chunk))
+//					{
+						begin->second.write_buff = ft_strdup(virtualServer->treatmentRequest(buff));
+//						std::cout << chunk << " 1 " << std::endl;
+//						free(chunk);
+//						chunk = nullptr;
+//					}
 				}
 				bzero(buff, ret);
 			}
