@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <cstring>
 
-int extract_message(char *&buf, char *&msg)
+int extract_message(char **buf, char **msg)
 {
 	char	*newbuf;
 	int	i;
@@ -20,17 +20,17 @@ int extract_message(char *&buf, char *&msg)
 	if (*buf == 0)
 		return (0);
 	i = 0;
-	while (buf[i])
+	while ((*buf)[i])
 	{
-		if (i > 3 && buf[i] == '\n' && buf[i - 1] == '\r' && buf[i - 2] == '\n' && buf[i - 3] == '\r')
+		if (i > 3 && (*buf)[i] == '\n' && (*buf)[i - 1] == '\r' && (*buf)[i - 2] == '\n' && (*buf)[i - 3] == '\r')
 		{
-			newbuf = (char *)calloc(1, sizeof(*newbuf) * (strlen(buf + i + 1) + 1));
+			newbuf = (char *)calloc(1, sizeof(*newbuf) * (strlen(*buf + i + 1) + 1));
 			if (newbuf == 0)
 				return (-1);
-			strcpy(newbuf, buf + i + 1);
+			strcpy(newbuf, *buf + i + 1);
 			*msg = *buf;
-			msg[i + 1] = 0;
-			buf = newbuf;
+			(*msg)[i + 1] = 0;
+			*buf = newbuf;
 			return (1);
 		}
 		i++;
@@ -95,7 +95,7 @@ void WebServer::handle() { // TODO разнести тело цикла по м�
 		tv.tv_sec = 240;
 		initSocketSet(write_fd, read_fd, max_fd);
 		addClientSocketToSet(write_fd, read_fd, max_fd);
-		select_value = select(max_fd, &read_fd, &write_fd, 0, &tv);
+		select_value = select(max_fd + 1, &read_fd, &write_fd, 0, &tv);
 		if (select_value < 1) {
 			if (errno != EINTR)
 				std::cout << "Select error" << std::endl;
@@ -123,9 +123,9 @@ void WebServer::initSocketSet(fd_set& write_fd, fd_set& read_fd, int& max_fd) {
 
 void WebServer::addClientSocketToSet(fd_set &write_fd, fd_set &read_fd, int &max_fd) {
 	for (size_t i = 0; i < _clients.size(); ++i) {
-		if (_clients[i]->getStage() == 1)
+		if (_clients[i]->getStage() == parsing_request)
 			FD_SET(_clients[i]->getSocket(), &read_fd);
-		if (_clients[i]->getStage() != 1)
+		if(_clients[i]->getStage() != parsing_request)
 			FD_SET(_clients[i]->getSocket(), &write_fd);
 		if (_clients[i]->getSocket() > max_fd)
 			max_fd = _clients[i]->getSocket();
@@ -146,45 +146,72 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 	std::vector<Client*>::iterator	it;
 	char*							buff;
 	size_t							ret = 0;
+	char*							chunk = nullptr;
 
 	for (it = _clients.begin(); it < _clients.end(); ++it) {
-		if (FD_ISSET((*it)->getSocket(), &read_fd))
-			readRequest(*it, write_fd, read_fd);
-		if (FD_ISSET((*it)->getSocket(), &write_fd))
-			nullptr;
+		if (FD_ISSET((*it)->getSocket(), &read_fd) || FD_ISSET((*it)->getSocket(), &write_fd))
+			handle_requests(*it, read_fd, write_fd);
+		else if ((*it)->getStage() == close_connection && !(FD_ISSET((*it)->getSocket(), &read_fd) || FD_ISSET((*it)->getSocket(), &write_fd)))
+			deleteClient(it);
+		if (_clients.empty())
+			break ;
 	}
 }
 
-void WebServer::readRequest(Client* client, fd_set& write_fd, fd_set& read_fd) {
+void WebServer::deleteClient(std::vector<Client*>::iterator& client) {
+	delete *client;
+	_clients.erase(client);
+	client = _clients.begin();
+}
+
+void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) {
 	HTTPRequest*	request = client->getRequest();
-	char*			buf;
+	char*			buf = (char*)calloc(4097, 1);
 	int				read_bytes;
-	int				size_buffer = 4096;
+	int				size_buffer = 4097;
 	char*			chunk = nullptr;
+
 	read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
 	buf[read_bytes] = 0;
-	if (read_bytes == 0)
-	{
-		close(client->getSocket());
-		if(client->getReadBuffer())
-			free((void *) client->getReadBuffer());
-		if(client->getWriteBuffer())
-			free((void *) client->getWriteBuffer());
-		FD_CLR(client->getSocket(), &read_fd);
-		FD_CLR(client->getSocket(), &write_fd);
-	}
-	else if (read_bytes > 0)
-	{
-		client->setReadBuffer(str_join((char*)client->getReadBuffer(), buf));
-		//тут ты пиздуешь в обработку или сначала смотришь есть ли тут \r\n
-		char *tmp = client->getReadBuffer();
-		while (extract_message(tmp, chunk))
-		{
-			client->setWriteBuffer((char*)"HTTP/1.1 200 OK\r\nServer: lol\r\nConnection: keep-alive\r\n\r\n");
-			std::cout << chunk << " 1 " << std::endl;
-			free(chunk);
-			chunk = nullptr;
+	try {
+		if (read_bytes > 0) {
+			client->getRequest()->parse_request_http(buf);
+			if (client->getRequest()->getParsingStage() == complite)
+				client->setStage(generate_response);
 		}
+		else if (read_bytes == 0)
+			client->setStage(close_connection);
 	}
-	bzero(buf, read_bytes);
+	catch (const std::string& status_value) {
+
+	}
 }
+
+
+//if (FD_ISSET((*it)->getSocket(), &read_fd))
+//readRequest(*it, write_fd, read_fd);
+//if (FD_ISSET((*it)->getSocket(), &write_fd)) {
+//ret = send((*it)->getSocket(), (*it)->getWriteBuffer(), strlen((*it)->getWriteBuffer()), 0);
+//if (ret == 0)
+//{
+//close((*it)->getSocket());
+//if((*it)->getReadBuffer())
+//free((*it)->getReadBuffer());
+//if((*it)->getWriteBuffer())
+//free((*it)->getWriteBuffer());
+//FD_CLR((*it)->getSocket(), &read_fd);
+//FD_CLR((*it)->getSocket(), &write_fd);
+//break;
+//}
+//else if (ret != strlen((*it)->getWriteBuffer()))
+//{
+//chunk = str_join(chunk, (*it)->getWriteBuffer() + ret);
+//free((*it)->getWriteBuffer());
+//(*it)->setWriteBuffer(chunk);
+//}
+//else
+//{
+////				free((*it)->getWriteBuffer());
+//(*it)->setWriteBuffer(nullptr);
+//}
+//}

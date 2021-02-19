@@ -31,6 +31,7 @@ public:
 	void						treatmentAccept(fd_set& read_fd);
 	void						searchSelectSocket(fd_set& write_fd, fd_set& read_fd);
 	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);
-
+	void						deleteClient(std::vector<Client*>::iterator& client);
+	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd);
 	std::vector<VirtualServer>	getVirtualServer();
 };

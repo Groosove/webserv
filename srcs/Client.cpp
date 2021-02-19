@@ -8,6 +8,6 @@
 
 #include "Client.hpp"
 
-Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port) {
+Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port), _stage(1) {
 	std::cout << "Client is added" << std::endl;
 }

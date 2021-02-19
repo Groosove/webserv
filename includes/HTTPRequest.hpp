@@ -14,6 +14,11 @@
 #include <sstream>
 #include "utils.hpp"
 
+enum ParsingRequest {
+	start_parsing,
+	complite,
+};
+
 class HTTPRequest {
 private:
 	std::map<std::string, std::string>	_request_params;
@@ -21,6 +26,7 @@ private:
 	char *		_path;
 	char *		_version_http;
 	char *		_host_url;
+	int			_stage;
 	std::string _status_code;
 public:
 	explicit HTTPRequest(const char *buf);
@@ -36,11 +42,13 @@ public:
 	const char *						getHostUrl(void) { return _host_url; };
 	const std::string&					getStatusCode() { return _status_code; }
 	std::map<std::string, std::string>	getHeaders() { return _request_params; }
+	int									getParsingStage() { return _stage; }
 
 	void								setMethod(char * method);
 	void								setPath(char * path);
 	void								setVersionHTTP(char * version_http);
 	void								setHostUrl(char * host_url);
 	void								setStatusCode(const std::string& status_code);
+	void								setParsingStage(int stage) { _stage = stage; }
 
 };

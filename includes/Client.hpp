@@ -12,6 +12,13 @@
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 
+enum Stage {
+	parsing_request,
+	generate_response,
+	send_response,
+	close_connection,
+};
+
 class Client {
 private:
 	int				_socket;
@@ -19,7 +26,7 @@ private:
 	HTTPResponse*	_response;
 	std::string		_host;
 	std::string		_port;
-	size_t			_stage;
+	int				_stage;
 	char*			_read_buffer;
 	char*			_write_buffer;
 
@@ -41,4 +48,5 @@ public:
 	void					setSocket(int&	socket) { _socket = socket; }
 	void					setReadBuffer(char* buf) { _read_buffer = buf; }
 	void					setWriteBuffer(char* buf) { _write_buffer = buf; }
+	void					setStage(size_t stage) { _stage = stage; }
 };
