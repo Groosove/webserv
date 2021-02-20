@@ -183,8 +183,22 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 			client->setStage(close_connection);
 	}
 	catch (const std::string& status_value) {
+		VirtualServer*	virtual_server = searchVirtualServer(client);
+		Location*		location = virtual_server->findLocation(client->getRequest());
 
+		createErrorPage();
 	}
+}
+
+VirtualServer *WebServer::searchVirtualServer(Client *client) {
+	HTTPRequest* request = client->getRequest();
+
+	for (size_t i = 0; i < _virtual_server.size(); ++i) {
+		if (client->getHost() == _virtual_server[i].getHost() && client->getPort() == _virtual_server[i].getPort()
+		&& std::string(request->getHostUrl()) == _virtual_server[i].getServerName())
+			return &_virtual_server[i];
+	}
+	return nullptr;
 }
 
 

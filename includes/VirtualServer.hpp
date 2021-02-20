@@ -43,6 +43,8 @@ public:
 	void							generateResponse(const char* method);
 	void						addBodyToResponse(const Location& location);
 
+	Location*						findLocation(HTTPRequest* request);
+
 	void							setHost(const std::string& host);
 	void							setPort(const std::string& port);
 	void							setServerName(const std::string& server_name);

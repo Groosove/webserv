@@ -107,4 +107,14 @@ void VirtualServer::addBodyToResponse(const Location& location) {
 	std::cout << "RESPONSE: " << _complete_response << std::endl;
 }
 
+Location *VirtualServer::findLocation(HTTPRequest* request) {
+	std::map<std::string, Location>::iterator it;
+
+	for (it = _location.begin(); it != _location.end(); ++it) {
+		if (it->first.find(request->getPath()) != std::string::npos)
+			return &it->second;
+	}
+	return nullptr;
+}
+
 

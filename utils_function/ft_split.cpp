@@ -77,3 +77,15 @@ char			**ft_split(char const *s, char c)
 	dst = ft_do_split(dst, (char *)s, c, length);
 	return (dst);
 }
+
+std::vector<std::string> ft_split(const std::string &s, const std::string& c, size_t i) {
+	std::vector<std::string> result;
+	std::string copy_s = s;
+	size_t pos;
+	while ((pos = copy_s.find(c)) != std::string::npos) {
+		result.push_back(copy_s.substr(0, pos));
+		copy_s.erase(0, pos + 1);
+	}
+	if (pos == (size_t)-1)
+		result.push_back(copy_s.substr(0, pos));
+	return result;

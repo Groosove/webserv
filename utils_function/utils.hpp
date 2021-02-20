@@ -29,3 +29,4 @@ char	*ft_substr(char *s, unsigned int start, size_t len);
 char	*ft_strjoin(const char *s1, const char *s2);
 char	*ft_read_line(void);
 char	**ft_split(char const *s, char c);
+std::vector<std::string> ft_split(const std::string &s, const std::string& c, size_t i);

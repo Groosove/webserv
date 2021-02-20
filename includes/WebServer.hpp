@@ -34,4 +34,5 @@ public:
 	void						deleteClient(std::vector<Client*>::iterator& client);
 	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd);
 	std::vector<VirtualServer>	getVirtualServer();
+	VirtualServer*				searchVirtualServer(Client* client);
 };

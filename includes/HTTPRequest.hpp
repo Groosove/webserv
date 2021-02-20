@@ -15,7 +15,9 @@
 #include "utils.hpp"
 
 enum ParsingRequest {
-	start_parsing,
+	parse_first_line,
+	parse_other_headers,
+	parse_body,
 	complite,
 };
 
@@ -31,8 +33,10 @@ private:
 public:
 	explicit HTTPRequest(const char *buf);
 	~HTTPRequest();
-	std::map<std::string, std::string>		parse_request_http(const char * buf);
-	void									parseFirstLine(const char * line);
+	void									parse_request_http(const char * buf);
+	void									parseFirstLine(const std::string& line);
+	void									parseHeaders(const std::string& header_line);
+	void									checkValidHeaders();
 
 	void								setRequestParams(std::map<std::string, std::string> request_params);
 
