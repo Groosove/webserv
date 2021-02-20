@@ -74,7 +74,7 @@ void VirtualServer::preparationParams() {
 	}
 }
 
-const char* VirtualServer::treatmentRequest(const char* buf) {
+const char* VirtualServer::treatmentRequest(char* buf) {
 	_request = new HTTPRequest(buf);
 	if (std::string(_request->getMethod()).find("GET") != std::string::npos)
 		generateResponse(_request->getMethod());

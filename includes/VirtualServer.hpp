@@ -39,7 +39,7 @@ public:
 
 	void							initSocket(void);
 	void							preparationParams(void);
-	const char*						treatmentRequest(const char* buf);
+	const char*						treatmentRequest(char* buf);
 	void							generateResponse(const char* method);
 	void						addBodyToResponse(const Location& location);
 
