@@ -23,16 +23,20 @@ private:
 	char *		_host_url;
 	char *		_body;
 
+
+	char *_request;
+
 	int			_stage;
 	std::string _status_code;
 public:
 	explicit HTTPRequest(char *buf);
 	~HTTPRequest();
-	std::map<std::string, std::string>		parse_request_http(char * buf);
-	void									parseFirstLine(const char * line, int& stage);
+	void		parse_request_http(char * buf);
+	void		parseFirstLine(const char * line, int& stage);
 
-	static char *	getData(char *&buf, size_t pos);
-	static void			takeHeader(char *header, std::map<std::string, std::string> &arg);
+	static char *	getStr(char *&buf, size_t pos);
+	void			takeHeader(char *header);
+	void			addBufferToRequest(char *buf);
 
 	const char *						getMethod(void) { return _method; };
 	const char *						getPath(void) {return _path; };

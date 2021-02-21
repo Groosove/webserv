@@ -9,58 +9,62 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(char * buf): _stage(0) {
-	_request_params = parse_request_http(buf);
+	parse_request_http(buf);
 }
 
 HTTPRequest::~HTTPRequest() {}
 
 std::string HTTPRequest::getArgument(const std::string &dst, int start) { return ft_strtrim(dst.substr(start + 1, dst.length()), " \t"); }
 
-char * HTTPRequest::getData(char *&buf, size_t pos) {
+char * HTTPRequest::getStr(char *&buf, size_t pos) {
 	char *result = ft_substr(buf, 0, pos);
 	buf = ft_substr(buf, pos + 2, ft_strlen(buf));
 	return result;
 }
 
-void HTTPRequest::takeHeader(char *header, std::map<std::string, std::string> &arg) {
+void HTTPRequest::takeHeader(char *header) {
 	size_t pos = ft_strchr(header, ':');
-	arg[ft_substr(header, 0, pos)] = getArgument(header, pos);
+	_request_params[ft_substr(header, 0, pos)] = getArgument(header, pos);
 }
 
-std::map<std::string, std::string> HTTPRequest::parse_request_http(char * buf) {
+void HTTPRequest::addBufferToRequest(char *buf) { _request = ft_strjoin(_request, buf); }
+
+void HTTPRequest::parse_request_http(char * buf) {
+	addBufferToRequest(buf);
 	std::cout << buf << std::endl;
-	std::map<std::string, std::string> result;
 	size_t  pos;
 	while (buf && _stage != 3) {
-		if (_stage == 0 && (pos = ft_find(buf, "\r\n")) != (size_t)-1) {
-			parseFirstLine(getData(buf, pos), _stage);
-			std::cout << "Method: " << getMethod() << std::endl;
-			std::cout << "Path:" << getPath() << std::endl;
-			std::cout << "HTTP:" << getVersionHTTP() << std::endl;
+		if (_stage == 0) {
+			if ((pos = ft_find(buf, "\r\n")) != (size_t) -1) {
+				parseFirstLine(getStr(buf, pos), _stage);
+				std::cout << "Method: " << getMethod() << std::endl;
+				std::cout << "Path:" << getPath() << std::endl;
+				std::cout << "HTTP:" << getVersionHTTP() << std::endl;
+			} else break;
 		}
 		else if (_stage == 1) {
 			if ((pos = ft_find(buf, "\r\n")) != (size_t)-1 && pos != 0)
-				takeHeader(getData(buf, pos), result);
+				takeHeader(getStr(buf, pos));
 			else if (pos == 0) { buf = ft_substr(buf, 2, ft_strlen(buf)); _stage = 2; }
 			else {std::cerr << "Error parse request" << std::endl;}
 		} else if (_stage == 2) {
-			if (result.count("content-length")) {
-				size_t size = ft_atoi(result["content-length"].c_str());
+			if (_request_params.count("content-length")) {
+				size_t size = ft_atoi(_request_params["content-length"].c_str());
 				_body = ft_strdup(buf);
 				if (ft_strlen(_body) > size)
 					_body = ft_substr(_body, 0, size);
 				std::cout << "Body: " << _body << std::endl;
-			} else {
+			} else if (_request_params.count("Transfer-Encoding")) {
+				size_t size = -1;
 				while (buf) {
-					break;
+
 				}
 			}
 			_stage = 3;
 		}
 	}
-	for (std::map<std::string, std::string>::iterator it = result.begin(); it != result.end(); ++it)
+	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
 		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
-	return result;
 }
 
 
