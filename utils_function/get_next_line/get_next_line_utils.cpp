@@ -1,96 +1,61 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: flavon <flavon@21-school.ru>               +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/08/11 15:22:03 by flavon            #+#    #+#             */
-/*   Updated: 2020/08/11 15:23:06 by flavon           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.hpp"
 
-void		ft_list_del_elem(t_data *list, t_data **begin_list)
+char	*gnl_strdup(char *str, int f)
 {
-	t_data	*elem;
-	t_data	*tmp;
+	char	*res;
+	size_t	len;
+	size_t	i;
 
-	elem = NULL;
-	free(list->line->line);
-	free(list->line);
-	if (*begin_list != list)
+	len = 0;
+	i = 0;
+	while (str[len])
+		len++;
+	if (!(res = (char *)malloc(sizeof(char) * len + 1)))
+		return (NULL);
+	while (i < len)
 	{
-		tmp = *begin_list;
-		while (tmp != 0 && tmp != list)
-		{
-			elem = tmp;
-			tmp = tmp->next;
-		}
-		if (tmp == list)
-			elem->next = list->next;
+		res[i] = str[i];
+		i++;
 	}
-	else
-		*begin_list = list->next;
-	free(list);
+	res[i] = '\0';
+	if (f)
+		free(str);
+	return (res);
 }
 
-t_data		*ft_list_get_elem(int fd, t_data *list)
+char	*gnl_strchr(const char *str, int c)
 {
-	while (list != 0)
+	while (*str)
 	{
-		if (list->line->fd == fd)
-			return (list);
-		list = list->next;
+		if (*str == c)
+			return ((char *)str);
+		str++;
 	}
+	if ((char)c == '\0')
+		return ((char *)str);
 	return (NULL);
 }
 
-void		ft_list_clear(t_data *list)
+char	*gnl_join(char *s1, char const *s2)
 {
-	t_data	*tmp;
+	char	*res;
+	int		i;
+	int		j;
 
-	while (list != 0)
-	{
-		free(list->line->line);
-		free(list->line);
-		tmp = list;
-		list = list->next;
-		free(tmp);
-	}
-}
-
-t_data		*ft_list_new_add(int fd, t_data **begin_list)
-{
-	t_data	*list;
-
-	if ((list = (t_data *)malloc(sizeof(t_data))) == 0 ||
-		(list->line = (t_line *)malloc(sizeof(t_line))) == 0 ||
-		(list->line->line = (char *)malloc(sizeof(char) * BUFFER_SIZE)) == 0)
+	i = 0;
+	j = 0;
+	while (s1[i])
+		++i;
+	while (s2[j])
+		++j;
+	if (!(res = (char *)malloc(sizeof(char) * (i + j + 1))))
 		return (NULL);
-	list->line->length = 0;
-	list->line->buff = BUFFER_SIZE;
-	list->line->fd = fd;
-	list->next = *begin_list;
-	*begin_list = list;
-	return (list);
-}
-
-char		*ft_strjoin(char *dst, char *src, size_t len1, size_t len2)
-{
-	size_t	index;
-	size_t	count;
-	char	*out_src;
-
-	index = -1;
-	count = 0;
-	if (((out_src = (char *)malloc((len1 + len2))) == 0) &&
-		(dst == 0 || src == 0))
-		return (NULL);
-	while (++index < len1)
-		out_src[index] = dst[index];
-	while (count < len2)
-		out_src[index++] = src[count++];
-	return (out_src);
+	i = -1;
+	j = 0;
+	while (s1[++i])
+		res[i] = s1[i];
+	while (s2[j])
+		res[i++] = s2[j++];
+	res[i] = '\0';
+	return (res);
 }

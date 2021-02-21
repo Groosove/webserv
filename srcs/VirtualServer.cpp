@@ -70,31 +70,31 @@ void VirtualServer::preparationParams() {
 	}
 }
 
-const char* VirtualServer::treatmentRequest(const char* buf) {
-	_request = new HTTPRequest(buf);
-	if (std::string(_request->getMethod()).find("GET") != std::string::npos)
-		generateResponse(_request->getMethod());
-	return _complete_response.c_str();
-}
+//const char* VirtualServer::treatmentRequest(const char* buf) {
+//	_request = new HTTPRequest(buf);
+//	if (std::string(_request->getMethod()).find("GET") != std::string::npos)
+//		generateResponse(_request->getMethod());
+//	return _complete_response.c_str();
+//}
 
-void	VirtualServer::generateResponse(const char *method) {
-	std::map<std::string, Location>::iterator begin = _location.begin();
-	std::cout << begin->first << std::endl;
-	while (begin != _location.end()) {
-		if (begin->first.find((_request->getPath())) != std::string::npos) {
-			if (!begin->second.validationLocation(_request->getMethod()))
-				return;
-			else
-			{
-				_response = new HTTPResponse(_request->getMethod());
-				_complete_response.append(_response->getResponse());
-				addBodyToResponse(begin->second);
-				break ;
-			}
-		}
-		begin++;
-	}
-}
+//void	VirtualServer::generateResponse(const char *method) {
+//	std::map<std::string, Location>::iterator begin = _location.begin();
+//	std::cout << begin->first << std::endl;
+//	while (begin != _location.end()) {
+//		if (begin->first.find((_request->getPath())) != std::string::npos) {
+//			if (!begin->second.validationLocation(_request->getMethod()))
+//				return;
+//			else
+//			{
+//				_response = new HTTPResponse(_request->getMethod());
+//				_complete_response.append(_response->getResponse());
+//				addBodyToResponse(begin->second);
+//				break ;
+//			}
+//		}
+//		begin++;
+//	}
+//}
 
 void VirtualServer::addBodyToResponse(const Location& location) {
 	std::ifstream	thread(location.getRoot() + location.getIndex());

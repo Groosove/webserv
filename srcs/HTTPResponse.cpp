@@ -48,8 +48,7 @@ void	HTTPResponse::generateResponse() {
 //		_buf_response.append(it->first + ":" + SPACE + it->second + CRLF);
 }
 
-HTTPResponse::HTTPResponse(const char *method) {
-	_request_status = nullptr;
+HTTPResponse::HTTPResponse() {
 //	_status_code = _request_status->getStatusCode();
 	_status_code.append("200");
 	generateResponse();

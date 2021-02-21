@@ -14,13 +14,6 @@
 #include <sstream>
 #include "utils.hpp"
 
-enum ParsingRequest {
-	parse_first_line,
-	parse_other_headers,
-	parse_body,
-	complite,
-};
-
 class HTTPRequest {
 private:
 	std::map<std::string, std::string>	_request_params;
@@ -28,31 +21,38 @@ private:
 	char *		_path;
 	char *		_version_http;
 	char *		_host_url;
+	char *		_body;
+
+
+	char *_request;
+
 	int			_stage;
 	std::string _status_code;
 public:
-	explicit HTTPRequest(const char *buf);
+	explicit HTTPRequest();
 	~HTTPRequest();
-	void									parse_request_http(const char * buf);
-	void									parseFirstLine(const std::string& line);
-	void									parseHeaders(const std::string& header_line);
-	void									checkValidHeaders();
+	void		parse_request_http(char * buf);
+	void		parseFirstLine(char * line);
 
-	void								setRequestParams(std::map<std::string, std::string> request_params);
+	static char *	getStr(char *&buf, size_t pos);
+	void			takeHeader(char *header);
+	void			addBufferToRequest(char *buf);
+	void			addBodyToRequest(char *buf);
+	int				parseBodyRequest();
 
 	const char *						getMethod(void) { return _method; };
 	const char *						getPath(void) {return _path; };
 	const char *						getVersionHTTP(void) { return _version_http; };
 	const char *						getHostUrl(void) { return _host_url; };
 	const std::string&					getStatusCode() { return _status_code; }
-	std::map<std::string, std::string>	getHeaders() { return _request_params; }
 	int									getParsingStage() { return _stage; }
+	std::map<std::string, std::string>	getHeaders() { return _request_params; }
+	static std::string getArgument(const std::string &dst, int start);
 
 	void								setMethod(char * method);
 	void								setPath(char * path);
 	void								setVersionHTTP(char * version_http);
 	void								setHostUrl(char * host_url);
 	void								setStatusCode(const std::string& status_code);
-	void								setParsingStage(int stage) { _stage = stage; }
 
 };

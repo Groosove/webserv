@@ -6,10 +6,10 @@ set(CMAKE_CXX_STANDARD 98)
 
 include_directories(
 		utils_function/
-        includes/
-        srcs/
+		includes/
+		srcs/
 		utils_function/get_next_line
-        .)
+		.)
 
 set(UTILS
 		utils_function/ft_strtrim.cpp
@@ -23,17 +23,19 @@ set(UTILS
 		utils_function/ft_strjoin.cpp
 		utils_function/get_next_line/get_next_line.cpp
 		utils_function/get_next_line/get_next_line_utils.cpp
+		utils_function/ft_atoi.cpp
+		utils_function/ft_find.cpp
 		)
 
 set(FILES
-        main.cpp
-        srcs/WebServer.cpp
-        srcs/VirtualServer.cpp
-        srcs/Location.cpp
-        srcs/HTTPRequest.cpp
-        srcs/HTTPResponse.cpp
-        srcs/Client.cpp
+		main.cpp
+		srcs/WebServer.cpp
+		srcs/VirtualServer.cpp
+		srcs/Location.cpp
+		srcs/HTTPRequest.cpp
+		srcs/HTTPResponse.cpp
+		srcs/Client.cpp
 		srcs/FileParser.cpp
-        srcs/CGI.cpp)
+		srcs/CGI.cpp)
 
 add_executable(WebServ ${UTILS} ${FILES} )

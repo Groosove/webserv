@@ -49,6 +49,7 @@ public:
 	void							setPort(const std::string& port);
 	void							setServerName(const std::string& server_name);
 	void							setSocket(int socket);
+	void							setErrorPage(const std::string& error_page) { _error_page.push_back(error_page); }
 
 	std::map<std::string, Location>& getLocation() { return _location; }
 	HTTPRequest*					getRequest() { return _request; }

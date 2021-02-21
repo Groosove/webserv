@@ -19,21 +19,20 @@ class HTTPResponse {
 private:
 	std::string 	_status_code;
 	std::string		_buf_response;
-	HTTPRequest*	_request_status;
 
 public:
-	explicit HTTPResponse(const char* method);
+	explicit HTTPResponse();
 	~HTTPResponse();
 
-	static const std::string	message_phrases[count_status_code][2];
+	static const std::string		message_phrases[count_status_code][2];
 
-	void			generateResponse();
+	void							generateResponse();
 
 	static std::string				getMessagePhrase(const std::string& code);
-	inline const std::string&		getStatusCode() const { return (_status_code); }
+	const std::string&				getStatusCode() const { return (_status_code); }
 	const std::string&				getResponse() const { return _buf_response; }
 
+	void							setStatusCode(const std::string& status) { _status_code = status; }
 
-	char*			getBuf() const;
 
 };

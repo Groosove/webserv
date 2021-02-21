@@ -8,71 +8,119 @@
 
 #include "HTTPRequest.hpp"
 
-HTTPRequest::HTTPRequest(const char * buf) {
-	std::cout << "Request ready for create" << std::endl;
+HTTPRequest::HTTPRequest(): _stage(0) {
+	_request = ft_strdup("");
+	_body = ft_strdup("");
 }
 
 HTTPRequest::~HTTPRequest() {}
 
-void HTTPRequest::parse_request_http(const char * buf) {
-	size_t pos = 0;
-	std::string tmp_buf = std::string(buf);
-
-	while (!tmp_buf.empty()) {
-		if (getParsingStage() == parse_first_line) {
-			if ((pos = tmp_buf.find("\r\n")) != std::string::npos) {
-				parseFirstLine(tmp_buf.substr(pos + 2));
-				tmp_buf.erase(pos + 2);
-			}
-			else return ;
-		}
-		else if (getParsingStage() == parse_other_headers) {
-			if ((pos = tmp_buf.find("\r\n")) != std::string::npos) {
-				parseHeaders(tmp_buf.substr(pos + 2));
-				tmp_buf.erase(pos + 2);
-			}
-			else if ((pos = tmp_buf.find("\r\n")) == 0) {
-				checkValidHeaders();
-				tmp_buf.erase(pos + 2);
-			}
-			else
-				return ;
-			break ;
-		}
-	}
+std::string HTTPRequest::getArgument(const std::string &dst, int start) {
+	return ft_strtrim(dst.substr(start + 1, dst.length()), " \t");
 }
 
-void HTTPRequest::parseFirstLine(const std::string& line) {
-	std::vector<std::string> dst = ft_split(line, std::string(" "), 1);
-	for (int i = 0; i != dst.size() - 1; ++i) {
-		if (i == 0)
-			setMethod((char*)dst[i].c_str());
+char * HTTPRequest::getStr(char *&buf, size_t pos) {
+	char *result = ft_substr(buf, 0, pos);
+	char *tmp = ft_substr(buf, pos + 2, ft_strlen(buf));
+	free(buf);
+	buf = tmp;
+	return result;
+}
+
+void HTTPRequest::takeHeader(char *header) {
+	size_t pos = ft_strchr(header, ':');
+	char *tmp = ft_substr(header, 0, pos);
+	_request_params[tmp] = getArgument(header, pos);
+	free(tmp);
+	free(header);
+}
+
+void HTTPRequest::addBufferToRequest(char *buf) {
+	char *tmp = gnl_join(_request, buf);
+	free(_request);
+	_request = tmp;
+	free(buf);
+}
+
+void HTTPRequest::addBodyToRequest(char *buf) {
+	char *tmp = gnl_join(_body, buf);
+	free(_body);
+	_body = tmp;
+}
+
+void HTTPRequest::parse_request_http(char * buf) {
+	std::cout << buf << std::endl;
+	addBufferToRequest(buf);
+	size_t  pos;
+	while (_request && _stage != 3) {
+		if (_stage == 0) {
+			if ((pos = ft_find(_request, "\r\n")) != (size_t) -1)
+				parseFirstLine(getStr(_request, pos));
+			else break;
+		}
+		else if (_stage == 1) {
+			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
+				takeHeader(getStr(_request, pos));
+			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
+			else {std::cerr << "Error parse request" << std::endl;}
+		} else if (_stage == 2) {
+			if (parseBodyRequest() == 1)
+				_stage = 3;
+			else break;
+		}
+	}
+	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
+		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
+}
+
+int HTTPRequest::parseBodyRequest() {
+	if (_request_params.count("content-length")) {
+		size_t size = ft_atoi(_request_params["content-length"].c_str());
+		addBodyToRequest(_request);
+		if (ft_strlen(_body) > size) {
+			char *tmp = ft_substr(_body, 0, size);
+			free(_body);
+			_body = tmp;
+		}
+		return 1;
+	} else if (_request_params.count("Transfer-Encoding")) {
+		int size;
+		size_t pos;
+		while (_request) {
+			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1) {
+				if (size == -1) {
+					size = ft_atoi_chunk(getStr(_request, pos));
+				} else if (size != 0) {
+					char *tmp = (char *)malloc(sizeof(size) + 1);
+					tmp[size] = '\0';
+					addBodyToRequest(tmp);
+					free(tmp);
+					size = -1;
+				} else return 1;
+			} else return 0;
+		}
+	}
+	return 0;
+}
+
+void HTTPRequest::parseFirstLine(char *line) {
+	char ** dst = ft_split(line, ' ');
+	for (int i = 0; dst[i] != nullptr; ++i) {
+		if (i == 0) {
+			if (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD"))
+				setMethod(dst[i]);
+			else throw std::string("400");
+		}
 		else if (i == 1)
-			setPath((char*)dst[i].c_str());
-		else
-			setVersionHTTP((char*)dst[i].c_str());
+			setPath(dst[i]);
+		else {
+			if (ft_compare(dst[i], "HTTP/1.1") || ft_compare(dst[i], "HTTP/1.0"))
+				setVersionHTTP(dst[i]);
+			else std::cerr << "Error set version HTTP/1.1" << std::endl;
+		}
 	}
-}
-
-void HTTPRequest::parseHeaders(const std::string& header_line) {
-	size_t pos;
-
-	if (std::count(header_line.begin(), header_line.end(), ':') < 1)
-		throw std::string("400");
-	if ((pos = header_line.find("Host")) != std::string::npos)
-		setHostUrl((char*)header_line.substr(pos + 2).c_str());
-	pos = header_line.find(':');
-	_request_params[header_line.substr(pos)] = header_line.substr(pos + 2);
-}
-
-void HTTPRequest::checkValidHeaders() {
-	if (!_host_url)
-		throw std::string("400");
-	setParsingStage(complite);
-}
-
-void HTTPRequest::setHostUrl(char *host_url) {
-	_host_url = host_url;
+	free(line);
+	++_stage;
 }
 
 void HTTPRequest::setMethod(char *method) {
@@ -87,28 +135,7 @@ void HTTPRequest::setVersionHTTP(char *version_http) {
 	_version_http = version_http;
 }
 
-void HTTPRequest::setRequestParams(std::map<std::string, std::string> request_params) {
-	_request_params = request_params;
-}
-
 void HTTPRequest::setStatusCode(const std::string &status_code) {
 	_status_code = status_code;
 }
 
-
-
-//char **request = ft_split(buf, '\n');
-//std::map<std::string, std::string> result;
-//size_t  pos;
-//for (size_t i = 0; request[i] != nullptr; ++i) {
-//if (ft_strchr(request[i], ':') == -1 && request[i + 1] != nullptr)
-//parseFirstLine((request[i]));
-//else if ((pos = ft_strchr(request[i], ':')) != (size_t) -1) {
-//if (ft_compare(request[i], "Host", 4))
-//setHostUrl(ft_substr(request[i], pos + 2, ft_strlen(request[i]) - 1));
-//else
-//result[ft_substr(request[i], 0, pos)] = ft_substr(request[i], pos + 2,
-//ft_strlen(request[i]) - 1);
-//}
-//}
-//return result;

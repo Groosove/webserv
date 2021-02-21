@@ -171,22 +171,32 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 	int				size_buffer = 4097;
 	char*			chunk = nullptr;
 
-	read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
-	buf[read_bytes] = 0;
-	try {
-		if (read_bytes > 0) {
-			client->getRequest()->parse_request_http(buf);
-			if (client->getRequest()->getParsingStage() == complite)
-				client->setStage(generate_response);
+	if (client->getStage() == parsing_request) {
+		read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
+		buf[read_bytes] = 0;
+		try {
+			if (read_bytes > 0) {
+				client->getRequest()->parse_request_http(buf);
+				if (client->getRequest()->getParsingStage() == 3)
+					client->setStage(generate_response);
+			}
+			else if (read_bytes == 0)
+				client->setStage(close_connection);
 		}
-		else if (read_bytes == 0)
-			client->setStage(close_connection);
-	}
-	catch (const std::string& status_value) {
-		VirtualServer*	virtual_server = searchVirtualServer(client);
-		Location*		location = virtual_server->findLocation(client->getRequest());
+		catch (const std::string& status_value) {
+			VirtualServer*	virtual_server = searchVirtualServer(client);
+			Location*		location = virtual_server->findLocation(client->getRequest());
 
-		createErrorPage();
+			client->getResponse()->setStatusCode(client->getRequest()->getStatusCode());
+			client->getResponse()->generateResponse();
+
+		}
+	}
+	else if (client->getStage() == generate_response) {
+
+	}
+	else if (client->getStage() == send_response) {
+
 	}
 }
 
@@ -200,32 +210,3 @@ VirtualServer *WebServer::searchVirtualServer(Client *client) {
 	}
 	return nullptr;
 }
-
-
-//if (FD_ISSET((*it)->getSocket(), &read_fd))
-//readRequest(*it, write_fd, read_fd);
-//if (FD_ISSET((*it)->getSocket(), &write_fd)) {
-//ret = send((*it)->getSocket(), (*it)->getWriteBuffer(), strlen((*it)->getWriteBuffer()), 0);
-//if (ret == 0)
-//{
-//close((*it)->getSocket());
-//if((*it)->getReadBuffer())
-//free((*it)->getReadBuffer());
-//if((*it)->getWriteBuffer())
-//free((*it)->getWriteBuffer());
-//FD_CLR((*it)->getSocket(), &read_fd);
-//FD_CLR((*it)->getSocket(), &write_fd);
-//break;
-//}
-//else if (ret != strlen((*it)->getWriteBuffer()))
-//{
-//chunk = str_join(chunk, (*it)->getWriteBuffer() + ret);
-//free((*it)->getWriteBuffer());
-//(*it)->setWriteBuffer(chunk);
-//}
-//else
-//{
-////				free((*it)->getWriteBuffer());
-//(*it)->setWriteBuffer(nullptr);
-//}
-//}
