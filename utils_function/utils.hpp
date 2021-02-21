@@ -11,6 +11,7 @@
 #include "unistd.h"
 #include <vector>
 #include "get_next_line.hpp"
+int		get_next_line(int fd, char **line);
 std::string					ft_strtrim(const std::string &s1, const std::string& set);
 int							ft_strchr(const std::string& str, int ch);
 int							ft_strchr(const char *str, int ch);
@@ -25,4 +26,5 @@ char	*ft_substr(char *s, unsigned int start, size_t len);
 char	*ft_strjoin(const char *s1, const char *s2);
 char	**ft_split(char const *s, char c);
 int		ft_atoi(const char *src);
+int		ft_atoi_chunk(const char *src);
 size_t	ft_find(const char *str, const char *find);

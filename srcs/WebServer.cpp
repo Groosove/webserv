@@ -66,10 +66,12 @@ typedef struct	s_client {
 WebServer::WebServer(const char *config_name): _status(true) {
 	std::vector<std::string> config;
 	int fd = open(config_name, O_RDONLY);
-	char *line = nullptr;
+	char *line;
 	if (fd > 0)
-		while (get_next_line(fd, &line) > 0)
+		while (get_next_line(fd, &line) > 0) {
 			config.push_back(line);
+			free(line);
+		}
 	else
 		std::cerr << "File doesn't open!" << std::endl;
 	FileParser _config(config);

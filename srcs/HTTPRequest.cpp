@@ -9,80 +9,119 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(char * buf): _stage(0) {
+	_request = ft_strdup("");
+	_body = ft_strdup("");
 	parse_request_http(buf);
 }
 
 HTTPRequest::~HTTPRequest() {}
 
-std::string HTTPRequest::getArgument(const std::string &dst, int start) { return ft_strtrim(dst.substr(start + 1, dst.length()), " \t"); }
+std::string HTTPRequest::getArgument(const std::string &dst, int start) {
+	return ft_strtrim(dst.substr(start + 1, dst.length()), " \t");
+}
 
 char * HTTPRequest::getStr(char *&buf, size_t pos) {
 	char *result = ft_substr(buf, 0, pos);
-	buf = ft_substr(buf, pos + 2, ft_strlen(buf));
+	char *tmp = ft_substr(buf, pos + 2, ft_strlen(buf));
+	free(buf);
+	buf = tmp;
 	return result;
 }
 
 void HTTPRequest::takeHeader(char *header) {
 	size_t pos = ft_strchr(header, ':');
-	_request_params[ft_substr(header, 0, pos)] = getArgument(header, pos);
+	char *tmp = ft_substr(header, 0, pos);
+	_request_params[tmp] = getArgument(header, pos);
+	free(tmp);
+	free(header);
 }
 
-void HTTPRequest::addBufferToRequest(char *buf) { _request = ft_strjoin(_request, buf); }
+void HTTPRequest::addBufferToRequest(char *buf) {
+	char *tmp = gnl_join(_request, buf);
+	free(_request);
+	_request = tmp;
+	free(buf);
+}
+
+void HTTPRequest::addBodyToRequest(char *buf) {
+	char *tmp = gnl_join(_body, buf);
+	free(_body);
+	_body = tmp;
+}
 
 void HTTPRequest::parse_request_http(char * buf) {
-	addBufferToRequest(buf);
 	std::cout << buf << std::endl;
+	addBufferToRequest(buf);
 	size_t  pos;
-	while (buf && _stage != 3) {
+	while (_request && _stage != 3) {
 		if (_stage == 0) {
-			if ((pos = ft_find(buf, "\r\n")) != (size_t) -1) {
-				parseFirstLine(getStr(buf, pos), _stage);
-				std::cout << "Method: " << getMethod() << std::endl;
-				std::cout << "Path:" << getPath() << std::endl;
-				std::cout << "HTTP:" << getVersionHTTP() << std::endl;
-			} else break;
+			if ((pos = ft_find(_request, "\r\n")) != (size_t) -1)
+				parseFirstLine(getStr(_request, pos));
+			else break;
 		}
 		else if (_stage == 1) {
-			if ((pos = ft_find(buf, "\r\n")) != (size_t)-1 && pos != 0)
-				takeHeader(getStr(buf, pos));
-			else if (pos == 0) { buf = ft_substr(buf, 2, ft_strlen(buf)); _stage = 2; }
+			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
+				takeHeader(getStr(_request, pos));
+			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
 			else {std::cerr << "Error parse request" << std::endl;}
 		} else if (_stage == 2) {
-			if (_request_params.count("content-length")) {
-				size_t size = ft_atoi(_request_params["content-length"].c_str());
-				_body = ft_strdup(buf);
-				if (ft_strlen(_body) > size)
-					_body = ft_substr(_body, 0, size);
-				std::cout << "Body: " << _body << std::endl;
-			} else if (_request_params.count("Transfer-Encoding")) {
-				size_t size = -1;
-				while (buf) {
-
-				}
-			}
-			_stage = 3;
+			if (parseBodyRequest() == 1)
+				_stage = 3;
+			else break;
 		}
 	}
 	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
 		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
 }
 
-
-void HTTPRequest::parseFirstLine(const char *line, int &stage) {
-	char ** dst = ft_split(line, ' ');
-	for (int i = 0; dst[i] != nullptr; ++i) {
-		if (i == 0)
-			setMethod(dst[i]);
-		else if (i == 1)
-			setPath(dst[i]);
-		else
-			setVersionHTTP(dst[i]);
+int HTTPRequest::parseBodyRequest() {
+	if (_request_params.count("content-length")) {
+		size_t size = ft_atoi(_request_params["content-length"].c_str());
+		addBodyToRequest(_request);
+		if (ft_strlen(_body) > size) {
+			char *tmp = ft_substr(_body, 0, size);
+			free(_body);
+			_body = tmp;
+		}
+		return 1;
+	} else if (_request_params.count("Transfer-Encoding")) {
+		int size;
+		size_t pos;
+		while (_request) {
+			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1) {
+				if (size == -1) {
+					size = ft_atoi_chunk(getStr(_request, pos));
+				} else if (size != 0) {
+					char *tmp = (char *)malloc(sizeof(size) + 1);
+					tmp[size] = '\0';
+					addBodyToRequest(tmp);
+					free(tmp);
+					size = -1;
+				} else return 1;
+			} else return 0;
+		}
 	}
-	++stage;
+	return 0;
 }
 
-void HTTPRequest::setHostUrl(char *host_url) {
-	_host_url = host_url;
+void HTTPRequest::parseFirstLine(char *line) {
+	char ** dst = ft_split(line, ' ');
+	for (int i = 0; dst[i] != nullptr; ++i) {
+		if (i == 0) {
+			if (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD"))
+				setMethod(dst[i]);
+			else std::cerr << "Error method" << std::endl;
+		}
+		else if (i == 1)
+			setPath(dst[i]);
+		else {
+			if (ft_compare(dst[i], "HTTP/1.1"))
+				setVersionHTTP(dst[i]);
+			else std::cerr << "Error set version HTTP/1.1" << std::endl;
+		}
+	}
+	free(line);
+	++_stage;
 }
 
 void HTTPRequest::setMethod(char *method) {

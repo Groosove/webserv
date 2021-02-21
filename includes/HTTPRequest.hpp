@@ -32,11 +32,13 @@ public:
 	explicit HTTPRequest(char *buf);
 	~HTTPRequest();
 	void		parse_request_http(char * buf);
-	void		parseFirstLine(const char * line, int& stage);
+	void		parseFirstLine(char * line);
 
 	static char *	getStr(char *&buf, size_t pos);
 	void			takeHeader(char *header);
 	void			addBufferToRequest(char *buf);
+	void			addBodyToRequest(char *buf);
+	int				parseBodyRequest();
 
 	const char *						getMethod(void) { return _method; };
 	const char *						getPath(void) {return _path; };
