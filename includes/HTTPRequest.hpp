@@ -29,6 +29,7 @@ private:
 	int			_stage;
 	std::string _status_code;
 public:
+
 	explicit HTTPRequest();
 	~HTTPRequest();
 	void		parse_request_http(char * buf);

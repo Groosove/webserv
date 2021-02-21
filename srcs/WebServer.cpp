@@ -205,7 +205,7 @@ VirtualServer *WebServer::searchVirtualServer(Client *client) {
 
 	for (size_t i = 0; i < _virtual_server.size(); ++i) {
 		if (client->getHost() == _virtual_server[i].getHost() && client->getPort() == _virtual_server[i].getPort()
-		&& std::string(request->getHostUrl()) == _virtual_server[i].getServerName())
+			&& std::string(request->getHostUrl()) == _virtual_server[i].getServerName())
 			return &_virtual_server[i];
 	}
 	return nullptr;

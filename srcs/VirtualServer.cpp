@@ -28,6 +28,10 @@ void VirtualServer::setServerName(const std::string &server_name) {
 	_parametr.insert(std::make_pair("server_name", _server_name));
 }
 
+void VirtualServer::setErrorPage(const std::string &error_page) {
+	_error_page.push_back(error_page);
+}
+
 void VirtualServer::initSocket() {
 	int	param = 1; // парамет р для setsockopt;
 	// Создаем сокет сервера;

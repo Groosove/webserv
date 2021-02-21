@@ -36,14 +36,14 @@ void HTTPRequest::takeHeader(char *header) {
 }
 
 void HTTPRequest::addBufferToRequest(char *buf) {
-	char *tmp = gnl_join(_request, buf);
+	char *tmp = ft_strjoin(_request, buf);
 	free(_request);
 	_request = tmp;
 	free(buf);
 }
 
 void HTTPRequest::addBodyToRequest(char *buf) {
-	char *tmp = gnl_join(_body, buf);
+	char *tmp = ft_strjoin(_body, buf);
 	free(_body);
 	_body = tmp;
 }
