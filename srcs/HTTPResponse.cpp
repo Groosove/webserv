@@ -37,20 +37,13 @@ std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 	return ("Unknown code");
 }
 
-void	HTTPResponse::generateResponse() {
+void	HTTPResponse::generateResponse(const std::string& status) {
 	std::map<std::string, std::string>::const_iterator it;
 
-	_buf_response.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
+	_buf_response.append(VERISON + SPACE + status + SPACE + getMessagePhrase(status) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "keep-alive" + CRLF + CRLF);
-
-//	for (it = _request_status->getHeaders().begin(); it != _request_status->getHeaders().end(); ++it)
-//		_buf_response.append(it->first + ":" + SPACE + it->second + CRLF);
+	_buf_response.append(_body);
 }
 
-HTTPResponse::HTTPResponse() {
-//	_status_code = _request_status->getStatusCode();
-	_status_code.append("200");
-	generateResponse();
-
-}
+HTTPResponse::HTTPResponse() {}

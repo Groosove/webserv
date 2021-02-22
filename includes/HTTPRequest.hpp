@@ -45,7 +45,7 @@ public:
 	const char *						getVersionHTTP(void) { return _version_http; };
 	const char *						getHostUrl(void) { return _host_url; };
 	const std::string&					getStatusCode() { return _status_code; }
-	int									getParsingStage() { return _stage; }
+	int									getParsingStage() const { return _stage; }
 	std::map<std::string, std::string>	getHeaders() { return _request_params; }
 	static std::string getArgument(const std::string &dst, int start);
 

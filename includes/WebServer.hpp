@@ -33,6 +33,10 @@ public:
 	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);
 	void						deleteClient(std::vector<Client*>::iterator& client);
 	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd);
+	void						handleGetHeadMethods(Client* client, Location* location, struct stat* stat_info);
+	bool						tryOpenDir(Location* location);
+	bool						tryOpenFile(Location* location);
+	const std::string&			generateAutoindex(HTTPRequest* request, const std::string& index, const std::string& root_dir);
 	std::vector<VirtualServer>	getVirtualServer();
 	VirtualServer*				searchVirtualServer(Client* client);
 };
