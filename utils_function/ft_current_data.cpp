@@ -28,19 +28,18 @@ int ft_get_day_of_week(tm &timeinfo) {
 }
 
 void ft_get_date(tm &timeinfo, long time) {
-	long tmp = time;
-	int year = 1970;
-	while (tmp - 3600 >= 0) { tmp -= 3600; }
-	timeinfo.tm_min = tmp / 60;
-	timeinfo.tm_sec = tmp % 60;
-	time = ((time - (timeinfo.tm_sec + timeinfo.tm_min * 60)) / 3600); // Время в часах
+	int year = 70;
+	int number_month = 1;
+	timeinfo.tm_min = time % 3600 / 60;
+	timeinfo.tm_sec = time % 3600 % 60;
+	time /= 3600;
 	timeinfo.tm_hour = time % 24 + 3;
-	time = (time - (timeinfo.tm_hour - 3)) / 24;
+	if (timeinfo.tm_hour >= 24) { timeinfo.tm_hour -= 24; ++timeinfo.tm_mday; }
+	time = (time - (timeinfo.tm_hour - 3)) / 24 + 1;
 	for (; time >= 365; ++year)
 		time -= (year % 4 == 0) ? 366 : 365;
 	timeinfo.tm_year = year;
 	bool leap = timeinfo.tm_year % 4 == 0;
-	int number_month = 1;
 	while (time >= 28 || (time >= 29 && leap)) {
 		if (number_month == 2)
 			time -= (leap) ? 29 : 28;
@@ -51,9 +50,8 @@ void ft_get_date(tm &timeinfo, long time) {
 		++number_month;
 	}
 	timeinfo.tm_mon = number_month - 1;
-	timeinfo.tm_mday = time + 1;
+	timeinfo.tm_mday = time;
 	timeinfo.tm_wday = ft_get_day_of_week(timeinfo);
-	timeinfo.tm_year -= 1900;
 }
 
 std::string ft_get_time() {

@@ -69,8 +69,8 @@ void HTTPRequest::parse_request_http(char * buf) {
 			else break;
 		}
 	}
-	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
-		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
+//	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
+//		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
 }
 
 int HTTPRequest::parseBodyRequest() {
