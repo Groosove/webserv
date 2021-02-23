@@ -40,3 +40,4 @@ set(FILES
 		srcs/CGI.cpp)
 
 add_executable(WebServ ${UTILS} ${FILES} )
+add_executable(DATA utils_function/ft_current_data.cpp)
