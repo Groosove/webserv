@@ -25,6 +25,7 @@ set(UTILS
 		utils_function/get_next_line/get_next_line_utils.cpp
 		utils_function/ft_atoi.cpp
 		utils_function/ft_find.cpp
+		utils_function/ft_memcpy.cpp
 		)
 
 set(FILES
