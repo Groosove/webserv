@@ -51,6 +51,7 @@ public:
 	size_t getRequestLimits() const { return _request_limits; }
 	std::vector<std::string>	getAllowMethods() { return _allow_methods; }
 
+	bool 						checkAllowMethod(const char* method);
 	bool						validationLocation(const char* method);
 	bool						tryOpenDir();
 	bool						tryOpenFile();

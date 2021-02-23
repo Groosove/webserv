@@ -104,3 +104,15 @@ bool Location::tryOpenFile() {
 	}
 	return false;
 }
+
+bool Location::checkAllowMethod(const char *method) {
+	std::vector<std::string>::iterator begin = _allow_methods.begin();
+	while (begin != _allow_methods.end()) { // проверка доступности метода
+		if ((*begin).find(method) != std::string::npos)
+			break;
+		else if (begin == _allow_methods.end() - 1 && (*begin).find(method) == std::string::npos)
+			return false;
+		begin++;
+	}
+	return true;
+}

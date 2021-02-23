@@ -29,6 +29,7 @@ private:
 	int				_stage;
 	char*			_read_buffer;
 	char*			_write_buffer;
+	std::string 	_response_complite;
 
 public:
 	explicit Client(int client_socket, const std::string& host, const std::string& port);
@@ -42,6 +43,7 @@ public:
 	size_t					getStage() const { return _stage; }
 	char*					getReadBuffer() { return _read_buffer; }
 	char*					getWriteBuffer() { return _write_buffer; }
+	std::string				getReponseBuffer() { return _response_complite; }
 
 	void					setHost(const std::string& host) { _host = host; }
 	void					setPort(const std::string& port) { _port = port; }
@@ -49,4 +51,5 @@ public:
 	void					setReadBuffer(char* buf) { _read_buffer = buf; }
 	void					setWriteBuffer(char* buf) { _write_buffer = buf; }
 	void					setStage(size_t stage) { _stage = stage; }
+	void 					setResponseBuffer(const std::string& buf) { _response_complite = buf; }
 };

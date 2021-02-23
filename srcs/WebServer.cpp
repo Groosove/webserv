@@ -108,7 +108,7 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 			handle_requests(*it, read_fd, write_fd);
 		else if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
 			handle_requests(*it, read_fd, write_fd);
-		else if ((*it)->getStage() == close_connection && !(FD_ISSET((*it)->getSocket(), &read_fd) || FD_ISSET((*it)->getSocket(), &write_fd)))
+		else if ((*it)->getStage() == close_connection)
 			deleteClient(it);
 		if (_clients.empty())
 			break ;
@@ -116,6 +116,7 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 }
 
 void WebServer::deleteClient(std::vector<Client*>::iterator& client) {
+//	close((*client)->getSocket());
 	delete *client;
 	_clients.erase(client);
 	client = _clients.begin();
@@ -133,8 +134,8 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		try {
 			if (read_bytes > 0) {
 				client->getRequest()->parse_request_http(buf, read_bytes);
-				if (client->getRequest()->getParsingStage() == 3)
-					client->setStage(generate_response);
+//				if (client->getRequest()->getParsingStage() == 3)
+				client->setStage(generate_response);
 			}
 			else if (read_bytes == 0)
 				client->setStage(close_connection);
@@ -148,7 +149,10 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		treatmentStageGenerate(client);
 	}
 	else if (client->getStage() == send_response) {
-		send(client->getSocket(), client->getResponse()->getResponse().c_str(), strlen(client->getResponse()->getResponse().c_str()), 0);
+		send(client->getSocket(), client->getReponseBuffer().c_str(), strlen(client->getReponseBuffer().c_str()), 0);
+		FD_CLR(client->getSocket(), &read_fd);
+		FD_CLR(client->getSocket(), &write_fd);
+		client->setStage(close_connection);
 	}
 }
 

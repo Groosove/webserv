@@ -48,6 +48,7 @@ public:
 	const std::string&					getStatusCode() { return _status_code; }
 	int									getParsingStage() const { return _stage; }
 	std::map<std::string, std::string>	getHeaders() { return _request_params; }
+	const char*							getBody() { return _body; }
 	static std::string getArgument(const std::string &dst, int start);
 
 	void								setMethod(char * method);
