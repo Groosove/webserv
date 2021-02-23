@@ -11,6 +11,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	VirtualServer*	virtual_server = searchVirtualServer(client);
 	Location*		location = virtual_server->findLocation(client->getRequest());
 	HTTPResponse*	response = client->getResponse();
+	HTTPRequest*	request = client->getRequest();
 	std::string 	error;
 	struct stat		stat_info;
 
@@ -18,7 +19,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	if (tryOpenDir(location)) {
 		if (S_ISDIR(stat_info.st_mode) && tryOpenFile(location))
 			stat((location->getRoot() + location->getIndex()).c_str(), &stat_info);
-		if (request->getMethod() == "GET" || request->getMethod() == "HEAD")
+		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
 			handleGetHeadMethods(client, location, &stat_info);
 	}
 	else {
@@ -42,7 +43,7 @@ void WebServer::handleGetHeadMethods(Client *client, Location *location, struct 
 			response->setStatusCode("405");
 	}
 	if (S_ISREG(stat_info->st_mode) || S_ISLNK(stat_info->st_mode)) { // проверка на то что это либо файл, лио лин на файл
-		if (fd = open((location->getRoot() + location->getIndex()).c_str(), O_RDONLY) && request->getMethod() == "GET") { // считааем этот файл если он есть и если метод GET, тк в нем есть body
+		if ((fd = open((location->getRoot() + location->getIndex()).c_str(), O_RDONLY)) && ft_compare(request->getMethod(), "GET")) { // считааем этот файл если он есть и если метод GET, тк в нем есть body
 			while (get_next_line(fd, &buf))
 				response->setBody(std::string(buf));
 		}
@@ -51,7 +52,7 @@ void WebServer::handleGetHeadMethods(Client *client, Location *location, struct 
 	}
 	else if (S_ISDIR(stat_info->st_mode) && !location->getAutoIndex()) // если это папка и нет автоиндекса, то 404, та же проверка, что и предыдущая, только на то что могут запросить директорию
 		response->setStatusCode("404");
-	else if (S_ISDIR(stat_info->st_mode) && location->getAutoIndex() && request->getMethod() == "GET") // если папка и директория, генерируем автоиндекс
+	else if (S_ISDIR(stat_info->st_mode) && location->getAutoIndex() && ft_compare(request->getMethod(), "GET")) // если папка и директория, генерируем автоиндекс
 		response->setBody(generateAutoindex(request, location->getIndex(), location->getRoot()));
 }
 

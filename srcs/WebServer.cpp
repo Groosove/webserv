@@ -154,12 +154,7 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 
 VirtualServer *WebServer::searchVirtualServer(Client *client) {
 	for (size_t i = 0; i < _virtual_server.size(); ++i) {
-<<<<<<< HEAD
 		if (client->getHost() == _virtual_server[i].getHost() && client->getPort() == _virtual_server[i].getPort()) // TODO добавить сравнение сервер неймов
-=======
-		if (client->getHost() == _virtual_server[i].getHost() && client->getPort() == _virtual_server[i].getPort()
-			&& std::string(request->getHostUrl()) == _virtual_server[i].getServerName())
->>>>>>> ce517d880b7834b28d007634bb45c8b4246a64d7
 			return &_virtual_server[i];
 	}
 	return nullptr;

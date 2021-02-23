@@ -40,11 +40,7 @@ void ft_get_date(tm &timeinfo, long time) {
 		time -= (year % 4 == 0) ? 366 : 365;
 	timeinfo.tm_year = year;
 	bool leap = timeinfo.tm_year % 4 == 0;
-<<<<<<< HEAD
-	while (time >= 28 || (time >= 29 && leap)) {
-=======
 	for (; time >= 28 || (time >= 29 && leap); ++number_month)
->>>>>>> ce517d880b7834b28d007634bb45c8b4246a64d7
 		if (number_month == 2)
 			time -= (leap) ? 29 : 28;
 		else if (number_month <= 8)
