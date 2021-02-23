@@ -19,7 +19,8 @@ class HTTPResponse {
 private:
 	std::string 	_status_code;
 	std::string		_buf_response;
-	std::string		_body;
+	char *			_body;
+	int				_body_size;
 
 public:
 	explicit HTTPResponse();
@@ -34,6 +35,6 @@ public:
 	const std::string&				getResponse() const { return _buf_response; }
 
 	void							setStatusCode(const std::string& status) { _status_code = status; }
-	void							setBody(const std::string& chunk_body) { _body.append(chunk_body); }
+	void							setBody(char* body, int size);
 
 };

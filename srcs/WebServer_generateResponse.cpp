@@ -58,7 +58,7 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 		response->setBody(generateAutoindex(request, location->getIndex(), location->getRoot()));
 }
 
-std::string WebServer::readBodyResponse(const std::string& root, const std::string& file) {
+char* WebServer::readBodyResponse(const std::string& root, const std::string& file) {
 	int 		fd;
 	char*		buf;
 	std::string	index_html;
@@ -66,8 +66,8 @@ std::string WebServer::readBodyResponse(const std::string& root, const std::stri
 	if (!(fd = open((root + file).c_str(), O_RDONLY)))
 		std::cerr << "File not open" << std::endl;
 	while (get_next_line(fd, &buf))
-		index_html.append(std::string(buf));
-	return index_html;
+		index_html.append(buf);
+	return (char*)index_html.c_str();
 }
 
 void WebServer::checkDirectoryOrFile(struct stat *info, Location *location) {

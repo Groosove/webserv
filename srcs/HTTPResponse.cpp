@@ -46,4 +46,14 @@ void	HTTPResponse::generateResponse() {
 	_buf_response.append(_body);
 }
 
-HTTPResponse::HTTPResponse() {}
+HTTPResponse::HTTPResponse(): _body_size(0) {
+	_body = ft_strdup("");
+}
+
+void HTTPResponse::setBody(char *body, int size) {
+	char *tmp = (char *)malloc(_body_size + size);
+	tmp = (char *)ft_memcpy(tmp, _body, _body_size);
+	tmp = (char *)ft_memcpy(tmp + _body_size, body, size);
+	_body_size += size;
+	tmp[_body_size] = '\0';
+}

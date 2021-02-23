@@ -43,5 +43,5 @@ public:
 	std::string					generateAutoindex(HTTPRequest* request, const std::string& index, const std::string& root_dir);
 	std::vector<VirtualServer>	getVirtualServer();
 	VirtualServer*				searchVirtualServer(Client* client);
-	std::string					readBodyResponse(const std::string& root, const std::string& file);
+	char*						readBodyResponse(const std::string& root, const std::string& file);
 };

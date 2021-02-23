@@ -52,7 +52,8 @@ void HTTPRequest::addBodyToRequest(char *buf, int bytes) {
 
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
 	std::cout << buf << std::endl;
-	addBufferToRequest(buf, bytes);
+//	addBufferToRequest(buf, bytes);
+	ft_add_bytes(_request, buf, _requset_size, bytes);
 	size_t  pos;
 	while (_request && _stage != 3) {
 		if (_stage == 0) {
@@ -80,7 +81,8 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 int HTTPRequest::parseBodyRequest() {
 	if (_request_params.count("content-length")) {
 		size_t size = ft_atoi(_request_params["content-length"].c_str());
-		addBodyToRequest(_request, size);
+//		addBodyToRequest(_request, size);
+		ft_add_bytes(_body, _request, _body_size, size);
 		if (ft_strlen(_body) > size) {
 			char *tmp = ft_substr(_body, 0, size);
 			free(_body);

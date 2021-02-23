@@ -25,3 +25,4 @@ int		ft_atoi(const char *src);
 int		ft_atoi_chunk(const char *src);
 size_t	ft_find(const char *str, const char *find);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
+void 	ft_add_bytes(char *&dst, char *src, int &dst_size, int src_size);

@@ -26,6 +26,7 @@ set(UTILS
 		utils_function/ft_atoi.cpp
 		utils_function/ft_find.cpp
 		utils_function/ft_memcpy.cpp
+		utils_function/ft_add_bytes.cpp
 		)
 
 set(FILES
