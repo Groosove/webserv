@@ -33,6 +33,7 @@ public:
 	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);
 	void						deleteClient(std::vector<Client*>::iterator& client);
 	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd);
+	void						treatmentStageGenerate(Client* client);
 	void						handleGetHeadMethods(Client* client, Location* location, struct stat* stat_info);
 	bool						tryOpenDir(Location* location);
 	bool						tryOpenFile(Location* location);

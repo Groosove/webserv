@@ -36,19 +36,19 @@ void HTTPRequest::takeHeader(char *header) {
 }
 
 void HTTPRequest::addBufferToRequest(char *buf) {
-	char *tmp = gnl_join(_request, buf);
+	char *tmp = ft_strjoin(_request, buf);
 	free(_request);
 	_request = tmp;
 	free(buf);
 }
 
 void HTTPRequest::addBodyToRequest(char *buf) {
-	char *tmp = gnl_join(_body, buf);
+	char *tmp = ft_strjoin(_body, buf);
 	free(_body);
 	_body = tmp;
 }
 
-void HTTPRequest::parse_request_http(char * buf) {
+void HTTPRequest::parse_request_http(char * buf, int bytes) {
 	std::cout << buf << std::endl;
 	addBufferToRequest(buf);
 	size_t  pos;
@@ -69,8 +69,8 @@ void HTTPRequest::parse_request_http(char * buf) {
 			else break;
 		}
 	}
-	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
-		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
+//	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
+//		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
 }
 
 int HTTPRequest::parseBodyRequest() {

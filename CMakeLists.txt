@@ -30,6 +30,7 @@ set(UTILS
 set(FILES
 		main.cpp
 		srcs/WebServer.cpp
+		srcs/WebServer_generateResponse.cpp
 		srcs/VirtualServer.cpp
 		srcs/Location.cpp
 		srcs/HTTPRequest.cpp
