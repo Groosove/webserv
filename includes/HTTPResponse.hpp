@@ -18,7 +18,7 @@ enum { count_status_code = 13, };
 class HTTPResponse {
 private:
 	std::string 	_status_code;
-	std::string		_buf_response;
+	char*			_buf_response;
 	char *			_body;
 	int				_body_size;
 
@@ -32,9 +32,9 @@ public:
 
 	static std::string				getMessagePhrase(const std::string& code);
 	const std::string&				getStatusCode() const { return (_status_code); }
-	const std::string&				getResponse() const { return _buf_response; }
+	char*							getResponse() const { return _buf_response; }
 
 	void							setStatusCode(const std::string& status) { _status_code = status; }
-	void							setBody(char* body, int size);
+	void							setBody(std::pair<char*, int> pair);
 
 };

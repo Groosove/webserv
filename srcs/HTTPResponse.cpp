@@ -40,20 +40,24 @@ std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 void	HTTPResponse::generateResponse() {
 	std::map<std::string, std::string>::const_iterator it;
 
-	_buf_response.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
+	int			size = 0;
+	std::string	header;
+	header.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "keep-alive" + CRLF + CRLF);
-	_buf_response.append(_body);
+	ft_add_bytes(_buf_response, (char*)header.c_str(), size, header.size());
 }
 
 HTTPResponse::HTTPResponse(): _body_size(0) {
 	_body = ft_strdup("");
 }
 
-void HTTPResponse::setBody(char *body, int size) {
+void HTTPResponse::setBody(std::pair<char*, int> pair) {
+	char*	body = pair.first;
+	int		size = pair.second;
 	char *tmp = (char *)malloc(_body_size + size);
-	tmp = (char *)ft_memcpy(tmp, _body, _body_size);
-	tmp = (char *)ft_memcpy(tmp + _body_size, body, size);
+	tmp = (char*)(std::memmove(tmp, _body, _body_size));
+	tmp = (char*)(std::memmove(tmp + _body_size, body, size));
 	_body_size += size;
 	tmp[_body_size] = '\0';
 }

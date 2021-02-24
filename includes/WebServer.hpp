@@ -40,8 +40,8 @@ public:
 	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info);
 	bool						tryOpenDir(Location* location);
 	bool						tryOpenFile(Location* location);
-	std::string					generateAutoindex(HTTPRequest* request, const std::string& index, const std::string& root_dir);
+	std::pair<char*, int>		generateAutoindex(HTTPRequest* request, const std::string& index, const std::string& root_dir);
 	std::vector<VirtualServer>	getVirtualServer();
 	VirtualServer*				searchVirtualServer(Client* client);
-	char*						readBodyResponse(const std::string& root, const std::string& file);
+	std::pair<char*, int>		readBodyResponse(const std::string& root, const std::string& file);
 };
