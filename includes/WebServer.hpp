@@ -32,7 +32,7 @@ public:
 	void						searchSelectSocket(fd_set& write_fd, fd_set& read_fd);
 	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);
 	void						deleteClient(std::vector<Client*>::iterator& client);
-	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd);
+	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd) throw();
 	void						treatmentStageGenerate(Client* client);
 	std::string					checkValidRequest(Location* location, Client* client, struct stat* info);
 	static void						checkDirectoryOrFile(struct stat* info, Location* location);

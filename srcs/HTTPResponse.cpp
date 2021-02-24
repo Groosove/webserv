@@ -39,6 +39,7 @@ std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 
 void	HTTPResponse::generateResponse() {
 	std::map<std::string, std::string>::const_iterator it;
+	size_t		pos = 0;
 	int size = 0;
 	std::string headers;
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
@@ -46,7 +47,11 @@ void	HTTPResponse::generateResponse() {
 						+ "Connection:" + SPACE + "keep-alive" + CRLF + CRLF);
 //	ft_add_bytes(_buf_response, (char *)headers.c_str(), size, headers.size());
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
-	_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
+	if ((pos = _status_code.find("4")) == std::string::npos)
+		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
+	else {
+		_body = ft_strdup((char*)generateErrorPage().c_str());
+	}
 }
 
 HTTPResponse::HTTPResponse(): _body_size(0) {
@@ -62,3 +67,11 @@ void HTTPResponse::setBody(std::pair<char *, int> dst) {
 }
 
 int HTTPResponse::getBodySize() const { return _header_size; }
+
+std::string HTTPResponse::generateErrorPage() {
+	return ("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" "
+			"content=\"width=device-width, initial-scale=1.0\"><meta http-equiv=\"X-UA-Compatible\" "
+			"content=\"ie=edge\"><title>" + _status_code + " " + getMessagePhrase(_status_code) + "</title><style>h1, "
+																								"p {text-align: center;}</style></head><body><h1>" + _status_code + " " + getMessagePhrase(_status_code) +
+			"</h1><hr><p>WebServ/0.1</p></body></html>");
+}

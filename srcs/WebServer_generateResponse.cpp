@@ -15,11 +15,10 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	std::string 	error;
 	struct stat		stat_info;
 
-	stat((location->getRoot()).c_str(), &stat_info);
 	if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
 		response->setStatusCode(error);
-	}
-	else {
+	} else {
+		stat((location->getRoot()).c_str(), &stat_info);
 		checkDirectoryOrFile(&stat_info, location);
 		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
 			handleDefaultResponse(client, location, &stat_info);

@@ -34,6 +34,7 @@ public:
 	static std::string				getMessagePhrase(const std::string& code);
 	const std::string&				getStatusCode() const { return (_status_code); }
 	char *							getResponse() const { return _buf_response; }
+	std::string						generateErrorPage();
 
 	int getBodySize() const;
 

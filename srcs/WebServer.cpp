@@ -103,7 +103,10 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 	size_t							ret = 0;
 	char*							chunk = nullptr;
 
-	for (it = _clients.begin(); it < _clients.end(); ++it) {
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+		std::cout << "CLIENTS FD: " << (*it)->getSocket() << " ";
+	std::cout << std::endl;
+	for (it = _clients.begin(); it != _clients.end(); ++it) {
 		if (FD_ISSET((*it)->getSocket(), &read_fd))
 			handle_requests(*it, read_fd, write_fd);
 		else if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
@@ -116,13 +119,15 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 }
 
 void WebServer::deleteClient(std::vector<Client*>::iterator& client) {
-//	close((*client)->getSocket());
+	close((*client)->getSocket());
+	std::vector<Client*>::iterator it;
 	delete *client;
 	_clients.erase(client);
-	client = _clients.begin();
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+		std::cout << "CLIENTS FDdddddd: " << (*it)->getSocket() << std::endl;
 }
 
-void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) {
+void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) throw(){
 	HTTPRequest*	request = client->getRequest();
 	char*			buf = (char*)calloc(4097, 1);
 	int				read_bytes;
@@ -134,8 +139,9 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		try {
 			if (read_bytes > 0) {
 				client->getRequest()->parse_request_http(buf, read_bytes);
-//				if (client->getRequest()->getParsingStage() == 3)
-				client->setStage(generate_response);
+				if (client->getRequest()->getParsingStage() == 3 ||
+								client->getRequest()->getParsingStage() == 2)
+					client->setStage(generate_response);
 			}
 			else if (read_bytes == 0)
 				client->setStage(close_connection);
@@ -143,6 +149,11 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		catch (const std::string& status_value) {
 			VirtualServer*	virtual_server = searchVirtualServer(client);
 			Location*		location = virtual_server->findLocation(client->getRequest());
+
+			client->getResponse()->setStatusCode(status_value);
+			client->getResponse()->generateResponse();
+			client->setResponseBuffer(client->getResponse()->getResponse(), client->getResponse()->getBodySize());
+			client->setStage(send_response);
 		}
 	}
 	else if (client->getStage() == generate_response) {

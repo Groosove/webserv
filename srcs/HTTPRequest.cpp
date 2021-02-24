@@ -65,6 +65,7 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 		else if (_stage == 1) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
+			else if (pos == (size_t)-1) { throw std::string("400"); }
 			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
 			else {std::cerr << "Error parse request" << std::endl;}
 
