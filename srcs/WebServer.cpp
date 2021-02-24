@@ -149,7 +149,7 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		treatmentStageGenerate(client);
 	}
 	else if (client->getStage() == send_response) {
-		send(client->getSocket(), client->getReponseBuffer().c_str(), strlen(client->getReponseBuffer().c_str()), 0);
+		send(client->getSocket(), client->getReponseBuffer(), client->getBytes(), 0);
 		FD_CLR(client->getSocket(), &read_fd);
 		FD_CLR(client->getSocket(), &write_fd);
 		client->setStage(close_connection);

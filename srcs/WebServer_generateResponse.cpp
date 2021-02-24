@@ -28,7 +28,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 //			handlePutRequest(client, location, &stat_info);
 	}
 	response->generateResponse();
-	client->setResponseBuffer(response->getResponse());
+	client->setResponseBuffer(response->getResponse(), response->getBodySize());
 	client->setStage(send_response);
 }
 
@@ -58,16 +58,20 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 		response->setBody(generateAutoindex(request, location->getIndex(), location->getRoot()));
 }
 
-char* WebServer::readBodyResponse(const std::string& root, const std::string& file) {
+std::pair<char *, int> WebServer::readBodyResponse(const std::string& root, const std::string& file) {
 	int 		fd;
-	char*		buf;
-	std::string	index_html;
+	char		buf[2048];
+	char*		index_html = ft_strdup("");
+	int			bytes;
+	int			size = 0;
 
 	if (!(fd = open((root + file).c_str(), O_RDONLY)))
 		std::cerr << "File not open" << std::endl;
-	while (get_next_line(fd, &buf))
-		index_html.append(buf);
-	return (char*)index_html.c_str();
+	while ((bytes = read(fd, &buf, 2048)) > 0) {
+		buf[bytes] = '\0';
+		index_html = (char *)ft_memjoin(index_html, buf, size, bytes);
+	}
+	return std::make_pair(index_html, size);
 }
 
 void WebServer::checkDirectoryOrFile(struct stat *info, Location *location) {
@@ -79,7 +83,7 @@ void WebServer::checkDirectoryOrFile(struct stat *info, Location *location) {
 	}
 }
 
-std::string WebServer::generateAutoindex(HTTPRequest *request, const std::string &index,
+std::pair<char *, int> WebServer::generateAutoindex(HTTPRequest *request, const std::string &index,
 												 const std::string &root_dir) {
 	std::string 	autoindex;
 	DIR*			directory = opendir(root_dir.c_str());
@@ -94,5 +98,5 @@ std::string WebServer::generateAutoindex(HTTPRequest *request, const std::string
 		}
 		autoindex.append("</body></html>");
 	}
-	return autoindex;
+	return std::make_pair((char *)autoindex.c_str(), autoindex.size());
 }
