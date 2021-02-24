@@ -120,11 +120,8 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 
 void WebServer::deleteClient(std::vector<Client*>::iterator& client) {
 	close((*client)->getSocket());
-	std::vector<Client*>::iterator it;
 	delete *client;
 	_clients.erase(client);
-	for (it = _clients.begin(); it != _clients.end(); ++it)
-		std::cout << "CLIENTS FDdddddd: " << (*it)->getSocket() << std::endl;
 }
 
 void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) throw(){

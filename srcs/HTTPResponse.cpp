@@ -50,7 +50,7 @@ void	HTTPResponse::generateResponse() {
 	if ((pos = _status_code.find("4")) == std::string::npos)
 		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 	else {
-		_body = ft_strdup((char*)generateErrorPage().c_str());
+		_buf_response = (char*)ft_memjoin(_buf_response, (char*)generateErrorPage().c_str(), _header_size, generateErrorPage().size());
 	}
 }
 
