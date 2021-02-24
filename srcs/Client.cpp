@@ -17,3 +17,5 @@ Client::Client(int client_socket, const std::string &host, const std::string &po
 Client::~Client() {
 
 }
+
+int Client::getBytes() const { return _bytes; }

@@ -39,25 +39,26 @@ std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 
 void	HTTPResponse::generateResponse() {
 	std::map<std::string, std::string>::const_iterator it;
-
-	int			size = 0;
-	std::string	header;
-	header.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
+	int size = 0;
+	std::string headers;
+	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "keep-alive" + CRLF + CRLF);
-	ft_add_bytes(_buf_response, (char*)header.c_str(), size, header.size());
+//	ft_add_bytes(_buf_response, (char *)headers.c_str(), size, headers.size());
+	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
+	_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 }
 
 HTTPResponse::HTTPResponse(): _body_size(0) {
 	_body = ft_strdup("");
+	_buf_response = ft_strdup("");
+	_header_size = 0;
 }
 
-void HTTPResponse::setBody(std::pair<char*, int> pair) {
-	char*	body = pair.first;
-	int		size = pair.second;
-	char *tmp = (char *)malloc(_body_size + size);
-	tmp = (char*)(std::memmove(tmp, _body, _body_size));
-	tmp = (char*)(std::memmove(tmp + _body_size, body, size));
-	_body_size += size;
-	tmp[_body_size] = '\0';
+void HTTPResponse::setBody(std::pair<char *, int> dst) {
+	char *body = dst.first;
+	int size = dst.second;
+	_body = (char *)ft_memjoin(_body, body, _body_size,size);
 }
+
+int HTTPResponse::getBodySize() const { return _header_size; }

@@ -26,8 +26,7 @@ set(UTILS
 		utils_function/ft_atoi.cpp
 		utils_function/ft_find.cpp
 		utils_function/ft_memcpy.cpp
-		utils_function/ft_add_bytes.cpp
-		utils_function/ft_add.cpp
+		utils_function/ft_memjoin.cpp
 		)
 
 set(FILES
@@ -40,7 +39,7 @@ set(FILES
 		srcs/HTTPResponse.cpp
 		srcs/Client.cpp
 		srcs/FileParser.cpp
-		srcs/CGI.cpp)
+		srcs/CGI.cpp
+		)
 
 add_executable(WebServ ${UTILS} ${FILES} )
-add_executable(DATA utils_function/ft_current_data.cpp)
