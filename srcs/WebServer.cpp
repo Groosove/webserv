@@ -103,16 +103,15 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 	size_t							ret = 0;
 	char*							chunk = nullptr;
 
-	for (it = _clients.begin(); it != _clients.end(); ++it)
-		std::cout << "CLIENTS FD: " << (*it)->getSocket() << " ";
-	std::cout << std::endl;
 	for (it = _clients.begin(); it != _clients.end(); ++it) {
 		if (FD_ISSET((*it)->getSocket(), &read_fd))
 			handle_requests(*it, read_fd, write_fd);
 		else if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
 			handle_requests(*it, read_fd, write_fd);
-		else if ((*it)->getStage() == close_connection)
+		else if ((*it)->getStage() == close_connection) {
 			deleteClient(it);
+			break ;
+		}
 		if (_clients.empty())
 			break ;
 	}
@@ -157,9 +156,18 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		treatmentStageGenerate(client);
 	}
 	else if (client->getStage() == send_response) {
-		int ret = 0;
-		while (ret != client->getBytes())
-			ret += send(client->getSocket(), client->getReponseBuffer() + ret, client->getBytes() - ret, 0);
+		if (client->getBytes() != client->getSendBytes()) {
+			size_t ret;
+			if (FD_ISSET(client->getSocket(), &write_fd)) {
+				ret = send(client->getSocket(), client->getReponseBuffer() + client->getSendBytes(),
+							client->getBytes() - client->getSendBytes(), 0);
+				if (errno != EPIPE) {
+					client->setSendBytes(client->getSendBytes() + ret);
+					return;
+				}
+				errno = 0;
+			}
+		}
 		FD_CLR(client->getSocket(), &read_fd);
 		FD_CLR(client->getSocket(), &write_fd);
 		client->setStage(close_connection);

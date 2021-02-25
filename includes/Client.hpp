@@ -31,6 +31,7 @@ private:
 	char*			_write_buffer;
 	char* 			_response_complite;
 	int				_bytes;
+	size_t 			_send_bytes;
 
 public:
 
@@ -46,6 +47,10 @@ public:
 	char*					getReadBuffer() { return _read_buffer; }
 	char*					getWriteBuffer() { return _write_buffer; }
 	char *					getReponseBuffer() { return _response_complite; }
+
+	size_t& getSendBytes();
+
+	void setSendBytes(size_t sendBytes);
 
 	int getBytes() const;
 

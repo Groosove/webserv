@@ -151,6 +151,7 @@
 int main(int ac, char** av) {
 	WebServer webServer(av[1]);
 
+	signal(SIGPIPE, SIG_IGN);
 	webServer.createVirtualServer();
 	std::vector<VirtualServer>::iterator it_begin;
 	std::vector<VirtualServer>::iterator it_end;

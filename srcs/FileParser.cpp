@@ -20,7 +20,7 @@ VirtualServer FileParser::parseConfigFile(std::vector<std::string> config, size_
 	_parseServerParam(config, index, server);
 	for (size_t i = index; i < size; ++i) {
 		if (config[i].find("location:") != std::string::npos && checkIndent(config[i], 1))
-			_parseLocationParam(config, i, server);
+			_parseLocationParam(config, i, server); // TODO Если директория без слеша, то нужно дополнять!
 		else if (config[i].empty()) continue;
 		else { std::cerr << "Error parse config file" << std::endl; break; }
 		index = i;

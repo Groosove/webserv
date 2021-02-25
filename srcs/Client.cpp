@@ -15,7 +15,15 @@ Client::Client(int client_socket, const std::string &host, const std::string &po
 }
 
 Client::~Client() {
-
+	free(_response_complite);
 }
 
 int Client::getBytes() const { return _bytes; }
+
+size_t& Client::getSendBytes() {
+	return _send_bytes;
+}
+
+void Client::setSendBytes(size_t sendBytes) {
+	_send_bytes = sendBytes;
+}

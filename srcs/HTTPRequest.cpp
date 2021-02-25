@@ -34,28 +34,9 @@ void HTTPRequest::takeHeader(char *header) {
 	free(header);
 }
 
-void HTTPRequest::addBufferToRequest(char *buf, int bytes) {
-	char *tmp = (char *)malloc(bytes + _requset_size + 1);
-	tmp = (char *)ft_memcpy(tmp, _request, _requset_size);
-	tmp = (char *)ft_memcpy(tmp + _requset_size, buf, bytes);
-	_requset_size += bytes;
-	_request = tmp;
-}
-
-void HTTPRequest::addBodyToRequest(char *buf, int bytes) {
-	char *tmp = (char *)malloc(bytes + _body_size + 1);
-	tmp = (char *)ft_memcpy(tmp, _request, _body_size);
-	tmp = (char *)ft_memcpy(tmp + _body_size, buf, bytes);
-	free(_body);
-	_body = tmp;
-}
-
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
-	std::cout << buf << std::endl;
-//	addBufferToRequest(buf, bytes);
-//	ft_add_bytes(_request, buf, _requset_size, bytes);
 	_request = (char *)ft_memjoin(_request, buf, _requset_size, bytes);
-	size_t  pos;
+	size_t pos;
 	while (_request && _stage != 3) {
 		if (_stage == 0) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t) -1)
@@ -67,23 +48,19 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 				takeHeader(getStr(pos));
 			else if (pos == (size_t)-1) { throw std::string("400"); }
 			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
-			else {std::cerr << "Error parse request" << std::endl;}
-
+			else break;
 		} else if (_stage == 2) {
+			if (!ft_compare(getMethod(), "GET")) { _stage = 3; return; }
 			if (parseBodyRequest() == 1)
 				_stage = 3;
 			else break;
 		}
 	}
-	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
-		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
-	std::cout << "BODY:" << _body << std::endl;
 }
 
 int HTTPRequest::parseBodyRequest() {
 	if (_request_params.count("content-length")) {
 		size_t size = ft_atoi(_request_params["content-length"].c_str());
-//		addBodyToRequest(_request, size);
 		_body = (char *) ft_memjoin(_body, _request, _body_size, size);
 		if (ft_strlen(_body) > size) {
 			char *tmp = ft_substr(_body, 0, size);
@@ -101,7 +78,7 @@ int HTTPRequest::parseBodyRequest() {
 				} else if (size != 0) {
 					char *tmp = (char *)malloc(sizeof(size) + 1);
 					tmp[size] = '\0';
-					addBodyToRequest(tmp, size);
+					_body = (char *)ft_memjoin(_body, tmp, _body_size, size);
 					free(tmp);
 					size = -1;
 				} else return 1;
