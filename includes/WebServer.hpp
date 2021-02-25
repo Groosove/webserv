@@ -19,6 +19,14 @@ private:
 	std::vector<Client*>		_clients;
 	std::vector<VirtualServer>	_virtual_server;
 	bool						_status;
+	int							_max_fd;
+public:
+	void setMaxFd(int maxFd);
+
+public:
+	int getMaxFd() const;
+
+private:
 
 	void		parseConfigFile(std::ifstream& file);
 public:
@@ -26,8 +34,8 @@ public:
 	~WebServer() {};
 	void						handle();
 	void						createVirtualServer();
-	void						initSocketSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
-	void						addClientSocketToSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
+	void						initSocketSet(fd_set& write_fd, fd_set& read_fd);
+	void						addClientSocketToSet(fd_set& write_fd, fd_set& read_fd);
 	void						treatmentAccept(fd_set& read_fd);
 	void						searchSelectSocket(fd_set& write_fd, fd_set& read_fd);
 	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);

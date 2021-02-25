@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <cstring>
 
-WebServer::WebServer(const char *config_name): _status(true) {
+WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
 	int fd = open(config_name, O_RDONLY);
 	char *line = nullptr;
@@ -40,16 +40,15 @@ std::vector<VirtualServer> WebServer::getVirtualServer() {
 void WebServer::handle() {
 	fd_set	write_fd;
 	fd_set	read_fd;
-	int		max_fd;
 	int		select_value;
 	struct	timeval	tv;
 
 	tv.tv_usec = 0;
 	while(_status) {
 		tv.tv_sec = 240;
-		initSocketSet(write_fd, read_fd, max_fd);
-		addClientSocketToSet(write_fd, read_fd, max_fd);
-		select_value = select(max_fd + 1, &read_fd, &write_fd, 0, &tv);
+		initSocketSet(write_fd, read_fd);
+		addClientSocketToSet(write_fd, read_fd);
+		select_value = select(getMaxFd() + 1, &read_fd, &write_fd, 0, &tv);
 		if (select_value < 1) {
 			if (errno != EINTR)
 				std::cout << "Select error" << std::endl;
@@ -66,23 +65,23 @@ void WebServer::handle() {
 	}
 }
 
-void WebServer::initSocketSet(fd_set& write_fd, fd_set& read_fd, int& max_fd) {
+void WebServer::initSocketSet(fd_set& write_fd, fd_set& read_fd) {
 	FD_ZERO(&write_fd);
 	FD_ZERO(&read_fd);
 
 	for (size_t i = 0; i < _virtual_server.size(); ++i)
 		FD_SET(_virtual_server[i].getSocket(), &read_fd);
-	max_fd = _virtual_server.back().getSocket();
+	setMaxFd(_virtual_server.back().getSocket());
 }
 
-void WebServer::addClientSocketToSet(fd_set &write_fd, fd_set &read_fd, int &max_fd) {
+void WebServer::addClientSocketToSet(fd_set &write_fd, fd_set &read_fd) {
 	for (size_t i = 0; i < _clients.size(); ++i) {
 		if (_clients[i]->getStage() == parsing_request)
 			FD_SET(_clients[i]->getSocket(), &read_fd);
 		if(_clients[i]->getStage() != parsing_request)
 			FD_SET(_clients[i]->getSocket(), &write_fd);
-		if (_clients[i]->getSocket() > max_fd)
-			max_fd = _clients[i]->getSocket();
+		if (_clients[i]->getSocket() > getMaxFd())
+			setMaxFd(_clients[i]->getSocket());
 	}
 }
 
@@ -157,6 +156,10 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 	}
 	else if (client->getStage() == send_response) {
 		if (client->getBytes() != client->getSendBytes()) {
+			if (client->getSocket() < getMaxFd()) {
+				client->setStage(close_connection);
+				return;
+			}
 			size_t ret;
 			std::cout << "SEND BYRES: " << client->getSendBytes() << " " << client->getBytes() << std::endl;
 			if (FD_ISSET(client->getSocket(), &write_fd)) {
@@ -164,12 +167,12 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 				ret = send(client->getSocket(), client->getReponseBuffer() + client->getSendBytes(),
 							client->getBytes() - client->getSendBytes(), 0);
 				client->setSendBytes(client->getSendBytes() + ret);
-				if (client->getSendBytes() > client->getBytes())
+				if (client->getSendBytes() > client->getBytes()) {
 					client->setSendBytes(0);
+				}
 				return;
 			}
 		}
-		std::cout << "HELLO I AM HERE" << std::endl;
 		FD_CLR(client->getSocket(), &read_fd);
 		FD_CLR(client->getSocket(), &write_fd);
 		client->setStage(close_connection);
@@ -182,4 +185,12 @@ VirtualServer *WebServer::searchVirtualServer(Client *client) {
 			return &_virtual_server[i];
 	}
 	return nullptr;
+}
+
+int WebServer::getMaxFd() const {
+	return _max_fd;
+}
+
+void WebServer::setMaxFd(int maxFd) {
+	_max_fd = maxFd;
 }
