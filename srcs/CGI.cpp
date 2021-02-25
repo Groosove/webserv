@@ -12,6 +12,7 @@
 
 
 CGI::CGI(HTTPRequest request) {
+	_env = (char**)calloc(18, sizeof(char*));
 	_env[0] = ft_strdup("AUTH_TYPE=BASIC");
 	_env[1] = ft_strdup("CONTENT_LENGTH="); // длина содержимого
 	_env[2] = ft_strdup("CONTENT_TYPE="); //MIME-type содержимого text/html, image/jpg
@@ -47,22 +48,23 @@ void CGI::execCGI() {
 	int file_fd;
 
 	fd_out = dup(1);
-	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0666);
-	if ((pid = fork()) == -1) {;}
-	else if (pid == 0) {
-		dup2(file_fd, 1);
-		dup2(fd_out, 1);
-		close(file_fd);
-		int status = execve(_argv[0], _argv, _env);
-		exit(status);
-	} else {
-
+	file_fd = open("file", O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	if ((pid = fork()) == -1) {
+		;
 	}
+	if (pid == 0) {
+		dup2(file_fd, 1);
+		exit(execve(_argv[0], _argv, _env));
+	}
+	else
+		wait(nullptr);
+	dup2(fd_out, 1);
+	close(file_fd);
 }
 
 char ** CGI::pathCGI() {
-	_argv[0] = ft_strdup("/Users/fkathryn/Desktop/cgi/test.py");
-	_argv[1] = ft_strdup("/Users/fkathryn/Desktop/cgi/test.py");
+	_argv[0] = ft_strdup("/Users/fkathryn/Desktop/webserv/cgi_scripts/test.py");
+	_argv[1] = ft_strdup("/Users/fkathryn/Desktop/webserv/cgi_scripts/test.py");
 	_argv[2] = nullptr;
 }
 

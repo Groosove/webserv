@@ -12,7 +12,7 @@
 
 class CGI {
 private:
-	char* _env[18];
+	char** _env;
 	char* _argv[3];
 
 public:
