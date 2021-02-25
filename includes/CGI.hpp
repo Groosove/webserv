@@ -8,3 +8,18 @@
 
 #pragma once
 
+#include "HTTPRequest.hpp"
+
+class CGI {
+private:
+	char* _env[18];
+	char* _argv[3];
+
+public:
+	CGI(HTTPRequest request);
+	~CGI();
+
+	void execCGI();
+	char** getEnv();
+	char** pathCGI();
+};
