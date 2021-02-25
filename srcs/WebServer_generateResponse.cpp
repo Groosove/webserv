@@ -59,14 +59,14 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 
 std::pair<char *, int> WebServer::readBodyResponse(const std::string& root, const std::string& file) {
 	int 		fd;
-	char		buf[2048];
+	char		buf[40000];
 	char*		index_html = ft_strdup("");
 	int			bytes;
 	int			size = 0;
 
 	if (!(fd = open((root + file).c_str(), O_RDONLY)))
 		std::cerr << "File not open" << std::endl;
-	while ((bytes = read(fd, &buf, 2048)) > 0) {
+	while ((bytes = read(fd, &buf, 40000)) > 0) {
 		buf[bytes] = '\0';
 		index_html = (char *)ft_memjoin(index_html, buf, size, bytes);
 	}
