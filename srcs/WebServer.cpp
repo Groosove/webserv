@@ -110,7 +110,7 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 			handle_requests(*it, read_fd, write_fd);
 		else if ((*it)->getStage() == close_connection) {
 			deleteClient(it);
-			break ;
+			break;
 		}
 		if (_clients.empty())
 			break ;
@@ -158,16 +158,18 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 	else if (client->getStage() == send_response) {
 		if (client->getBytes() != client->getSendBytes()) {
 			size_t ret;
+			std::cout << "SEND BYRES: " << client->getSendBytes() << " " << client->getBytes() << std::endl;
 			if (FD_ISSET(client->getSocket(), &write_fd)) {
+				std::cout << client->getSocket() << std::endl;
 				ret = send(client->getSocket(), client->getReponseBuffer() + client->getSendBytes(),
 							client->getBytes() - client->getSendBytes(), 0);
-				if (errno != EPIPE) {
-					client->setSendBytes(client->getSendBytes() + ret);
-					return;
-				}
-				errno = 0;
+				client->setSendBytes(client->getSendBytes() + ret);
+				if (client->getSendBytes() > client->getBytes())
+					client->setSendBytes(0);
+				return;
 			}
 		}
+		std::cout << "HELLO I AM HERE" << std::endl;
 		FD_CLR(client->getSocket(), &read_fd);
 		FD_CLR(client->getSocket(), &write_fd);
 		client->setStage(close_connection);
