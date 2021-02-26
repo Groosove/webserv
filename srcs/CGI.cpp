@@ -55,32 +55,31 @@ void CGI::execCGI(HTTPResponse response) {
 	pid_t pid;
 	int file_fd;
 	char buf;
-	char* result_buf;
+	char* result_buf = (char*)calloc(10000, sizeof(char));
 
 	fd_out = dup(1);
-	file_fd = open("file", O_CREAT | O_WRONLY | O_TRUNC, 0666);
-	if ((pid = fork()) == -1) {
-		;
-	}
-	if (pid == 0) {
+	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0666);
+	if ((pid = fork()) == 0) {
 		dup2(file_fd, 1);
 		exit(execve(_argv[0], _argv, getEnv()));
+	}
+	else if(pid == -1) {
+		;//error
 	}
 	else {
 		write(fd_out, _request.getBody(), _request.getRequestSize());
 		wait(nullptr);
 		lseek(file_fd, 0, 0);
-		int r, size, i = 0;
+		int r, size = 0;
 		while ((r = read(file_fd, &buf, 1)) > 0) {
-			result_buf[i++] = buf;
-			size++;
+			result_buf[size++] = buf;
 		}
 		std::pair<char*, int> result;
 		result.first = result_buf;
 		result.second = size;
+		//delete old response
 		response.setBody(result);
 	}
-	dup2(fd_out, 1);
 	close(file_fd);
 }
 
