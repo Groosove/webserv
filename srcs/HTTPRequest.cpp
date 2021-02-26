@@ -10,7 +10,7 @@
 
 HTTPRequest::HTTPRequest(): _stage(false), _body_size(0) {
 	_request = ft_strdup("");
-	_requset_size = 0;
+	_request_size = 0;
 	_body = ft_strdup("");
 }
 
@@ -22,7 +22,7 @@ std::string HTTPRequest::getArgument(const std::string &dst, int start) {
 
 char * HTTPRequest::getStr(size_t pos) {
 	char *result = ft_substr(_request, 0, pos);
-	_request = ft_substr(_request, pos + 2, _requset_size);
+	_request = ft_substr(_request, pos + 2, _request_size);
 	return result;
 }
 
@@ -35,10 +35,10 @@ void HTTPRequest::takeHeader(char *header) {
 }
 
 void HTTPRequest::addBufferToRequest(char *buf, int bytes) {
-	char *tmp = (char *)malloc(bytes + _requset_size + 1);
-	tmp = (char *)ft_memcpy(tmp, _request, _requset_size);
-	tmp = (char *)ft_memcpy(tmp + _requset_size, buf, bytes);
-	_requset_size += bytes;
+	char *tmp = (char *)malloc(bytes + _request_size + 1);
+	tmp = (char *)ft_memcpy(tmp, _request, _request_size);
+	tmp = (char *)ft_memcpy(tmp + _request_size, buf, bytes);
+	_request_size += bytes;
 	_request = tmp;
 }
 
@@ -53,8 +53,8 @@ void HTTPRequest::addBodyToRequest(char *buf, int bytes) {
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
 	std::cout << buf << std::endl;
 //	addBufferToRequest(buf, bytes);
-//	ft_add_bytes(_request, buf, _requset_size, bytes);
-	_request = (char *)ft_memjoin(_request, buf, _requset_size, bytes);
+//	ft_add_bytes(_request, buf, _request_size, bytes);
+	_request = (char *)ft_memjoin(_request, buf, _request_size, bytes);
 	size_t  pos;
 	while (_request && _stage != 3) {
 		if (_stage == 0) {
@@ -146,4 +146,3 @@ void HTTPRequest::setVersionHTTP(char *version_http) {
 void HTTPRequest::setStatusCode(const std::string &status_code) {
 	_status_code = status_code;
 }
-

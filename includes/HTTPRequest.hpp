@@ -24,7 +24,7 @@ private:
 
 	char *	_body;
 	char *	_request;
-	int		_requset_size;
+	int		_request_size;
 	int		_body_size;
 
 	int			_stage;
@@ -48,6 +48,7 @@ public:
 	const char *						getHostUrl() const { return _host_url; };
 	const std::string&					getStatusCode() const { return _status_code; }
 	int									getParsingStage() const { return _stage; }
+	int 								getRequestSize() const { return _request_size; }
 	std::map<std::string, std::string>	getHeaders() { return _request_params; }
 	const char*							getBody() { return _body; }
 	static std::string getArgument(const std::string &dst, int start);
