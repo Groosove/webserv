@@ -9,19 +9,25 @@
 
 void WebServer::treatmentStageGenerate(Client *client) {
 	VirtualServer*	virtual_server = searchVirtualServer(client);
-	Location*		location = virtual_server->findLocation(client->getRequest());
+	std::map<std::string, Location>::iterator it = virtual_server->findLocation(client->getRequest());
+	Location*		location = &it->second;
 	HTTPResponse*	response = client->getResponse();
 	HTTPRequest*	request = client->getRequest();
 	std::string 	error;
 	struct stat		stat_info;
+	std::string		path;
 
+	if (location)
+		path = location->getRoot() + std::string(request->getPath()).erase(0, it->first.size());
+	else
+		path = "";
 	if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
 		response->setStatusCode(error);
 	} else {
-		stat((location->getRoot()).c_str(), &stat_info);
-		checkDirectoryOrFile(&stat_info, location);
+		stat((path.c_str()), &stat_info);
+		checkDirectoryOrFile(&stat_info, location, path);
 		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
-			handleDefaultResponse(client, location, &stat_info);
+			handleDefaultResponse(client, location, &stat_info, path);
 		else if (ft_compare(request->getMethod(), "PUT"))
 			nullptr;
 //			handlePutRequest(client, location, &stat_info);
@@ -42,29 +48,29 @@ std::string WebServer::checkValidRequest(Location *location, Client *client,
 	return std::string("");
 }
 
-void WebServer::handleDefaultResponse(Client *client, Location *location, struct stat *stat_info) {
+void WebServer::handleDefaultResponse(Client *client, Location *location, struct stat *stat_info, std::string& path) {
 	HTTPRequest*	request = client->getRequest();
 	HTTPResponse*	response = client->getResponse();
 
 	response->setStatusCode("200");
 	if (S_ISLNK(stat_info->st_mode) || S_ISREG(stat_info->st_mode)) {
 		if (ft_compare(request->getMethod(), "GET"))
-			response->setBody(readBodyResponse(location->getRoot(), location->getIndex()));
+			response->setBody(readBodyResponse(path));
 	}
 	else if (S_ISDIR(stat_info->st_mode) && !location->getAutoIndex())
 		response->setStatusCode("404");
 	else if (S_ISDIR(stat_info->st_mode) && ft_compare(request->getMethod(), "GET") && location->getAutoIndex())
-		response->setBody(generateAutoindex(request, location->getIndex(), location->getRoot()));
+		response->setBody(generateAutoindex(request, path));
 }
 
-std::pair<char *, int> WebServer::readBodyResponse(const std::string& root, const std::string& file) {
+std::pair<char *, int> WebServer::readBodyResponse(const std::string& path) {
 	int 		fd;
 	char		buf[40000];
 	char*		index_html = ft_strdup("");
 	int			bytes;
 	int			size = 0;
 
-	if (!(fd = open((root + file).c_str(), O_RDONLY)))
+	if (!(fd = open(path.c_str(), O_RDONLY)))
 		std::cerr << "File not open" << std::endl;
 	while ((bytes = read(fd, &buf, 40000)) > 0) {
 		buf[bytes] = '\0';
@@ -73,24 +79,23 @@ std::pair<char *, int> WebServer::readBodyResponse(const std::string& root, cons
 	return std::make_pair(index_html, size);
 }
 
-void WebServer::checkDirectoryOrFile(struct stat *info, Location *location) {
+void WebServer::checkDirectoryOrFile(struct stat *info, Location *location, std::string& path) {
 	int fd = 0;
 	if (S_ISDIR(info->st_mode) &&
-		(fd = open((location->getRoot() + location->getIndex()).c_str(), O_RDONLY))) {
-		stat((location->getRoot() + location->getIndex()).c_str(), info);
+		(fd = open((path + location->getIndex()).c_str(), O_RDONLY))) {
+		path = path + location->getIndex();
+		stat(path.c_str(), info);
 		close(fd);
 	}
 }
 
-std::pair<char *, int> WebServer::generateAutoindex(HTTPRequest *request, const std::string &index,
-												 const std::string &root_dir) {
+std::pair<char *, int> WebServer::generateAutoindex(HTTPRequest *request, const std::string& path) {
 	std::string 	autoindex;
-	DIR*			directory = opendir(root_dir.c_str());
+	DIR*			directory = opendir(path.c_str());
 	struct dirent*	entry = nullptr;
 
 	if (directory) {
-		autoindex.append("<html><head><title>Index of " + index + "</title></head><body>" +
-		"<h1>Index of " + index + "</h1><br><hr><a href=\"../\">../</a><br>");
+		autoindex.append("<html><head><title>Index of </title></head><body><h1>Index of </h1><br><hr><a href=\"../\">../</a><br>");
 		while ((entry = readdir(directory)) != nullptr) {
 			autoindex.append("<a href=\"" + std::string(entry->d_name) + "\">"
 							+ std::string(entry->d_name) + "</a><br>");

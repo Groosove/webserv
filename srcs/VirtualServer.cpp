@@ -74,51 +74,27 @@ void VirtualServer::preparationParams() {
 	}
 }
 
-//const char* VirtualServer::treatmentRequest(const char* buf) {
-//	_request = new HTTPRequest(buf);
-//	if (std::string(_request->getMethod()).find("GET") != std::string::npos)
-//		generateResponse(_request->getMethod());
-//	return _complete_response.c_str();
-//}
+int	ft_strrchr(const char *str, int ch)
+{
+	int	index;
 
-//void	VirtualServer::generateResponse(const char *method) {
-//	std::map<std::string, Location>::iterator begin = _location.begin();
-//	std::cout << begin->first << std::endl;
-//	while (begin != _location.end()) {
-//		if (begin->first.find((_request->getPath())) != std::string::npos) {
-//			if (!begin->second.validationLocation(_request->getMethod()))
-//				return;
-//			else
-//			{
-//				_response = new HTTPResponse(_request->getMethod());
-//				_complete_response.append(_response->getResponse());
-//				addBodyToResponse(begin->second);
-//				break ;
-//			}
-//		}
-//		begin++;
-//	}
-//}
-
-void VirtualServer::addBodyToResponse(const Location& location) {
-	std::ifstream	thread(location.getRoot() + location.getIndex());
-	std::string		buf;
-
-	while(std::getline(thread, buf))
-		_complete_response.append(buf);
-
-	_complete_response.append("\r\n\r\n\r\n");
-	std::cout << "RESPONSE: " << _complete_response << std::endl;
+	index = ft_strlen(str);
+	while (index-- != 0)
+		if (str[index] == ch)
+			return (index);
+	if (str[index] == ch)
+		return (index);
+	return (-1);
 }
 
-Location *VirtualServer::findLocation(HTTPRequest* request) {
+std::map<std::string, Location>::iterator VirtualServer::findLocation(HTTPRequest* request) {
 	std::map<std::string, Location>::iterator it;
+	size_t		current_size = 0;
 
 	for (it = _location.begin(); it != _location.end(); ++it) {
-		if (it->first.find(request->getPath()) != std::string::npos)
-			return &it->second;
+		if (it->first.find(request->getPath()) == 0 && current_size < it->first.size())
+			current_size = it->first.size();
 	}
-	return nullptr;
+	it--;
+	return (it);
 }
-
-

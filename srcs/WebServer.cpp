@@ -143,7 +143,7 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 		}
 		catch (const std::string& status_value) {
 			VirtualServer*	virtual_server = searchVirtualServer(client);
-			Location*		location = virtual_server->findLocation(client->getRequest());
+//			Location*		location = virtual_server->findLocation(client->getRequest());
 
 			client->getResponse()->setStatusCode(status_value);
 			client->getResponse()->generateResponse();
@@ -157,6 +157,8 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 	else if (client->getStage() == send_response) {
 		if (client->getBytes() != client->getSendBytes()) {
 			if (client->getSocket() < getMaxFd()) {
+//				FD_CLR(client->getSocket(), &read_fd);
+//				FD_CLR(client->getSocket(), &write_fd);
 				client->setStage(close_connection);
 				return;
 			}

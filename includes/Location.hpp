@@ -34,7 +34,7 @@ private:
 	std::vector<std::string>	_allow_methods;
 	bool						_autoindex;
 	size_t						_request_limits;
-
+	std::string					_path_location;
 public:
 	Location() {};
 	~Location() {};
@@ -45,8 +45,8 @@ public:
 	void						setIndex(const std::string& index);
 	void						setAllowMethods(const std::string& allow_methods);
 
-	const std::string&				getRoot() const { return _root; }
-	const std::string&				getIndex() const { return _index; }
+	std::string&				getRoot() { return _root; }
+	std::string&				getIndex() { return _index; }
 	bool getAutoIndex() const { return _autoindex; }
 	size_t getRequestLimits() const { return _request_limits; }
 	std::vector<std::string>	getAllowMethods() { return _allow_methods; }
@@ -55,4 +55,5 @@ public:
 	bool						validationLocation(const char* method);
 	bool						tryOpenDir();
 	bool						tryOpenFile();
+
 };

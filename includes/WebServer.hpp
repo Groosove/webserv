@@ -43,13 +43,13 @@ public:
 	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd) throw();
 	void						treatmentStageGenerate(Client* client);
 	std::string					checkValidRequest(Location* location, Client* client, struct stat* info);
-	static void						checkDirectoryOrFile(struct stat* info, Location* location);
-	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info);
+	static void						checkDirectoryOrFile(struct stat* info, Location* location, std::string& path);
+	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
 	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info);
 	bool						tryOpenDir(Location* location);
 	bool						tryOpenFile(Location* location);
-	std::pair<char *, int>		generateAutoindex(HTTPRequest* request, const std::string& index, const std::string& root_dir);
+	std::pair<char *, int>		generateAutoindex(HTTPRequest* request, const std::string& path);
 	std::vector<VirtualServer>	getVirtualServer();
 	VirtualServer*				searchVirtualServer(Client* client);
-	static std::pair<char *, int>		readBodyResponse(const std::string& root, const std::string& file);
+	static std::pair<char *, int>		readBodyResponse(const std::string& path);
 };
