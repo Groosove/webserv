@@ -36,7 +36,7 @@ private:
 	size_t						_request_limits;
 	std::string					_path_location;
 public:
-	Location() {};
+	Location();
 	~Location() {};
 
 	void						setRequestLimits(const std::string& body_size);

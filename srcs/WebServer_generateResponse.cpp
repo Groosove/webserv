@@ -21,16 +21,18 @@ void WebServer::treatmentStageGenerate(Client *client) {
 		path = location->getRoot() + std::string(request->getPath()).erase(0, it->first.size());
 	else
 		path = "";
-	if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
+	if (stat((path.c_str()), &stat_info) == -1)
+		response->setStatusCode("404");
+	else if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
 		response->setStatusCode(error);
 	} else {
-		stat((path.c_str()), &stat_info);
 		checkDirectoryOrFile(&stat_info, location, path);
+		if (ft_compare(request->getMethod(), "POST"))
+			handlePostReponse(client, location, &stat_info, path);
 		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
 			handleDefaultResponse(client, location, &stat_info, path);
 		else if (ft_compare(request->getMethod(), "PUT"))
-			nullptr;
-//			handlePutRequest(client, location, &stat_info);
+			handlePutResponse(client, location, &stat_info, path);
 	}
 	response->generateResponse();
 	client->setResponseBuffer(response->getResponse(), response->getBodySize());
@@ -63,6 +65,47 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 		response->setBody(generateAutoindex(request, path));
 }
 
+void WebServer::handlePutResponse(Client *client, Location *location, struct stat *stat_info,
+								  std::string &path) {
+	HTTPResponse*	response = client->getResponse();
+	int 			fd = 0;
+	int				tmp_fd = open(path.c_str(), O_RDONLY);
+
+	if (response->getBodySize() < location->getRequestLimits())
+		response->setStatusCode("413");
+	if (S_ISDIR(stat_info->st_mode))
+		response->setStatusCode("404");
+	if ((fd = open(path.c_str(), O_RDONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+		response->setStatusCode("500");
+	else {
+		write(fd, response->getBody(), response->getBodySize());
+		if (tmp_fd < 0)
+			response->setStatusCode("200");
+		else
+			response->setStatusCode("201");
+		close(fd);
+		close(tmp_fd);
+	}
+}
+
+void WebServer::handlePostReponse(Client *client, Location *location, struct stat *stat_info,
+								  std::string &path) {
+	HTTPResponse*	response = client->getResponse();
+	int				fd = 0;
+
+	if (response->getBodySize() < location->getRequestLimits())
+		response->setStatusCode("413");
+	if (S_ISDIR(stat_info->st_mode))
+		response->setStatusCode("404");
+	if ((fd = open(path.c_str(), O_RDONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+		response->setStatusCode("500");
+	else {
+		write(fd, response->getBody(), response->getBodySize());
+		response->setStatusCode("200");
+		close(fd);
+	}
+}
+
 std::pair<char *, int> WebServer::readBodyResponse(const std::string& path) {
 	int 		fd;
 	char		buf[40000];
@@ -82,7 +125,7 @@ std::pair<char *, int> WebServer::readBodyResponse(const std::string& path) {
 void WebServer::checkDirectoryOrFile(struct stat *info, Location *location, std::string& path) {
 	int fd = 0;
 	if (S_ISDIR(info->st_mode) &&
-		(fd = open((path + location->getIndex()).c_str(), O_RDONLY))) {
+		(fd = open((path + location->getIndex()).c_str(), O_RDONLY)) > 0) {
 		path = path + location->getIndex();
 		stat(path.c_str(), info);
 		close(fd);
@@ -91,6 +134,7 @@ void WebServer::checkDirectoryOrFile(struct stat *info, Location *location, std:
 
 std::pair<char *, int> WebServer::generateAutoindex(HTTPRequest *request, const std::string& path) {
 	std::string 	autoindex;
+	char*			tmp = NULL;
 	DIR*			directory = opendir(path.c_str());
 	struct dirent*	entry = nullptr;
 
@@ -102,5 +146,6 @@ std::pair<char *, int> WebServer::generateAutoindex(HTTPRequest *request, const 
 		}
 		autoindex.append("</body></html>");
 	}
-	return std::make_pair((char *)autoindex.c_str(), autoindex.size());
+	tmp = ft_strdup(autoindex.c_str());
+	return std::make_pair(tmp, autoindex.size());
 }

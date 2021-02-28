@@ -45,11 +45,15 @@ public:
 	std::string					checkValidRequest(Location* location, Client* client, struct stat* info);
 	static void						checkDirectoryOrFile(struct stat* info, Location* location, std::string& path);
 	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
-	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info);
+	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
+	void						handlePostReponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
 	bool						tryOpenDir(Location* location);
 	bool						tryOpenFile(Location* location);
 	std::pair<char *, int>		generateAutoindex(HTTPRequest* request, const std::string& path);
 	std::vector<VirtualServer>	getVirtualServer();
 	VirtualServer*				searchVirtualServer(Client* client);
 	static std::pair<char *, int>		readBodyResponse(const std::string& path);
+	void						parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	void						generate_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	void						send_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
 };

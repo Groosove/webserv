@@ -109,7 +109,7 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 			handle_requests(*it, read_fd, write_fd);
 		else if ((*it)->getStage() == close_connection) {
 			deleteClient(it);
-			break;
+			break ;
 		}
 		if (_clients.empty())
 			break ;
@@ -122,71 +122,66 @@ void WebServer::deleteClient(std::vector<Client*>::iterator& client) {
 	_clients.erase(client);
 }
 
-void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) throw(){
-	HTTPRequest*	request = client->getRequest();
-	char*			buf = (char*)calloc(4097, 1);
-	int				read_bytes;
-	int				size_buffer = 4097;
-
-	if (client->getStage() == parsing_request) {
-		read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
-		buf[read_bytes] = 0;
-		try {
-			if (read_bytes > 0) {
-				client->getRequest()->parse_request_http(buf, read_bytes);
-				if (client->getRequest()->getParsingStage() == 3 ||
-								client->getRequest()->getParsingStage() == 2)
-					client->setStage(generate_response);
-			}
-			else if (read_bytes == 0)
-				client->setStage(close_connection);
-		}
-		catch (const std::string& status_value) {
-			VirtualServer*	virtual_server = searchVirtualServer(client);
-//			Location*		location = virtual_server->findLocation(client->getRequest());
-
-			client->getResponse()->setStatusCode(status_value);
-			client->getResponse()->generateResponse();
-			client->setResponseBuffer(client->getResponse()->getResponse(), client->getResponse()->getBodySize());
-			client->setStage(send_response);
-		}
-	}
-	else if (client->getStage() == generate_response) {
-		treatmentStageGenerate(client);
-	}
-	else if (client->getStage() == send_response) {
-		if (client->getBytes() != client->getSendBytes()) {
-			if (client->getSocket() < getMaxFd()) {
-//				FD_CLR(client->getSocket(), &read_fd);
-//				FD_CLR(client->getSocket(), &write_fd);
-				client->setStage(close_connection);
-				return;
-			}
-			size_t ret;
-			std::cout << "SEND BYRES: " << client->getSendBytes() << " " << client->getBytes() << std::endl;
-			if (FD_ISSET(client->getSocket(), &write_fd)) {
-				std::cout << client->getSocket() << std::endl;
-				ret = send(client->getSocket(), client->getReponseBuffer() + client->getSendBytes(),
-							client->getBytes() - client->getSendBytes(), 0);
-				client->setSendBytes(client->getSendBytes() + ret);
-				if (client->getSendBytes() > client->getBytes()) {
-					client->setSendBytes(0);
-				}
-				return;
-			}
-		}
-		FD_CLR(client->getSocket(), &read_fd);
-		FD_CLR(client->getSocket(), &write_fd);
-		client->setStage(close_connection);
-	}
-}
-
 VirtualServer *WebServer::searchVirtualServer(Client *client) {
 	for (size_t i = 0; i < _virtual_server.size(); ++i) {
 		if (client->getHost() == _virtual_server[i].getHost() && client->getPort() == _virtual_server[i].getPort()) // TODO добавить сравнение сервер неймов
 			return &_virtual_server[i];
 	}
 	return nullptr;
+}
+
+void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) throw(){
+	if (client->getStage() == parsing_request) {
+		parsing_request_part(client, read_fd, write_fd);
+	}
+	else if (client->getStage() == generate_response) {
+		treatmentStageGenerate(client);
+	}
+	else if (client->getStage() == send_response)
+		send_response_part(client, read_fd, write_fd);
+}
+
+void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd) {
+	char*			buf = (char*)calloc(4097, 1);
+	int				read_bytes;
+	int				size_buffer = 4097;
+
+	read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
+	buf[read_bytes] = 0;
+	try {
+		if (read_bytes > 0) {
+			client->getRequest()->parse_request_http(buf, read_bytes);
+			if (client->getRequest()->getParsingStage() == 3 ||
+				client->getRequest()->getParsingStage() == 2)
+				client->setStage(generate_response);
+		}
+		else if (read_bytes == 0)
+			client->setStage(close_connection);
+	}
+	catch (const std::string& status_value) {
+		client->getResponse()->setStatusCode(status_value);
+		client->getResponse()->generateResponse();
+		client->setResponseBuffer(client->getResponse()->getResponse(), client->getResponse()->getBodySize());
+		client->setStage(send_response);
+	}
+}
+
+void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &write_fd) {
+	if (client->getBytes() != client->getSendBytes()) {
+		size_t ret;
+		if (FD_ISSET(client->getSocket(), &write_fd)) {
+			ret = send(client->getSocket(), client->getReponseBuffer() + client->getSendBytes(),
+					   client->getBytes() - client->getSendBytes(), 0);
+			if (errno != EPIPE) {
+				client->setSendBytes(client->getSendBytes() + ret);
+				return;
+			}
+			errno = 0;
+		}
+	}
+	FD_CLR(client->getSocket(), &read_fd);
+	FD_CLR(client->getSocket(), &write_fd);
+	client->setStage(close_connection);
 }
 
 int WebServer::getMaxFd() const {

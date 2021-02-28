@@ -8,7 +8,7 @@
 
 #include "Client.hpp"
 
-Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port), _stage(0) {
+Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port), _stage(0), _send_bytes(0) {
 	_request = new HTTPRequest();
 	_response = new HTTPResponse();
 	_send_bytes = 0;
