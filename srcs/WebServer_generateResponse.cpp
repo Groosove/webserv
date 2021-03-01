@@ -34,6 +34,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 		else if (ft_compare(request->getMethod(), "PUT"))
 			handlePutResponse(client, location, &stat_info, path);
 	}
+	std::cout << "METHOD: " << request->getMethod() << std::endl;
 	response->generateResponse();
 	client->setResponseBuffer(response->getResponse(), response->getBodySize());
 	client->setStage(send_response);

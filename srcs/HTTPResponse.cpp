@@ -43,11 +43,11 @@ void	HTTPResponse::generateResponse() {
 	size_t		pos = 0;
 	int size = 0;
 	std::string headers;
-	std::cout << "STATUS CODE: " <<  _status_code << std::endl;
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "close" + CRLF
 						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF + CRLF);
+	std::cout << "STATUS CODE: " << _status_code << std::endl;
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)
