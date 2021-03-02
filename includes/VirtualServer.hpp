@@ -43,7 +43,7 @@ public:
 	void							generateResponse(const char* method);
 	void						addBodyToResponse(const Location& location);
 
-	std::map<std::string, Location>::iterator	findLocation(HTTPRequest* request);
+	std::map<std::string, Location>::iterator 	findLocation(HTTPRequest* request);
 
 	void							setHost(const std::string& host);
 	void							setPort(const std::string& port);

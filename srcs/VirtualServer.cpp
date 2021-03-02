@@ -75,16 +75,12 @@ void VirtualServer::preparationParams() {
 }
 
 std::map<std::string, Location>::iterator VirtualServer::findLocation(HTTPRequest* request) {
-	std::map<std::string, Location>::iterator it;
-	size_t		current_size = 0;
-	bool		flag = false;
+	std::map<std::string, Location>::iterator it = _location.end();
 
-	for (it = _location.begin(); it != _location.end() && flag == false; ++it) {
-		if (std::string(request-> getPath()).find(it->first) == 0 && current_size < it->first.size()) {
-			current_size = it->first.size();
-			flag = true;
-		}
+	it--;
+	for (; it != _location.begin(); --it){
+		if (!std::strncmp(request->getPath(), it->first.c_str(), it->first.length()))
+			return it;
 	}
-	--it;
-	return (it);
+	return _location.begin();
 }

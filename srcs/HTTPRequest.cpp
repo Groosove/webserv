@@ -23,11 +23,13 @@ std::string HTTPRequest::getArgument(const std::string &dst, int start) {
 char * HTTPRequest::getStr(size_t pos) {
 	char *result = ft_substr(_request, 0, pos);
 	_request = ft_substr(_request, pos + 2, _requset_size);
+	_requset_size -= pos + 2;
 	return result;
 }
 
 void HTTPRequest::takeHeader(char *header) {
 	size_t pos = ft_strchr(header, ':');
+	if (pos == (size_t)-1) throw std::string ("400");
 	char *tmp = ft_substr(header, 0, pos);
 	_request_params[tmp] = getArgument(header, pos);
 	free(tmp);
@@ -35,7 +37,10 @@ void HTTPRequest::takeHeader(char *header) {
 }
 
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
-	_request = (char *)ft_memjoin(_request, buf, _requset_size, bytes);
+	std::cout << buf << std::endl;
+	char *tmp = (char *)ft_memjoin(_request, buf, _requset_size, bytes);
+	free(_request);
+	_request = tmp;
 	size_t pos;
 	while (_request && _stage != 3) {
 		if (_stage == 0) {
@@ -46,16 +51,26 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 		else if (_stage == 1) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
-			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
-			else if (pos == (size_t)-1) { throw std::string("405"); }
+			else if (pos == 0) {
+				_request = ft_substr(_request, 2, ft_strlen(_request));
+				if (_request_params.count("Host") == 0) { throw std::string ("400"); }
+				if (_request_params.count("PUT") || _request_params.count("POST")) {
+					if (!_request_params.count("Content-length") && !_request_params.count("Transfer-encoding"))
+						throw std::string ("400");
+					else
+						_stage = 2;
+				}
+				_stage = 3;
+			}
 			else break;
 		} else if (_stage == 2) {
-			if (!ft_compare(getMethod(), "GET")) { _stage = 3; return; }
 			if (parseBodyRequest() == 1)
 				_stage = 3;
 			else break;
 		}
 	}
+	if (_stage == 4 && _request != 0)
+		throw std::string ("400");
 }
 
 int HTTPRequest::parseBodyRequest() {
