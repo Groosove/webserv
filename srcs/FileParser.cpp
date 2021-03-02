@@ -20,7 +20,7 @@ VirtualServer FileParser::parseConfigFile(std::vector<std::string> config, size_
 	_parseServerParam(config, index, server);
 	for (size_t i = index; i < size; ++i) {
 		if (config[i].find("location:") != std::string::npos && checkIndent(config[i], 1))
-			_parseLocationParam(config, i, server);
+			_parseLocationParam(config, i, server); // TODO Если директория без слеша, то нужно дополнять!
 		else if (config[i].empty()) continue;
 		else { std::cerr << "Error parse config file" << std::endl; break; }
 		index = i;
@@ -75,12 +75,12 @@ void FileParser::_parseLocationParam(std::vector<std::string> &config, size_t &i
 	while (config[i].find("location:") == std::string::npos && config[i].find("server:") == std::string::npos && i < config.size()) {
 		if ((config[i].find("root:", 0, 5)) != std::string::npos)
 			location.setRoot(getArgument(config[i], ft_strchr(config[i], ':')));
+		else if ((config[i].find("autoindex:", 0, 10)) != std::string::npos)
+			location.setAutoIndex(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("index:", 0, 6)) != std::string::npos)
 			location.setIndex(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("allow_methods:", 0, 14)) != std::string::npos)
 			location.setAllowMethods(getArgument(config[i], ft_strchr(config[i], ':')));
-		else if ((config[i].find("autoindex:", 0, 10)) != std::string::npos)
-			location.setAutoIndex(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("limits_client_body_size", 0, 24)) !=  std::string::npos)
 			location.setRequestLimits(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if (config[i].empty()) { ++i; continue; }

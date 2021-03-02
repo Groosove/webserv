@@ -43,7 +43,7 @@ public:
 	void							generateResponse(const char* method);
 	void						addBodyToResponse(const Location& location);
 
-	Location*						findLocation(HTTPRequest* request);
+	std::map<std::string, Location>::iterator 	findLocation(HTTPRequest* request);
 
 	void							setHost(const std::string& host);
 	void							setPort(const std::string& port);
@@ -57,4 +57,5 @@ public:
 	inline const std::string& 		getPort() const	{ return _port; }
 	inline const std::string& 		getServerName() const { return _server_name; }
 	inline int 						getSocket() const { return _socket; }
+
 };

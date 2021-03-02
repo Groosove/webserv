@@ -23,39 +23,26 @@ std::string HTTPRequest::getArgument(const std::string &dst, int start) {
 char * HTTPRequest::getStr(size_t pos) {
 	char *result = ft_substr(_request, 0, pos);
 	_request = ft_substr(_request, pos + 2, _request_size);
+	_request_size -= pos + 2;
 	return result;
 }
 
 void HTTPRequest::takeHeader(char *header) {
 	size_t pos = ft_strchr(header, ':');
+	if (pos == (size_t)-1) throw std::string ("400");
 	char *tmp = ft_substr(header, 0, pos);
 	_request_params[tmp] = getArgument(header, pos);
 	free(tmp);
 	free(header);
 }
 
-void HTTPRequest::addBufferToRequest(char *buf, int bytes) {
-	char *tmp = (char *)malloc(bytes + _request_size + 1);
-	tmp = (char *)ft_memcpy(tmp, _request, _request_size);
-	tmp = (char *)ft_memcpy(tmp + _request_size, buf, bytes);
-	_request_size += bytes;
-	_request = tmp;
-}
-
-void HTTPRequest::addBodyToRequest(char *buf, int bytes) {
-	char *tmp = (char *)malloc(bytes + _body_size + 1);
-	tmp = (char *)ft_memcpy(tmp, _request, _body_size);
-	tmp = (char *)ft_memcpy(tmp + _body_size, buf, bytes);
-	free(_body);
-	_body = tmp;
-}
 
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
 	std::cout << buf << std::endl;
-//	addBufferToRequest(buf, bytes);
-//	ft_add_bytes(_request, buf, _request_size, bytes);
-	_request = (char *)ft_memjoin(_request, buf, _request_size, bytes);
-	size_t  pos;
+	char *tmp = (char *)ft_memjoin(_request, buf, _request_size, bytes);
+	free(_request);
+	_request = tmp;
+	size_t pos;
 	while (_request && _stage != 3) {
 		if (_stage == 0) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t) -1)
@@ -65,25 +52,31 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 		else if (_stage == 1) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
-			else if (pos == (size_t)-1) { throw std::string("400"); }
-			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
-			else {std::cerr << "Error parse request" << std::endl;}
-
+			else if (pos == 0) {
+				_request = ft_substr(_request, 2, ft_strlen(_request));
+				if (_request_params.count("Host") == 0) { throw std::string ("400"); }
+				if (_request_params.count("PUT") || _request_params.count("POST")) {
+					if (!_request_params.count("Content-length") && !_request_params.count("Transfer-encoding"))
+						throw std::string ("400");
+					else
+						_stage = 2;
+				}
+				_stage = 3;
+			}
+			else break;
 		} else if (_stage == 2) {
 			if (parseBodyRequest() == 1)
 				_stage = 3;
 			else break;
 		}
 	}
-	for (std::map<std::string, std::string>::iterator it = _request_params.begin(); it != _request_params.end(); ++it)
-		std::cout << "KEK:" << it->first << ":" << it->second << std::endl;
-	std::cout << "BODY:" << _body << std::endl;
+	if (_stage == 4 && _request != 0)
+		throw std::string ("400");
 }
 
 int HTTPRequest::parseBodyRequest() {
 	if (_request_params.count("content-length")) {
 		size_t size = ft_atoi(_request_params["content-length"].c_str());
-//		addBodyToRequest(_request, size);
 		_body = (char *) ft_memjoin(_body, _request, _body_size, size);
 		if (ft_strlen(_body) > size) {
 			char *tmp = ft_substr(_body, 0, size);
@@ -101,7 +94,7 @@ int HTTPRequest::parseBodyRequest() {
 				} else if (size != 0) {
 					char *tmp = (char *)malloc(sizeof(size) + 1);
 					tmp[size] = '\0';
-					addBodyToRequest(tmp, size);
+					_body = (char *)ft_memjoin(_body, tmp, _body_size, size);
 					free(tmp);
 					size = -1;
 				} else return 1;

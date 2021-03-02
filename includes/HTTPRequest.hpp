@@ -38,8 +38,6 @@ public:
 
 	char *	getStr(size_t pos);
 	void			takeHeader(char *header);
-	void			addBufferToRequest(char *buf, int bytes);
-	void			addBodyToRequest(char *buf, int bytes);
 	int				parseBodyRequest();
 
 	const char *						getMethod() const { return _method; };

@@ -19,15 +19,16 @@ private:
 	std::vector<Client*>		_clients;
 	std::vector<VirtualServer>	_virtual_server;
 	bool						_status;
+	int							_max_fd;
 
-	void		parseConfigFile(std::ifstream& file);
+
 public:
 	explicit WebServer(const char *config_name = "default.conf");
 	~WebServer() {};
 	void						handle();
 	void						createVirtualServer();
-	void						initSocketSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
-	void						addClientSocketToSet(fd_set& write_fd, fd_set& read_fd, int& max_fd);
+	void						initSocketSet(fd_set& write_fd, fd_set& read_fd);
+	void						addClientSocketToSet(fd_set& write_fd, fd_set& read_fd);
 	void						treatmentAccept(fd_set& read_fd);
 	void						searchSelectSocket(fd_set& write_fd, fd_set& read_fd);
 	void						readRequest(Client*	client, fd_set& write_fd, fd_set& read_fd);
@@ -35,13 +36,19 @@ public:
 	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd) throw();
 	void						treatmentStageGenerate(Client* client);
 	std::string					checkValidRequest(Location* location, Client* client, struct stat* info);
-	static void						checkDirectoryOrFile(struct stat* info, Location* location);
-	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info);
-	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info);
+	static void						checkDirectoryOrFile(struct stat* info, Location* location, std::string& path);
+	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
+	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path, int stat_info_created);
+	void						handlePostReponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
 	bool						tryOpenDir(Location* location);
 	bool						tryOpenFile(Location* location);
-	std::pair<char *, int>		generateAutoindex(HTTPRequest* request, const std::string& index, const std::string& root_dir);
+	std::pair<char *, int>		generateAutoindex(HTTPRequest* request, const std::string& path);
 	std::vector<VirtualServer>	getVirtualServer();
 	VirtualServer*				searchVirtualServer(Client* client);
-	static std::pair<char *, int>		readBodyResponse(const std::string& root, const std::string& file);
+	static std::pair<char *, int>		readBodyResponse(const std::string& path);
+	void						parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	void						generate_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	void						send_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	int getMaxFd() const;
+	void setMaxFd(int maxFd);
 };

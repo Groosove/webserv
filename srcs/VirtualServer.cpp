@@ -74,51 +74,13 @@ void VirtualServer::preparationParams() {
 	}
 }
 
-//const char* VirtualServer::treatmentRequest(const char* buf) {
-//	_request = new HTTPRequest(buf);
-//	if (std::string(_request->getMethod()).find("GET") != std::string::npos)
-//		generateResponse(_request->getMethod());
-//	return _complete_response.c_str();
-//}
+std::map<std::string, Location>::iterator VirtualServer::findLocation(HTTPRequest* request) {
+	std::map<std::string, Location>::iterator it = _location.end();
 
-//void	VirtualServer::generateResponse(const char *method) {
-//	std::map<std::string, Location>::iterator begin = _location.begin();
-//	std::cout << begin->first << std::endl;
-//	while (begin != _location.end()) {
-//		if (begin->first.find((_request->getPath())) != std::string::npos) {
-//			if (!begin->second.validationLocation(_request->getMethod()))
-//				return;
-//			else
-//			{
-//				_response = new HTTPResponse(_request->getMethod());
-//				_complete_response.append(_response->getResponse());
-//				addBodyToResponse(begin->second);
-//				break ;
-//			}
-//		}
-//		begin++;
-//	}
-//}
-
-void VirtualServer::addBodyToResponse(const Location& location) {
-	std::ifstream	thread(location.getRoot() + location.getIndex());
-	std::string		buf;
-
-	while(std::getline(thread, buf))
-		_complete_response.append(buf);
-
-	_complete_response.append("\r\n\r\n\r\n");
-	std::cout << "RESPONSE: " << _complete_response << std::endl;
-}
-
-Location *VirtualServer::findLocation(HTTPRequest* request) {
-	std::map<std::string, Location>::iterator it;
-
-	for (it = _location.begin(); it != _location.end(); ++it) {
-		if (it->first.find(request->getPath()) != std::string::npos)
-			return &it->second;
+	--it;
+	for (; it != _location.begin(); --it) {
+		if (!std::strncmp(request->getPath(), it->first.c_str(), it->first.length()))
+			return it;
 	}
-	return nullptr;
+	return _location.begin();
 }
-
-
