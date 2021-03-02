@@ -34,7 +34,6 @@ private:
 	std::vector<std::string>	_allow_methods;
 	bool						_autoindex;
 	size_t						_request_limits;
-	std::string					_path_location;
 public:
 	Location();
 	~Location() {};

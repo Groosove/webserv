@@ -20,15 +20,8 @@ private:
 	std::vector<VirtualServer>	_virtual_server;
 	bool						_status;
 	int							_max_fd;
-public:
-	void setMaxFd(int maxFd);
 
-public:
-	int getMaxFd() const;
 
-private:
-
-	void		parseConfigFile(std::ifstream& file);
 public:
 	explicit WebServer(const char *config_name = "default.conf");
 	~WebServer() {};
@@ -56,4 +49,6 @@ public:
 	void						parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd);
 	void						generate_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
 	void						send_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	int getMaxFd() const;
+	void setMaxFd(int maxFd);
 };
