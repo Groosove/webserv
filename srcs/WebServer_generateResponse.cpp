@@ -16,12 +16,17 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	std::string 	error;
 	struct stat		stat_info;
 	std::string		path;
+	std::string		tmp_path;
 
-	if (location)
-		path = location->getRoot() + std::string(request->getPath()).erase(0, it->first.size());
+	if (location) {
+		tmp_path = std::string(request->getPath()).erase(0, it->first.size());
+		if (tmp_path.find("/", 0, 1) != std::string::npos)
+			tmp_path.erase(0, 1);
+		path = location->getRoot() + tmp_path;
+	}
 	else
 		path = "";
-	if (stat((path.c_str()), &stat_info) == -1)
+	if (stat((path.c_str()), &stat_info) == -1) // накидать стурктуру в которой будет значение файла, есть он или его нет, тем самым избавиться от проблемы в 15 тесте в PUT
 		response->setStatusCode("404");
 	else if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
 		response->setStatusCode(error);
@@ -125,11 +130,25 @@ std::pair<char *, int> WebServer::readBodyResponse(const std::string& path) {
 
 void WebServer::checkDirectoryOrFile(struct stat *info, Location *location, std::string& path) {
 	int fd = 0;
-	if (S_ISDIR(info->st_mode) &&
-		(fd = open((path + location->getIndex()).c_str(), O_RDONLY)) > 0) {
-		path = path + location->getIndex();
-		stat(path.c_str(), info);
-		close(fd);
+	int	flag = 0;
+
+	if (S_ISDIR(info->st_mode)) {
+		if (path.find("/", path.length() - 1, 1) != std::string::npos) {
+			flag = 1;
+			fd = open((path + location->getIndex()).c_str(), O_RDONLY);
+		}
+		else {
+			flag = 2;
+			fd = open((path + "/" + location->getIndex()).c_str(), O_RDONLY);
+		}
+		if (fd > 0) {
+			if (flag == 1)
+				path = path + location->getIndex();
+			if (flag == 2)
+				path = path + "/" + location->getIndex();
+			stat(path.c_str(), info);
+			close(fd);
+		}
 	}
 }
 

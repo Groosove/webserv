@@ -47,7 +47,10 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
 			else if (pos == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
-			else if (pos == (size_t)-1) { throw std::string("405"); }
+			else if (pos == (size_t)-1) {
+				if ((pos = ft_find(_request, "\r")) == 0) { _request = ft_substr(_request, 2, ft_strlen(_request)); _stage = 2; }
+				else { throw std::string("400"); }
+			}
 			else break;
 		} else if (_stage == 2) {
 			if (!ft_compare(getMethod(), "GET")) { _stage = 3; return; }
@@ -94,7 +97,7 @@ void HTTPRequest::parseFirstLine(char *line) {
 		if (i == 0) {
 			if (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD"))
 				setMethod(dst[i]);
-			else throw std::string("405");
+			else throw std::string("400");
 		}
 		else if (i == 1)
 			setPath(dst[i]);
