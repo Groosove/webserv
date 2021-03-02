@@ -105,7 +105,7 @@ bool Location::tryOpenFile() {
 	return false;
 }
 
-Location::Location(): _root(), _index(), _allow_methods(0), _autoindex(false), _request_limits(0), _path_location() {}
+Location::Location(): _root(), _index(), _allow_methods(0), _autoindex(false), _request_limits(0) {}
 
 bool Location::checkAllowMethod(const char *method) {
 	std::vector<std::string>::iterator begin = _allow_methods.begin();

@@ -139,3 +139,11 @@ void HTTPRequest::setStatusCode(const std::string &status_code) {
 	_status_code = status_code;
 }
 
+char *HTTPRequest::getRequest() const {
+	return _request;
+}
+
+int HTTPRequest::getRequsetSize() const {
+	return _requset_size;
+}
+

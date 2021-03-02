@@ -76,6 +76,7 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 void WebServer::handlePutResponse(Client *client, Location *location, struct stat *stat_info,
 								  std::string &path, int stat_info_created) {
 	HTTPResponse*	response = client->getResponse();
+	HTTPRequest*	request = client->getRequest();
 	int 			fd = 0;
 
 	if (response->getBodySize() < location->getRequestLimits())
@@ -85,7 +86,8 @@ void WebServer::handlePutResponse(Client *client, Location *location, struct sta
 	if ((fd = open(path.c_str(), O_RDONLY | O_CREAT | O_TRUNC, 0666)) < 0)
 		response->setStatusCode("500");
 	else {
-		write(fd, response->getBody(), response->getBodySize());
+		std::cout << "REQUEST: " << request->getRequest() << " " << "REQUEST SIZE: " << request->getRequsetSize() << std::endl;
+		write(fd, request->getRequest(), request->getRequsetSize());
 		if (stat_info_created != -1)
 			response->setStatusCode("200");
 		else

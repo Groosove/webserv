@@ -48,6 +48,11 @@ public:
 	int									getParsingStage() const { return _stage; }
 	std::map<std::string, std::string>	getHeaders() { return _request_params; }
 	const char*							getBody() { return _body; }
+
+	int getRequsetSize() const;
+
+	char *getRequest() const;
+
 	static std::string getArgument(const std::string &dst, int start);
 	void								setMethod(char * method);
 	void								setPath(char * path);
