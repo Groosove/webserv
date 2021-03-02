@@ -43,6 +43,11 @@ void	HTTPResponse::generateResponse() {
 	size_t		pos = 0;
 	int size = 0;
 	std::string headers;
+	std::string	errorPage = generateErrorPage();
+
+	pos = std::stoi(_status_code);
+	if (pos >= 400)
+		_body_size = errorPage.length();
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "close" + CRLF
@@ -53,7 +58,7 @@ void	HTTPResponse::generateResponse() {
 	if (pos < 400)
 		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 	else {
-		_buf_response = (char*)ft_memjoin(_buf_response, (char*)generateErrorPage().c_str(), _header_size, generateErrorPage().size());
+		_buf_response = (char*)ft_memjoin(_buf_response, (char*)errorPage.c_str(), _header_size, _body_size);
 	}
 }
 
