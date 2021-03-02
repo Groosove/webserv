@@ -77,8 +77,8 @@ void VirtualServer::preparationParams() {
 std::map<std::string, Location>::iterator VirtualServer::findLocation(HTTPRequest* request) {
 	std::map<std::string, Location>::iterator it = _location.end();
 
-	it--;
-	for (; it != _location.begin(); --it){
+	--it;
+	for (; it != _location.begin(); --it) {
 		if (!std::strncmp(request->getPath(), it->first.c_str(), it->first.length()))
 			return it;
 	}

@@ -109,7 +109,7 @@ void HTTPRequest::parseFirstLine(char *line) {
 		if (i == 0) {
 			if (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD"))
 				setMethod(dst[i]);
-			else throw std::string("405");
+			else throw std::string("400");
 		}
 		else if (i == 1)
 			setPath(dst[i]);
