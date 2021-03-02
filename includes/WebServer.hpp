@@ -45,7 +45,7 @@ public:
 	std::string					checkValidRequest(Location* location, Client* client, struct stat* info);
 	static void						checkDirectoryOrFile(struct stat* info, Location* location, std::string& path);
 	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
-	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
+	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path, int stat_info_created);
 	void						handlePostReponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
 	bool						tryOpenDir(Location* location);
 	bool						tryOpenFile(Location* location);

@@ -17,6 +17,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	struct stat		stat_info;
 	std::string		path;
 	std::string		tmp_path;
+	int				stat_info_created;
 
 	if (location) {
 		tmp_path = std::string(request->getPath()).erase(0, it->first.size());
@@ -26,9 +27,8 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	}
 	else
 		path = "";
-	if (stat((path.c_str()), &stat_info) == -1) // накидать стурктуру в которой будет значение файла, есть он или его нет, тем самым избавиться от проблемы в 15 тесте в PUT
-		response->setStatusCode("404");
-	else if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
+	stat_info_created  = stat(path.c_str(), &stat_info); // накидать стурктуру в которой будет значение файла, есть он или его нет, тем самым избавиться от проблемы в 15 тесте в PUT
+	if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
 		response->setStatusCode(error);
 	} else {
 		checkDirectoryOrFile(&stat_info, location, path);
@@ -37,7 +37,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
 			handleDefaultResponse(client, location, &stat_info, path);
 		else if (ft_compare(request->getMethod(), "PUT"))
-			handlePutResponse(client, location, &stat_info, path);
+			handlePutResponse(client, location, &stat_info, path, stat_info_created);
 	}
 	std::cout << "METHOD: " << request->getMethod() << std::endl;
 	response->generateResponse();
@@ -69,13 +69,14 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 		response->setStatusCode("404");
 	else if (S_ISDIR(stat_info->st_mode) && ft_compare(request->getMethod(), "GET") && location->getAutoIndex())
 		response->setBody(generateAutoindex(request, path));
+	else
+		response->setStatusCode("404");
 }
 
 void WebServer::handlePutResponse(Client *client, Location *location, struct stat *stat_info,
-								  std::string &path) {
+								  std::string &path, int stat_info_created) {
 	HTTPResponse*	response = client->getResponse();
 	int 			fd = 0;
-	int				tmp_fd = open(path.c_str(), O_RDONLY);
 
 	if (response->getBodySize() < location->getRequestLimits())
 		response->setStatusCode("413");
@@ -85,12 +86,11 @@ void WebServer::handlePutResponse(Client *client, Location *location, struct sta
 		response->setStatusCode("500");
 	else {
 		write(fd, response->getBody(), response->getBodySize());
-		if (tmp_fd < 0)
+		if (stat_info_created != -1)
 			response->setStatusCode("200");
 		else
 			response->setStatusCode("201");
 		close(fd);
-		close(tmp_fd);
 	}
 }
 
