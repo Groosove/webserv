@@ -26,6 +26,7 @@ private:
 	char *	_request;
 	int		_requset_size;
 	int		_body_size;
+	size_t	_hex_size;
 
 	int			_stage;
 	std::string _status_code;
@@ -37,8 +38,8 @@ public:
 	void		parseFirstLine(char * line);
 
 	char *	getStr(size_t pos);
-	void			takeHeader(char *header);
-	int				parseBodyRequest();
+	void	takeHeader(char *header);
+	int		parseBodyRequest();
 
 	const char *						getMethod() const { return _method; };
 	const char *						getPath() const {return _path; }

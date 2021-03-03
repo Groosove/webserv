@@ -87,7 +87,7 @@ void WebServer::handlePutResponse(Client *client, Location *location, struct sta
 		response->setStatusCode("413");
 	if (S_ISDIR(stat_info->st_mode))
 		response->setStatusCode("404");
-	if ((fd = open(path.c_str(), O_RDONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+	if ((fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0666)) < 0)
 		response->setStatusCode("500");
 	else {
 		std::cout << "REQUEST: " << client->getRequest()->getBody() << " " << "REQUEST SIZE: " << client->getRequest()->getBodySize() << std::endl;

@@ -151,8 +151,7 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 	try {
 		if (read_bytes > 0) {
 			client->getRequest()->parse_request_http(buf, read_bytes);
-			if (client->getRequest()->getParsingStage() == 3 ||
-				client->getRequest()->getParsingStage() == 2)
+			if (client->getRequest()->getParsingStage() == 3)
 				client->setStage(generate_response);
 		}
 		else if (read_bytes == 0)

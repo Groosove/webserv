@@ -9,7 +9,7 @@
 #include "HTTPRequest.hpp"
 #include "fcntl.h"
 
-HTTPRequest::HTTPRequest(): _stage(false), _body_size(0) {
+HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 	_request = ft_strdup("");
 	_requset_size = 0;
 	_body = ft_strdup("");
@@ -54,7 +54,9 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 				takeHeader(getStr(pos));
 			else if (pos == 0) {
 				_request = ft_substr(_request, 2, ft_strlen(_request));
-				if (_request_params.count("Host") == 0) { throw std::string ("400"); }
+				_requset_size -=2;
+				if (_request_params.count("Host") == 0)
+					throw std::string ("400");
 				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST")) {
 					if (_request_params.count("Content-Length") == 0 && _request_params.count("Transfer-Encoding") == 0)
 						throw std::string ("400");
@@ -69,8 +71,8 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 		} else if (_stage == 2) {
 			if (parseBodyRequest() == 1)
 				_stage = 3;
-			else break;
-			std::cout << _body << std::endl;
+			else
+				break;
 		}
 	}
 }
@@ -86,15 +88,14 @@ int HTTPRequest::parseBodyRequest() {
 		}
 		return 1;
 	} else if (_request_params.count("Transfer-Encoding")) {
-		int size = -1;
 		size_t pos;
 		while (_request) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1) {
-				if (size == -1) {
-					size = ft_atoi_chunk(getStr(pos));
-				} else if (size != 0) {
-					_body = (char *)ft_memjoin(_body, getStr(pos), _body_size, size);
-					size = -1;
+				if (_hex_size == (size_t)-1) {
+					_hex_size = ft_atoi_chunk(getStr(pos));
+				} else if (_hex_size != 0) {
+					_body = (char *)ft_memjoin(_body, getStr(pos), _body_size, _hex_size);
+					_hex_size = -1;
 				} else return 1;
 			} else return 0;
 		}
