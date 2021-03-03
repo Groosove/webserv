@@ -41,7 +41,9 @@ public:
 	int				parseBodyRequest();
 
 	const char *						getMethod() const { return _method; };
-	const char *						getPath() const {return _path; };
+	const char *						getPath() const {return _path; }
+
+	int getBodySize() const;;
 	const char *						getVersionHTTP() const { return _version_http; };
 	const char *						getHostUrl() const { return _host_url; };
 	const std::string&					getStatusCode() const { return _status_code; }

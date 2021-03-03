@@ -7,6 +7,7 @@
 //
 
 #include "HTTPRequest.hpp"
+#include "fcntl.h"
 
 HTTPRequest::HTTPRequest(): _stage(false), _body_size(0) {
 	_request = ft_strdup("");
@@ -54,11 +55,13 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			else if (pos == 0) {
 				_request = ft_substr(_request, 2, ft_strlen(_request));
 				if (_request_params.count("Host") == 0) { throw std::string ("400"); }
-				if (_request_params.count("PUT") || _request_params.count("POST")) {
-					if (!_request_params.count("Content-length") && !_request_params.count("Transfer-encoding"))
+				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST")) {
+					if (_request_params.count("Content-Length") == 0 && _request_params.count("Transfer-Encoding") == 0)
 						throw std::string ("400");
-					else
+					else {
 						_stage = 2;
+						continue;
+					}
 				}
 				_stage = 3;
 			}
@@ -67,6 +70,7 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			if (parseBodyRequest() == 1)
 				_stage = 3;
 			else break;
+			std::cout << _body << std::endl;
 		}
 	}
 	if (_stage == 4 && _request != 0)
@@ -74,8 +78,8 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 }
 
 int HTTPRequest::parseBodyRequest() {
-	if (_request_params.count("content-length")) {
-		size_t size = ft_atoi(_request_params["content-length"].c_str());
+	if (_request_params.count("Content-Length")) {
+		size_t size = ft_atoi(_request_params["Content-Length"].c_str());
 		_body = (char *) ft_memjoin(_body, _request, _body_size, size);
 		if (ft_strlen(_body) > size) {
 			char *tmp = ft_substr(_body, 0, size);
@@ -145,5 +149,9 @@ char *HTTPRequest::getRequest() const {
 
 int HTTPRequest::getRequsetSize() const {
 	return _requset_size;
+}
+
+int HTTPRequest::getBodySize() const {
+	return _body_size;
 }
 
