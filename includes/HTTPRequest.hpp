@@ -26,6 +26,7 @@ private:
 	char *	_request;
 	int		_request_size;
 	int		_body_size;
+	size_t	_hex_size;
 
 	int			_stage;
 	std::string _status_code;
@@ -37,11 +38,13 @@ public:
 	void		parseFirstLine(char * line);
 
 	char *	getStr(size_t pos);
-	void			takeHeader(char *header);
-	int				parseBodyRequest();
+	void	takeHeader(char *header);
+	int		parseBodyRequest();
 
 	const char *						getMethod() const { return _method; };
-	const char *						getPath() const {return _path; };
+	const char *						getPath() const {return _path; }
+
+	int getBodySize() const;;
 	const char *						getVersionHTTP() const { return _version_http; };
 	const char *						getHostUrl() const { return _host_url; };
 	const std::string&					getStatusCode() const { return _status_code; }
@@ -49,6 +52,11 @@ public:
 	int 								getRequestSize() const { return _request_size; }
 	std::map<std::string, std::string>	getHeaders() { return _request_params; }
 	const char*							getBody() { return _body; }
+
+	int getRequsetSize() const;
+
+	char *getRequest() const;
+
 	static std::string getArgument(const std::string &dst, int start);
 	void								setMethod(char * method);
 	void								setPath(char * path);
