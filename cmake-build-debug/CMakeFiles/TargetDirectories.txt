@@ -1,4 +1,0 @@
-/Users/arturlutfullin/Desktop/webserv/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/arturlutfullin/Desktop/webserv/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/arturlutfullin/Desktop/webserv/cmake-build-debug/CMakeFiles/ERASE.dir
-/Users/arturlutfullin/Desktop/webserv/cmake-build-debug/CMakeFiles/WebServ.dir
