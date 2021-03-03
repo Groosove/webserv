@@ -11,6 +11,7 @@ FileParser::FileParser(std::vector<std::string> config) {
 	for (size_t i = 0; i < size;) {
 		if (config[i].find("server:") != std::string::npos && checkIndent(config[i], 0))
 			_server.push_back(parseConfigFile(config, ++i));
+		++i;
 	};
 }
 
@@ -87,7 +88,9 @@ void FileParser::_parseLocationParam(std::vector<std::string> &config, size_t &i
 		if (!checkIndent(config[i], 2)) { std::cerr << "Error parse config file" << std::endl; break; }
 		++i;
 	}
-	if (i <= config.size() && config[i].find("location:") != std::string::npos)
+	if (i >= config.size())
+		--i;
+	if (config[i].find("location:") != std::string::npos)
 		--i;
 	server.getLocation()[path] = location;
 }

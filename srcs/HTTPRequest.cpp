@@ -73,8 +73,6 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			std::cout << _body << std::endl;
 		}
 	}
-	if (_stage == 4 && _request != 0)
-		throw std::string ("400");
 }
 
 int HTTPRequest::parseBodyRequest() {
@@ -88,17 +86,14 @@ int HTTPRequest::parseBodyRequest() {
 		}
 		return 1;
 	} else if (_request_params.count("Transfer-Encoding")) {
-		int size;
+		int size = -1;
 		size_t pos;
 		while (_request) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1) {
 				if (size == -1) {
 					size = ft_atoi_chunk(getStr(pos));
 				} else if (size != 0) {
-					char *tmp = (char *)malloc(sizeof(size) + 1);
-					tmp[size] = '\0';
-					_body = (char *)ft_memjoin(_body, tmp, _body_size, size);
-					free(tmp);
+					_body = (char *)ft_memjoin(_body, getStr(pos), _body_size, size);
 					size = -1;
 				} else return 1;
 			} else return 0;
