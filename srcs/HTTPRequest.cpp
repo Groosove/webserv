@@ -15,10 +15,19 @@ HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 	_body = ft_strdup("");
 }
 
-HTTPRequest::~HTTPRequest() {}
+HTTPRequest::~HTTPRequest() {
+	free(_request);
+	free(_body);
+	free(_method);
+	free(_version_http);
+	free(_path);
+}
 
-std::string HTTPRequest::getArgument(const std::string &dst, int start) {
-	return ft_strtrim(dst.substr(start + 1, dst.length()), " \t");
+char *HTTPRequest::getArgument(char *dst, int start) {
+	char *tmp = ft_substr(dst, start + 1, ft_strlen(dst));
+	char *result = ft_strtrim(tmp, " \t");
+	free(tmp);
+	return result;
 }
 
 char * HTTPRequest::getStr(size_t pos) {
@@ -32,9 +41,13 @@ char * HTTPRequest::getStr(size_t pos) {
 
 void HTTPRequest::takeHeader(char *header) {
 	size_t pos = ft_strchr(header, ':');
-	if (pos == (size_t)-1) throw std::string ("400");
+	if (pos == (size_t)-1)
+		throw std::string("400");
+
 	char *tmp = ft_substr(header, 0, pos);
-	_request_params[tmp] = getArgument(header, pos);
+	char *value = getArgument(header, pos);
+	_request_params[tmp] = value;
+	free(value);
 	free(tmp);
 	free(header);
 }
@@ -55,7 +68,9 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
 			else if (pos == 0) {
-				_request = ft_substr(_request, 2, ft_strlen(_request));
+				char *tmp = ft_substr(_request, 2, ft_strlen(_request));
+				free(_request);
+				_request = tmp;
 				_request_size -=2;
 				if (_request_params.count("Host") == 0)
 					throw std::string ("400");
@@ -123,7 +138,6 @@ void HTTPRequest::parseFirstLine(char *line) {
 			else std::cerr << "Error set version HTTP/1.1" << std::endl;
 		}
 	}
-	delete [] dst;
 	free(line);
 	++_stage;
 }

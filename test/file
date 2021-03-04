@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Process:         WebServ [58509]
 Path:            /Volumes/VOLUME/*/WebServ
 Load Address:    0x108d77000
@@ -8,11 +9,24 @@ Parent Process:  clion [7369]
 
 Date/Time:       2021-03-04 15:58:06.507 +0300
 Launch Time:     2021-03-04 15:57:23.587 +0300
+=======
+Process:         WebServ [43390]
+Path:            /Volumes/VOLUME/*/WebServ
+Load Address:    0x10db4d000
+Identifier:      WebServ
+Version:         ???
+Code Type:       X86-64
+Parent Process:  debugserver [43391]
+
+Date/Time:       2021-03-04 15:30:45.203 +0300
+Launch Time:     2021-03-04 15:28:57.849 +0300
+>>>>>>> d1f9f44bf7d432744850a939bae63bf48b61d685
 OS Version:      Mac OS X 10.14.6 (18G8022)
 Report Version:  7
 Analysis Tool:   /Applications/Xcode.app/Contents/Developer/usr/bin/leaks
 Analysis Tool Version:  Xcode 11.3.1 (11C505)
 
+<<<<<<< HEAD
 Physical footprint:         31.9M
 Physical footprint (peak):  41.4M
 ----
@@ -1164,4 +1178,13 @@ Process 58509: 1090 leaks for 40921600 total leaked bytes.
       1 (16 bytes) ROOT LEAK: 0x7fa8ce100a80 [16]  length: 4  "8000"
       1 (16 bytes) ROOT LEAK: 0x7fa8ce100a90 [16]  length: 4  "8000"
       1 (16 bytes) ROOT LEAK: 0x7fa8ce100b00 [16]  length: 4  "8000"
+=======
+Physical footprint:         344K
+Physical footprint (peak):  344K
+----
+
+leaks Report Version: 4.0
+Process 43390: 175 nodes malloced for 23 KB
+Process 43390: 0 leaks for 0 total leaked bytes.
+>>>>>>> d1f9f44bf7d432744850a939bae63bf48b61d685
 

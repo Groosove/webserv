@@ -57,7 +57,7 @@ public:
 
 	char *getRequest() const;
 
-	static std::string getArgument(const std::string &dst, int start);
+	char *getArgument(char *dst, int start);
 	void								setMethod(char * method);
 	void								setPath(char * path);
 	void								setVersionHTTP(char * version_http);
