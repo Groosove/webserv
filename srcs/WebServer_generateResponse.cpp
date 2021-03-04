@@ -33,6 +33,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	} else {
 		checkDirectoryOrFile(&stat_info, location, path);
 		if (ft_compare(request->getMethod(), "POST")) {
+			std::cout << "YA ZAHOJU V CGI GOTOVTES" << std::endl;
 			std::map<std::string, std::string>::iterator it = location->getCgi().find(".bla");
 			CGI cgi_response(client, virtual_server, (char*)it->second.c_str());
 		}

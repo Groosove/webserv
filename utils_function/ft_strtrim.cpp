@@ -21,16 +21,16 @@ std::string	ft_strtrim(const std::string &s1, const std::string& set)
 	return s1.substr(start, end + 1);
 }
 
-char			*ft_strtrim(char const *s1, char const *set)
+char			*ft_strtrim(char *s1, char const *set)
 {
 	size_t	size;
 
 	if (set == 0 || s1 == 0)
 		return (0);
-	while (*s1 != 0 && ft_strchr(set, *s1))
+	while (*s1 != 0 && ft_strchr(set, *s1) != -1)
 		s1++;
 	size = ft_strlen(s1);
-	while (size && ft_strchr(set, s1[size]))
+	while (size && ft_strchr(set, s1[size]) != -1)
 		size--;
 	return (ft_substr((char *)s1, 0, size + 1));
 }

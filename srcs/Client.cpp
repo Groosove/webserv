@@ -16,7 +16,7 @@ Client::Client(int client_socket, const std::string &host, const std::string &po
 }
 
 Client::~Client() {
-	free(_response_complite);
+//	free(_response_complite);
 }
 
 int Client::getBytes() const { return _bytes; }

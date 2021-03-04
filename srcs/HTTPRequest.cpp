@@ -24,7 +24,7 @@ HTTPRequest::~HTTPRequest() {
 }
 
 char *HTTPRequest::getArgument(char *dst, int start) {
-	char *tmp = ft_substr(dst, start + 1, ft_strlen(dst));
+	char *tmp = ft_substr(dst, start, ft_strlen(dst));
 	char *result = ft_strtrim(tmp, " \t");
 	free(tmp);
 	return result;
@@ -44,7 +44,7 @@ void HTTPRequest::takeHeader(char *header) {
 	if (pos == (size_t)-1)
 		throw std::string("400");
 
-	char *tmp = ft_substr(header, 0, pos);
+	char *tmp = ft_substr(header, 0, pos - 1);
 	char *value = getArgument(header, pos);
 	_request_params[tmp] = value;
 	free(value);

@@ -25,6 +25,6 @@ int		ft_atoi(const char *src);
 int		ft_atoi_chunk(const char *src);
 size_t	ft_find(const char *str, const char *find);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
-char			*ft_strtrim(char const *s1, char const *set);
+char			*ft_strtrim(char *s1, char const *set);
 void 	*ft_memjoin(char *dst, char *src, int &dst_size, int src_size);
 char *ft_erase(char *&dst, int dst_size, int len);

@@ -1,1 +1,1 @@
-cgi: bad CONTENT_LENGTH in environment: *êVü
+cgi: no REQUEST_METHOD in environment

@@ -27,7 +27,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[7] = ft_strdup("REMOTE_ADDR="); //IP-адрес, с которого пользователь просматривает текущую страницу
 	_env[8] = ft_strdup("REMOTE_IDENT=");
 	_env[9] = ft_strdup("REMOTE_USER=");
-	_env[10] = ft_strjoin("REQUEST_METHOD=", _request->getMethod());
+	_env[10] = ft_strjoin("REQUEST_METHOD=", "POST");
 	_env[11] = ft_strjoin("REQUEST_URI=", _request->getHostUrl());
 	_env[12] = ft_strjoin("SCRIPT_NAME=", getPathCGI());
 	_env[13] = ft_strjoin("SERVER_NAME=", virtualServer->getServerName().c_str());
@@ -35,7 +35,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
-	std::cout << path << std::endl;
+	std::cout << path << " THIS IS ENV " << _env[10] << std::endl;
 	_path = ft_strdup(path);
 	setArgs();
 	execCGI(_response);
