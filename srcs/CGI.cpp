@@ -13,17 +13,14 @@
 
 
 CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
+	std::cout << "ETO PATH, VSEM PRIVET: " << path << std::endl;
 	_request = client->getRequest();
 	_response = client->getResponse();
 	_sizeEnv = 18;
 	_env = (char**)calloc(_sizeEnv, sizeof(char*));
 	_env[0] = ft_strdup("AUTH_TYPE=BASIC");
-	_env[1] = ft_strjoin("CONTENT_LENGTH=", std::to_string(_request->getRequestSize()).c_str());
-	if (!(_request->getHeaders().find("Content-type")->second.empty())) {
-		_env[2] = ft_strjoin("CONTENT_TYPE=", (_request->getHeaders().find("Content-type")->second).c_str());
-	} else {
-		_env[2] = ft_strdup("CONTENT_TYPE=");
-	}
+	_env[1] = ft_strjoin("CONTENT_LENGTH=", _request->getContentLength());
+	_env[2] = ft_strjoin("CONTENT_TYPE=", (_request->getContentType()));
 	_env[3] = ft_strdup("GATEWAY_INTERFACE=CGI/1.1");
 	_env[4] = ft_strdup("PATH_INFO="); // HTTP-путь к сценарию
 	_env[5] = ft_strjoin("PATH_TRANSLATED=", getPathCGI());
@@ -39,7 +36,8 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
-	setPathCGI(ft_strdup(path));
+	_path = ft_strdup(path);
+	setArgs();
 	execCGI(_response);
 }
 
@@ -48,9 +46,7 @@ CGI::~CGI() {
 		free(_env[i]);
 	}
 	free(_env);
-	for (int i = 0; i < 2; ++i) {
-		free(_argv[i]);
-	}
+	free(_path);
 }
 
 void CGI::execCGI(HTTPResponse* response) {
@@ -84,12 +80,13 @@ void CGI::execCGI(HTTPResponse* response) {
 		response->setBody(result);
 		response->setStatusCode("200");
 	}
+	std::cout << "YA TUTA, ZASHEL V CGI I PERJUUUUUUUUUUUUU" << std::endl;
 	close(file_fd);
 	free(result_buf);
 }
 
-void CGI::setPathCGI(char * string) {
-	_argv[0] = string;
-	_argv[1] = string;
+void CGI::setArgs() {
+	_argv[0] = _path;
+	_argv[1] = _path;
 	_argv[2] = nullptr;
 }

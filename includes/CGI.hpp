@@ -19,7 +19,7 @@ public:
 
 	void execCGI(HTTPResponse* response);
 	char** getEnv() const { return _env; }
-	void setPathCGI(char * path);
+	void setArgs();
 	char* getPathCGI() const { return _argv[0]; }
 
 private:
@@ -28,4 +28,5 @@ private:
 	char**	_env;
 	char*	_argv[3];
 	int 	_sizeEnv;
+	char*	_path;
 };

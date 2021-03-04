@@ -50,7 +50,7 @@ public:
 	bool getAutoIndex() const { return _autoindex; }
 	size_t getRequestLimits() const { return _request_limits; }
 	std::vector<std::string>	getAllowMethods() { return _allow_methods; }
-	std::map<std::string, std::string>	getCgi() { return _cgi; }
+	std::map<std::string, std::string>&	getCgi() { return _cgi; }
 
 	bool 						checkAllowMethod(const char* method);
 	bool						validationLocation(const char* method);

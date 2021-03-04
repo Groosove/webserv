@@ -136,7 +136,8 @@ bool Location::findCgiFile(const std::string &value) {
 }
 
 void Location::setCgiPath(const std::string &path_and_file) {
-	std::string tmp = ft_strtrim(path_and_file, " \t");
-	_cgi[path_and_file.substr(0, path_and_file.find(' '))] =
-				path_and_file.substr(path_and_file.find(' '));
+	size_t pos;
+	if ((pos = path_and_file.find(' ')) == std::string::npos)
+		std::cerr << "Error cgi_path" << std::endl;
+	_cgi.insert(std::make_pair(path_and_file.substr(0, pos), path_and_file.substr(pos + 1, path_and_file.size())));
 }
