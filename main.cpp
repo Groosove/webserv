@@ -9,8 +9,8 @@
 #include "WebServer.hpp"
 
 int main(int ac, char** av) {
-	WebServer webServer(av[1]);
-
+	const char *config_name = (ac == 1) ? "default.conf" : av[1];
+	WebServer webServer(config_name);
 	signal(SIGPIPE, SIG_IGN);
 	webServer.createVirtualServer();
 	std::vector<VirtualServer>::iterator it_begin;

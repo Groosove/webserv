@@ -23,7 +23,9 @@ std::string HTTPRequest::getArgument(const std::string &dst, int start) {
 
 char * HTTPRequest::getStr(size_t pos) {
 	char *result = ft_substr(_request, 0, pos);
-	_request = ft_substr(_request, pos + 2, _request_size);
+	char *tmp = ft_substr(_request, pos + 2, _request_size);
+	free(_request);
+	_request = tmp;
 	_request_size -= pos + 2;
 	return result;
 }
@@ -39,7 +41,6 @@ void HTTPRequest::takeHeader(char *header) {
 
 
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
-	std::cout << buf << std::endl;
 	char *tmp = (char *)ft_memjoin(_request, buf, _request_size, bytes);
 	free(_request);
 	_request = tmp;
@@ -95,7 +96,9 @@ int HTTPRequest::parseBodyRequest() {
 				if (_hex_size == (size_t)-1) {
 					_hex_size = ft_atoi_chunk(getStr(pos));
 				} else if (_hex_size != 0) {
-					_body = (char *)ft_memjoin(_body, getStr(pos), _body_size, _hex_size);
+					char *tmp = (char *)ft_memjoin(_body, getStr(pos), _body_size, _hex_size);
+					free(_body);
+					_body = tmp;
 					_hex_size = -1;
 				} else return 1;
 			} else return 0;
@@ -120,6 +123,7 @@ void HTTPRequest::parseFirstLine(char *line) {
 			else std::cerr << "Error set version HTTP/1.1" << std::endl;
 		}
 	}
+	delete [] dst;
 	free(line);
 	++_stage;
 }
