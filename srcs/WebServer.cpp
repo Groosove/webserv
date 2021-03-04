@@ -17,10 +17,13 @@ WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	int fd = open(config_name, O_RDONLY);
 	char *line = nullptr;
 	if (fd > 0)
-		while (get_next_line(fd, &line) > 0)
+		while (get_next_line(fd, &line) > 0) {
 			config.push_back(line);
+			free(line);
+		}
 	else
 		std::cerr << "File doesn't open!" << std::endl;
+	free(line);
 	FileParser _config(config);
 	_virtual_server = _config.getServer();
 }
