@@ -38,6 +38,8 @@ public:
 
 	int getBodySize() const;
 
+	char *getBody() const;
+
 	void							setStatusCode(const std::string& status) { _status_code = status; }
 	void							setBody(std::pair<char *, int> buf);
 

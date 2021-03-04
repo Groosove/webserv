@@ -11,6 +11,7 @@ FileParser::FileParser(std::vector<std::string> config) {
 	for (size_t i = 0; i < size;) {
 		if (config[i].find("server:") != std::string::npos && checkIndent(config[i], 0))
 			_server.push_back(parseConfigFile(config, ++i));
+		++i;
 	};
 }
 
@@ -20,7 +21,7 @@ VirtualServer FileParser::parseConfigFile(std::vector<std::string> config, size_
 	_parseServerParam(config, index, server);
 	for (size_t i = index; i < size; ++i) {
 		if (config[i].find("location:") != std::string::npos && checkIndent(config[i], 1))
-			_parseLocationParam(config, i, server);
+			_parseLocationParam(config, i, server); // TODO Если директория без слеша, то нужно дополнять!
 		else if (config[i].empty()) continue;
 		else { std::cerr << "Error parse config file" << std::endl; break; }
 		index = i;
@@ -72,21 +73,23 @@ void FileParser::_parseLocationParam(std::vector<std::string> &config, size_t &i
 	Location location;
 	std::string path = getArgument(config[i], ft_strchr(config[i], ':'));
 	++i;
-	while (config[i].find("location:") == std::string::npos && config[i].find("server:") == std::string::npos && i < config.size()) {
+	while (i < config.size() && config[i].find("location:") == std::string::npos && config[i].find("server:") == std::string::npos) {
 		if ((config[i].find("root:", 0, 5)) != std::string::npos)
 			location.setRoot(getArgument(config[i], ft_strchr(config[i], ':')));
+		else if ((config[i].find("autoindex:", 0, 10)) != std::string::npos)
+			location.setAutoIndex(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("index:", 0, 6)) != std::string::npos)
 			location.setIndex(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("allow_methods:", 0, 14)) != std::string::npos)
 			location.setAllowMethods(getArgument(config[i], ft_strchr(config[i], ':')));
-		else if ((config[i].find("autoindex:", 0, 10)) != std::string::npos)
-			location.setAutoIndex(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("limits_client_body_size", 0, 24)) !=  std::string::npos)
 			location.setRequestLimits(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if (config[i].empty()) { ++i; continue; }
 		if (!checkIndent(config[i], 2)) { std::cerr << "Error parse config file" << std::endl; break; }
 		++i;
 	}
+	if (i >= config.size())
+		--i;
 	if (config[i].find("location:") != std::string::npos)
 		--i;
 	server.getLocation()[path] = location;

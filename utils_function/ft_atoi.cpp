@@ -21,6 +21,16 @@ int		ft_atoi(const char *src)
 	return (result * negative);
 }
 
+int ft_hex2dec(char c) {
+	if (('0' <= c && c <= '9'))
+		return (c - '0');
+	else if (('a' <= c && c <= 'f'))
+		return (c - 'a' + 10);
+	else
+		return (c - 'A' + 10);
+}
+
+
 int		ft_atoi_chunk(const char *src)
 {
 	long int	result;
@@ -33,8 +43,7 @@ int		ft_atoi_chunk(const char *src)
 	if (*src == '+' || *src == '-')
 		src++;
 	while (*src != 0 && ((*src >= 48 && *src <= 57) || (*src >= 'a' && *src <= 'z') || (*src >= 'A' && *src <= 'Z'))) {
-		result *= 16;
-		result += *src - ((*src >= 48 && *src <= 57) ? '0' : (*src >= 'a' && *src <= 'z') ? ('a' + 10) : ('A' + 10));
+		result = result * 16 + ft_hex2dec(*src);
 		src++;
 	}
 	return (result * negative);

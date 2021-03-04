@@ -8,6 +8,7 @@
 
 
 #include "HTTPResponse.hpp"
+#include <fcntl.h>
 
 const std::string	HTTPResponse::message_phrases[count_status_code][2] = {
 		{"200", "OK"},
@@ -42,15 +43,22 @@ void	HTTPResponse::generateResponse() {
 	size_t		pos = 0;
 	int size = 0;
 	std::string headers;
+	std::string	errorPage = generateErrorPage();
+
+	pos = std::stoi(_status_code);
+	if (pos >= 400)
+		_body_size = errorPage.length();
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
-						+ "Connection:" + SPACE + "keep-alive" + CRLF + CRLF);
-//	ft_add_bytes(_buf_response, (char *)headers.c_str(), size, headers.size());
+						+ "Connection:" + SPACE + "close" + CRLF
+						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF + CRLF);
+	std::cout << "STATUS CODE: " << _status_code << std::endl;
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
-	if ((pos = _status_code.find("4")) == std::string::npos)
+	pos = std::stoi(_status_code);
+	if (pos < 400)
 		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 	else {
-		_buf_response = (char*)ft_memjoin(_buf_response, (char*)generateErrorPage().c_str(), _header_size, generateErrorPage().size());
+		_buf_response = (char*)ft_memjoin(_buf_response, (char*)errorPage.c_str(), _header_size, _body_size);
 	}
 }
 
@@ -74,4 +82,8 @@ std::string HTTPResponse::generateErrorPage() {
 			"content=\"ie=edge\"><title>" + _status_code + " " + getMessagePhrase(_status_code) + "</title><style>h1, "
 																								"p {text-align: center;}</style></head><body><h1>" + _status_code + " " + getMessagePhrase(_status_code) +
 			"</h1><hr><p>WebServ/0.1</p></body></html>");
+}
+
+char *HTTPResponse::getBody() const {
+	return _body;
 }

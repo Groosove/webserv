@@ -27,6 +27,7 @@ set(UTILS
 		utils_function/ft_find.cpp
 		utils_function/ft_memcpy.cpp
 		utils_function/ft_memjoin.cpp
+		utils_function/ft_erase.cpp
 		)
 
 set(FILES
@@ -43,3 +44,4 @@ set(FILES
 		)
 
 add_executable(WebServ ${UTILS} ${FILES} )
+add_executable(ERASE utils_function/ft_erase.cpp)
