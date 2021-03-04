@@ -40,7 +40,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 			handlePutResponse(client, location, &stat_info, path, stat_info_created);
 	}
 	std::cout << "METHOD: " << request->getMethod() << std::endl;
-	response->generateResponse();
+	response->generateResponse(request);
 	client->setResponseBuffer(response->getResponse(), response->getBodySize());
 	client->setStage(send_response);
 }
@@ -104,16 +104,20 @@ void WebServer::handlePostReponse(Client *client, Location *location, struct sta
 								  std::string &path) {
 	HTTPResponse*	response = client->getResponse();
 	int				fd = 0;
-
+	std::cout << "Status code start: " << response->getStatusCode() << std::endl;
 	if (response->getBodySize() < location->getRequestLimits())
 		response->setStatusCode("413");
+	std::cout << "Status code second: " << response->getStatusCode() << std::endl;
 	if (S_ISDIR(stat_info->st_mode))
 		response->setStatusCode("404");
+	std::cout << "Status code third: " << response->getStatusCode() << std::endl;
 	if ((fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) < 0)
 		response->setStatusCode("500");
 	else {
+		std::cout << "Status code read body: " << response->getStatusCode() << std::endl;
 		write(fd, response->getBody(), response->getBodySize());
 		response->setStatusCode("200");
+		std::cout << "Status code complete: " << response->getStatusCode() << std::endl;
 		close(fd);
 	}
 }

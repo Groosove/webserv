@@ -29,7 +29,7 @@ public:
 
 	static const std::string		message_phrases[count_status_code][2];
 
-	void							generateResponse();
+	void							generateResponse(HTTPRequest* requestz);
 
 	static std::string				getMessagePhrase(const std::string& code);
 	const std::string&				getStatusCode() const { return (_status_code); }

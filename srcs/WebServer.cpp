@@ -142,9 +142,9 @@ void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_f
 }
 
 void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd) {
-	char*			buf = (char*)calloc(4097, 1);
+	char*			buf = (char*)calloc(80000, 1);
 	int				read_bytes;
-	int				size_buffer = 4097;
+	int				size_buffer = 80000;
 
 	read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
 	buf[read_bytes] = 0;
@@ -159,7 +159,7 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 	}
 	catch (const std::string& status_value) {
 		client->getResponse()->setStatusCode(status_value);
-		client->getResponse()->generateResponse();
+		client->getResponse()->generateResponse(client->getRequest());
 		client->setResponseBuffer(client->getResponse()->getResponse(), client->getResponse()->getBodySize());
 		client->setStage(send_response);
 	}

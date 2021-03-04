@@ -11,6 +11,7 @@
 #include "FileParser.hpp"
 #include "VirtualServer.hpp"
 #include "Client.hpp"
+#include "CGI.hpp"
 #include "sys/socket.h"
 #include "sys/select.h"
 

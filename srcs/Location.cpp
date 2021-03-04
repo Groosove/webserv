@@ -118,3 +118,25 @@ bool Location::checkAllowMethod(const char *method) {
 	}
 	return true;
 }
+
+bool Location::findCgiPath(const std::string &value) {
+	std::map<std::string, std::string>::iterator it = _cgi.begin();
+	for (; it != _cgi.end(); ++it)
+		if (value.rfind(it->second) != std::string::npos)
+			return true;
+	return false;
+}
+
+bool Location::findCgiFile(const std::string &value) {
+	std::map<std::string, std::string>::iterator it = _cgi.begin();
+	for (; it != _cgi.end(); ++it)
+		if (value.rfind(it->first) != std::string::npos)
+			return true;
+	return false;
+}
+
+void Location::setCgiPath(const std::string &path_and_file) {
+	std::string tmp = ft_strtrim(path_and_file, " \t");
+	_cgi[path_and_file.substr(0, path_and_file.find(' '))] =
+				path_and_file.substr(path_and_file.find(' '));
+}

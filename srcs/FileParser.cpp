@@ -84,6 +84,8 @@ void FileParser::_parseLocationParam(std::vector<std::string> &config, size_t &i
 			location.setAllowMethods(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if ((config[i].find("limits_client_body_size", 0, 24)) !=  std::string::npos)
 			location.setRequestLimits(getArgument(config[i], ft_strchr(config[i], ':')));
+		else if ((config[i].find("cgi_path:", 0, 9)) != std::string::npos)
+			location.setCgiPath(getArgument(config[i], ft_strchr(config[i], ':')));
 		else if (config[i].empty()) { ++i; continue; }
 		if (!checkIndent(config[i], 2)) { std::cerr << "Error parse config file" << std::endl; break; }
 		++i;

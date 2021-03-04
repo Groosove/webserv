@@ -38,25 +38,28 @@ std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 	return ("Unknown code");
 }
 
-void	HTTPResponse::generateResponse() {
+void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	std::map<std::string, std::string>::const_iterator it;
 	size_t		pos = 0;
 	int size = 0;
 	std::string headers;
 	std::string	errorPage = generateErrorPage();
 
+	if (_buf_response)
+		free(_buf_response);
+	std::cout << "STATUS CODE: " << _status_code << std::endl;
 	pos = std::stoi(_status_code);
 	if (pos >= 400)
 		_body_size = errorPage.length();
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "close" + CRLF
-						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF + CRLF);
-	std::cout << "STATUS CODE: " << _status_code << std::endl;
+						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
+						+ "Content-type:" + SPACE + request->getHeaders().find("Content-type")->second + CRLF + CRLF);
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)
-		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
+	_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 	else {
 		_buf_response = (char*)ft_memjoin(_buf_response, (char*)errorPage.c_str(), _header_size, _body_size);
 	}

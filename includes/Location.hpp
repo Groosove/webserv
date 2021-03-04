@@ -28,12 +28,12 @@ enum Method {
 class Location {
 private:
 //	std::map<std::string, std::string>  _value_location;
-//	std::map<std::string, std::string>  _cgi;
-	std::string					_root;
-	std::string					_index;
-	std::vector<std::string>	_allow_methods;
-	bool						_autoindex;
-	size_t						_request_limits;
+	std::map<std::string, std::string>  _cgi;
+	std::string							_root;
+	std::string							_index;
+	std::vector<std::string>			_allow_methods;
+	bool								_autoindex;
+	size_t								_request_limits;
 public:
 	Location();
 	~Location() {};
@@ -43,6 +43,7 @@ public:
 	void						setRoot(const std::string& root);
 	void						setIndex(const std::string& index);
 	void						setAllowMethods(const std::string& allow_methods);
+	void						setCgiPath(const std::string& path_and_file);
 
 	std::string&				getRoot() { return _root; }
 	std::string&				getIndex() { return _index; }
@@ -54,5 +55,6 @@ public:
 	bool						validationLocation(const char* method);
 	bool						tryOpenDir();
 	bool						tryOpenFile();
-
+	bool						findCgiPath(const std::string& value);
+	bool						findCgiFile(const std::string& value);
 };
