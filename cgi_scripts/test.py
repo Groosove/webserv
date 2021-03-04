@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# print("Status: 200\r")
+print("Status: 200 Success\r")
 print("Content-type:text/html\r\n\r")
 print('<html>')
 print('<head>')

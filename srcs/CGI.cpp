@@ -13,7 +13,6 @@
 
 
 CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
-	std::cout << "ETO PATH, VSEM PRIVET: " << path << std::endl;
 	_request = client->getRequest();
 	_response = client->getResponse();
 	_sizeEnv = 18;
@@ -36,6 +35,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
+	std::cout << path << std::endl;
 	_path = ft_strdup(path);
 	setArgs();
 	execCGI(_response);
@@ -50,37 +50,51 @@ CGI::~CGI() {
 }
 
 void CGI::execCGI(HTTPResponse* response) {
-	int fd_out;
 	pid_t pid;
 	int file_fd;
 	char buf;
+	int		pipe_fd[2];
 	char* result_buf = (char*)calloc(100000, sizeof(char));
 
-	fd_out = dup(1);
-	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0666);
+	pipe(pipe_fd);
+	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0677);
+	std::cerr << "FORK" << std::endl;
 	if ((pid = fork()) == 0) {
+		close(pipe_fd[1]);
+		dup2(pipe_fd[0], 0);
+		close(pipe_fd[0]);
 		dup2(file_fd, 1);
-		exit(execve(_argv[0], _argv, getEnv()));
+		close(file_fd);
+		execve(_argv[0], _argv, getEnv());
+		std::cerr << "YA YPAL REBYATKI" << std::endl;
+		exit(1);
+
 	}
 	else if(pid == -1) {
 		;//error
 	}
 	else {
-		write(fd_out, _request->getBody(), _request->getRequestSize());
+		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
+		write(pipe_fd[1], _request->getBody(), _request->getBodySize());
+		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
+		close(pipe_fd[1]);
+		close(pipe_fd[0]);
 		wait(nullptr);
+		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		lseek(file_fd, 0, 0);
 		int r, size = 0;
 		while ((r = read(file_fd, &buf, 1)) > 0) {
 			result_buf[size++] = buf;
 		}
+		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		std::pair<char*, int> result;
 		result.first = result_buf;
 		result.second = size;
 		//delete old response
+		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		response->setBody(result);
 		response->setStatusCode("200");
 	}
-	std::cout << "YA TUTA, ZASHEL V CGI I PERJUUUUUUUUUUUUU" << std::endl;
 	close(file_fd);
 	free(result_buf);
 }

@@ -47,22 +47,24 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 
 	if (_buf_response)
 		free(_buf_response);
+	std::cout << "SIZE: " << _body_size << std::endl;
 	std::cout << "STATUS CODE: " << _status_code << std::endl;
 	pos = std::stoi(_status_code);
 	if (pos >= 400)
 		_body_size = errorPage.length();
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
-						+ "Connection:" + SPACE + "close" + CRLF
-						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
-						+ "Content-type:" + SPACE + request->getHeaders().find("Content-type")->second + CRLF + CRLF);
+						+ "Connection:" + SPACE + "keep-alive" + CRLF
+						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF + CRLF);
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)
-	_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
+		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 	else {
 		_buf_response = (char*)ft_memjoin(_buf_response, (char*)errorPage.c_str(), _header_size, _body_size);
 	}
+	std::cout << "BODY RESPONSE: " << _buf_response << std::endl;
+	std::cout << "SIZE RESPONSE: " << _body_size << std::endl;
 }
 
 HTTPResponse::HTTPResponse(): _body_size(0) {
@@ -74,7 +76,7 @@ HTTPResponse::HTTPResponse(): _body_size(0) {
 void HTTPResponse::setBody(std::pair<char *, int> dst) {
 	char *body = dst.first;
 	int size = dst.second;
-	_body = (char *)ft_memjoin(_body, body, _body_size,size);
+	_body = (char *)ft_memjoin(_body, body, _body_size, size);
 }
 
 int HTTPResponse::getBodySize() const { return _header_size; }
