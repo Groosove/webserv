@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-print("Status: 200 Success\r\n")
-print("Content-type:text/html\r\n\r\n")
+print("Content-type:text/html\r\n\r")
 print('<html>')
 print('<head>')
 print('<title>Shonna Jakku and Fenix Lavon best boys in the world!</title>')

@@ -32,8 +32,10 @@ void WebServer::treatmentStageGenerate(Client *client) {
 		response->setStatusCode(error);
 	} else {
 		checkDirectoryOrFile(&stat_info, location, path);
-		if (ft_compare(request->getMethod(), "POST"))
-			handlePostReponse(client, location, &stat_info, path);
+		if (ft_compare(request->getMethod(), "POST")) {
+			std::map<std::string, std::string>::iterator it = location->getCgi().find(".py");
+			CGI cgi_response(client, virtual_server, (char*)it->second.c_str());
+		}
 		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
 			handleDefaultResponse(client, location, &stat_info, path);
 		else if (ft_compare(request->getMethod(), "PUT"))

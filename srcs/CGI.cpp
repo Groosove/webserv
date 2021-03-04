@@ -39,7 +39,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
-	setPathCGI(path);
+	setPathCGI(ft_strdup(path));
 	execCGI(_response);
 }
 
@@ -82,6 +82,7 @@ void CGI::execCGI(HTTPResponse* response) {
 		result.second = size;
 		//delete old response
 		response->setBody(result);
+		response->setStatusCode("200");
 	}
 	close(file_fd);
 	free(result_buf);
