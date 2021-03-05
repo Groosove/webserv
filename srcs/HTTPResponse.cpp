@@ -55,7 +55,8 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 						+ "Connection:" + SPACE + "keep-alive" + CRLF
-						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF + CRLF);
+						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
+						+ "Content-type:" + SPACE + request->getHeaders().find("Content-type")->second + CRLF + CRLF);
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)

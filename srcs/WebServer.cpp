@@ -176,17 +176,14 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 					   client->getBytes() - client->getSendBytes(), 0);
 			if (errno != EPIPE) {
 				client->setSendBytes(client->getSendBytes() + ret);
-				FD_CLR(client->getSocket(), &read_fd);
-				FD_CLR(client->getSocket(), &write_fd);
-				client->setStage(close_connection);
 				return;
 			}
 			errno = 0;
 		}
 	}
-//	FD_CLR(client->getSocket(), &read_fd);
-//	FD_CLR(client->getSocket(), &write_fd);
-//	client->setStage(close_connection);
+	FD_CLR(client->getSocket(), &read_fd);
+	FD_CLR(client->getSocket(), &write_fd);
+	client->setStage(close_connection);
 }
 
 int WebServer::getMaxFd() const {

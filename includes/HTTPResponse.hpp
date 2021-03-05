@@ -20,8 +20,8 @@ private:
 	std::string 	_status_code;
 	char *			_buf_response;
 	char *			_body;
-	int				_body_size;
-	int				_header_size;
+	size_t 				_body_size;
+	size_t 				_header_size;
 
 public:
 	explicit HTTPResponse();

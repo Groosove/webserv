@@ -12,7 +12,7 @@
 HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 	_request = ft_strdup("");
 	_request_size = 0;
-	_requset_capacity = 0;
+	_request_capacity = 0;
 	_body = ft_strdup("");
 }
 
@@ -184,12 +184,12 @@ const char *HTTPRequest::getContentType() {
 
 void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
 	char *_realloc_request = _request;
-	if (_request_size + buf_size >= _requset_capacity) {
+	if (_request_size + buf_size >= _request_capacity) {
 		size_t new_capacity = (_request_size + buf_size) * 2;
 		free(_request);
 		_request = (char *)malloc(new_capacity);
 		ft_memcpy(_request, _realloc_request, _request_size);
-		_requset_capacity = new_capacity;
+		_request_capacity = new_capacity;
 	}
 	for (int i = 0; i < buf_size; ++i, ++_request_size)
 		_request[_request_size] = buf[i];
