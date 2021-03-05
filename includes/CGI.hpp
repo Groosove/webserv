@@ -19,8 +19,8 @@ public:
 
 	void execCGI(HTTPResponse* response);
 	char** getEnv() const { return _env; }
-	void setArgs();
-	char* getPathCGI() const { return _argv[0]; }
+	void setArgs() { _argv[0] = _path; _argv[1] = _path; _argv[2] = nullptr; }
+	char* getPathCGI() const { return _path; }
 
 private:
 	HTTPRequest* _request;
