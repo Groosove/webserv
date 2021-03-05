@@ -47,8 +47,8 @@ public:
 	int getBodySize() const;;
 	const char *						getVersionHTTP() const { return _version_http; };
 	const char *						getHostUrl() const { return _request_params.find("Host")->second.c_str(); };
-	const char *						getContentLength() const { return _request_params.find("Content-Length")->second.c_str(); }
-	const char *						getContentType() const { return _request_params.find("Content-Type")->second.c_str(); }
+	const char *						getContentLength() ;
+	const char *						getContentType();
 	const std::string&					getStatusCode() const { return _status_code; }
 	int									getParsingStage() const { return _stage; }
 	int 								getRequestSize() const { return _request_size; }

@@ -166,3 +166,19 @@ int HTTPRequest::getRequsetSize() const { return _request_size; }
 int HTTPRequest::getBodySize() const {
 	return _body_size;
 }
+
+const char *HTTPRequest::getContentLength() {
+	std::map<std::string, std::string>::iterator it = _request_params.find("Content-Length");
+	if (it == _request_params.end())
+		return "0";
+	else
+		it->second.c_str();
+}
+
+const char *HTTPRequest::getContentType() {
+	std::map<std::string, std::string>::iterator it = _request_params.find("Content-Type");
+	if (it == _request_params.end())
+		return nullptr;
+	else
+		it->second.c_str();
+}
