@@ -12,6 +12,7 @@
 HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 	_request = ft_strdup("");
 	_request_size = 0;
+	_requset_capacity = 0;
 	_body = ft_strdup("");
 }
 
@@ -54,7 +55,7 @@ void HTTPRequest::takeHeader(char *header) {
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
 	addBufToRequest(buf, bytes);
 	size_t pos;
-	while (_request && _stage != 3) {
+	while (_request_size != 0 && _stage != 3) {
 		if (_stage == 0) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t) -1)
 				parseFirstLine(getStr(pos));
@@ -182,15 +183,26 @@ const char *HTTPRequest::getContentType() {
 }
 
 void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
-	char *tmp = (char *)ft_memjoin(_request, buf, _request_size, buf_size);
-	free(_request);
-	_request = tmp;
+	char *_realloc_request = _request;
+	if (_request_size + buf_size >= _requset_capacity) {
+		size_t new_capacity = (_request_size + buf_size) * 2;
+		free(_request);
+		_request = (char *)malloc(new_capacity);
+		ft_memcpy(_request, _realloc_request, _request_size);
+		_requset_capacity = new_capacity;
+	}
+	for (int i = 0; i < buf_size; ++i, ++_request_size)
+		_request[_request_size] = buf[i];
+	_request[_request_size] = '\0';
+
 }
 
+
 void HTTPRequest::ft_erase(int size) {
-	char *tmp = ft_substr(_request, size, _request_size);
-	free(_request);
-	_request = tmp;
+	std::memmove(_request, _request + size, _request_size);
+//	char *tmp = ft_substr(_request, size, _request_size);
+//	free(_request);
+//	_request = tmp;
 	_request_size -= size;
 }
 

@@ -5,16 +5,22 @@
 
 #include "utils.hpp"
 
-void	*ft_memcpy(void *dst, const void *src, size_t n)
+void	ft_memcpy(const void *dst, const void *src, size_t n)
 {
-	unsigned char	*tmp1;
-	unsigned char	*tmp2;
+	unsigned int* tmp1;
+	unsigned int* tmp2;
+	unsigned char *c_dst;
+	unsigned char *c_src;
 
-	tmp1 = (unsigned char *)dst;
-	tmp2 = (unsigned char *)src;
-	if (dst == 0 && src == 0)
-		return (0);
-	while (n-- != 0)
+	tmp1 = (unsigned int *)dst;
+	tmp2 = (unsigned int *)src;
+	while (n > 4) {
 		*tmp1++ = *tmp2++;
-	return (dst);
+		n -= 4;
+	}
+
+	c_dst = reinterpret_cast<unsigned char *>(tmp1);
+	c_src = reinterpret_cast<unsigned char *>(tmp2);
+	while (n-- != 0)
+		*c_dst++ = *c_src++;
 }

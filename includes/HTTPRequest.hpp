@@ -21,14 +21,14 @@ private:
 	char *		_http_path;
 	char *		_http_query;
 	char *		_version_http;
-	char *		_host_url;
 
 	char *	_body;
 	char *	_request;
 
 	int		_request_size;
+	int		_requset_capacity;
 	int		_body_size;
-	int		_body_capacity;
+	int 	_body_capacity;
 	size_t	_hex_size;
 
 	int			_stage;
