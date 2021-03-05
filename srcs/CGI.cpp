@@ -15,29 +15,29 @@
 CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_request = client->getRequest();
 	_response = client->getResponse();
+	_path = ft_strdup(path);
 	_sizeEnv = 18;
 	std::cout << "PATH : " << _request->getPath() << std::endl;
 	_env = (char**)calloc(_sizeEnv, sizeof(char*));
-	_env[0] = ft_strdup("AUTH_TYPE=BASIC");
+	_env[0] = ft_strdup("AUTH_TYPE=basic");
 	_env[1] = ft_strjoin("CONTENT_LENGTH=", std::to_string(_request->getBodySize()).c_str());
 	_env[2] = ft_strjoin("CONTENT_TYPE=", (_request->getContentType()));
 	_env[3] = ft_strdup("GATEWAY_INTERFACE=CGI/1.1");
-	_env[4] = ft_strjoin("PATH_INFO=", "./directory/youpi.bla"); // HTTP-путь к сценарию
-	_env[5] = ft_strjoin("PATH_TRANSLATED=", "/Users/arturlutfullin/Desktop/webserv/test/YoupiBanane/");
-	_env[6] = ft_strjoin("QUERY_STRING=", _request->getHttpQuery()); //Строка запроса, если есть, через которую была открыта страница
-	_env[7] = ft_strdup("REMOTE_ADDR="); //IP-адрес, с которого пользователь просматривает текущую страницу
+	_env[4] = ft_strjoin("PATH_INFO=", _request->getPath());
+	_env[5] = ft_strjoin("PATH_TRANSLATED=", _path);
+	_env[6] = ft_strjoin("QUERY_STRING=", _request->getHttpQuery());
+	_env[7] = ft_strdup("REMOTE_ADDR=");
 	_env[8] = ft_strdup("REMOTE_IDENT=");
 	_env[9] = ft_strdup("REMOTE_USER=");
 	_env[10] = ft_strjoin("REQUEST_METHOD=", "POST");
-	_env[11] = ft_strjoin("REQUEST_URI=", _request->getHostUrl());
-	_env[12] = ft_strjoin("SCRIPT_NAME=", getPathCGI());
-	_env[13] = ft_strjoin("SERVER_NAME=", virtualServer->getServerName().c_str());
-	_env[14] = ft_strjoin("SERVER_PORT=", std::to_string(virtualServer->getSocket()).c_str());
-	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
+	_env[11] = ft_strjoin("REQUEST_URI=http://", (client->getHost() + ":" + client->getPort() + _request->getPath()).c_str());
+	_env[12] = ft_strjoin("SCRIPT_NAME=", _request->getPath());
+	_env[13] = ft_strjoin("SERVER_NAME=", client->getHost().c_str());
+	_env[14] = ft_strjoin("SERVER_PORT=", client->getPort().c_str());
+	_env[15] = ft_strjoin("SERVER_PROTOCOL=HTTP/1.1", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
 	std::cout << path << " THIS IS ENV " << _env[10] << std::endl;
-	_path = ft_strdup(path);
 	setArgs();
 	execCGI(_response);
 }
