@@ -130,7 +130,7 @@ std::pair<char *, int> WebServer::readBodyResponse(const std::string& path) {
 	char		buf[40000];
 	char*		index_html = ft_strdup("");
 	int			bytes;
-	int			size = 0;
+	size_t 			size = 0;
 
 	if (!(fd = open(path.c_str(), O_RDONLY)))
 		std::cerr << "File not open" << std::endl;

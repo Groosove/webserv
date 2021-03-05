@@ -5,7 +5,7 @@
 
 #include "utils.hpp"
 
-void *ft_memjoin(char *dst, char *src, int &dst_size, int src_size)
+void *ft_memjoin(char *dst, char *src, size_t &dst_size, size_t src_size)
 {
 	char *result;
 	int count;

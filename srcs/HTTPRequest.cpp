@@ -68,7 +68,7 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 				if (_request_params.count("Host") == 0)
 					throw std::string ("400");
 				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST")) {
-					if (_request_params.count("content-length") == 0 && _request_params.count("Transfer-Encoding") == 0)
+					if (_request_params.count("Content-Length") == 0 && _request_params.count("Transfer-Encoding") == 0)
 						throw std::string ("400");
 					else {
 						_stage = 2;
@@ -88,8 +88,8 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 }
 
 int HTTPRequest::parseBodyRequest() {
-	if (_request_params.count("content-length")) {
-		size_t size = ft_atoi(_request_params["content-length"].c_str());
+	if (_request_params.count("Content-Length")) {
+		size_t size = ft_atoi(_request_params["Content-Length"].c_str());
 		_body = (char *) ft_memjoin(_body, _request, _body_size, size);
 		if (ft_strlen(_body) > size) {
 			char *tmp = ft_substr(_body, 0, size);

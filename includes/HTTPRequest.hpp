@@ -26,8 +26,8 @@ private:
 	char *	_body;
 	char *	_request;
 
-	int		_request_size;
-	int		_body_size;
+	size_t 		_request_size;
+	size_t 		_body_size;
 	int		_body_capacity;
 	size_t	_hex_size;
 
