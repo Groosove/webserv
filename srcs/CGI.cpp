@@ -21,7 +21,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[1] = ft_strjoin("CONTENT_LENGTH=", _request->getContentLength());
 	_env[2] = ft_strjoin("CONTENT_TYPE=", (_request->getContentType()));
 	_env[3] = ft_strdup("GATEWAY_INTERFACE=CGI/1.1");
-	_env[4] = ft_strdup("PATH_INFO="); // HTTP-путь к сценарию
+	_env[4] = ft_strjoin("PATH_INFO=", path); // HTTP-путь к сценарию
 	_env[5] = ft_strjoin("PATH_TRANSLATED=", getPathCGI());
 	_env[6] = ft_strdup("QUERY_STRING="); //Строка запроса, если есть, через которую была открыта страница
 	_env[7] = ft_strdup("REMOTE_ADDR="); //IP-адрес, с которого пользователь просматривает текущую страницу

@@ -24,8 +24,10 @@ private:
 
 	char *	_body;
 	char *	_request;
+
 	int		_request_size;
 	int		_body_size;
+	int		_body_capacity;
 	size_t	_hex_size;
 
 	int			_stage;
@@ -65,4 +67,7 @@ public:
 	void								setVersionHTTP(char * version_http);
 	void								setStatusCode(const std::string& status_code);
 
+	void			addBufToRequest(char *buf, int buf_size);
+	void			addBufToBody();
+	void			ft_erase(int size);
 };
