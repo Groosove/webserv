@@ -18,7 +18,8 @@ class HTTPRequest {
 private:
 	std::map<std::string, std::string>	_request_params;
 	char *		_method;
-	char *		_path;
+	char *		_http_path;
+	char *		_http_query;
 	char *		_version_http;
 	char *		_host_url;
 
@@ -44,7 +45,9 @@ public:
 	int		parseBodyRequest();
 
 	const char *						getMethod() const { return _method; };
-	const char *						getPath() const {return _path; }
+
+	const char *						getPath() const {return _http_path; }
+	const char *						getHttpQuery() const { return _http_query; }
 
 	int getBodySize() const;;
 	const char *						getVersionHTTP() const { return _version_http; };

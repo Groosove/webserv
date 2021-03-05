@@ -20,7 +20,8 @@ HTTPRequest::~HTTPRequest() {
 	free(_body);
 	free(_method);
 	free(_version_http);
-	free(_path);
+	free(_http_path);
+	free(_http_query);
 }
 
 char *HTTPRequest::getArgument(char *dst, int start) {
@@ -63,7 +64,7 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
 			else if (pos == 0) {
-				ft_erase(0);
+				ft_erase(2);
 				if (_request_params.count("Host") == 0)
 					throw std::string ("400");
 				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST")) {
@@ -139,7 +140,14 @@ void HTTPRequest::setMethod(char *method) {
 }
 
 void HTTPRequest::setPath(char * path) {
-	_path = path;
+	size_t pos = ft_strchr(path, '?');
+	if (pos == (size_t)-1) {
+		_http_path = path;
+		_http_query = ft_strdup("");
+	} else {
+		_http_path = ft_substr(path, 0, pos - 1);
+		_http_query = ft_substr(path, pos + 2, ft_strlen(path));
+	}
 }
 
 void HTTPRequest::setVersionHTTP(char *version_http) {
@@ -185,5 +193,6 @@ void HTTPRequest::ft_erase(int size) {
 	_request = tmp;
 	_request_size -= size;
 }
+
 
 

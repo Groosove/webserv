@@ -16,14 +16,15 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_request = client->getRequest();
 	_response = client->getResponse();
 	_sizeEnv = 18;
+	std::cout << "PATH : " << _request->getPath() << std::endl;
 	_env = (char**)calloc(_sizeEnv, sizeof(char*));
 	_env[0] = ft_strdup("AUTH_TYPE=BASIC");
-	_env[1] = ft_strjoin("CONTENT_LENGTH=", _request->getContentLength());
+	_env[1] = ft_strjoin("CONTENT_LENGTH=", std::to_string(_request->getBodySize()).c_str());
 	_env[2] = ft_strjoin("CONTENT_TYPE=", (_request->getContentType()));
 	_env[3] = ft_strdup("GATEWAY_INTERFACE=CGI/1.1");
-	_env[4] = ft_strjoin("PATH_INFO=", path); // HTTP-путь к сценарию
-	_env[5] = ft_strjoin("PATH_TRANSLATED=", getPathCGI());
-	_env[6] = ft_strdup("QUERY_STRING="); //Строка запроса, если есть, через которую была открыта страница
+	_env[4] = ft_strjoin("PATH_INFO=", "./directory/youpi.bla"); // HTTP-путь к сценарию
+	_env[5] = ft_strjoin("PATH_TRANSLATED=", "/Users/arturlutfullin/Desktop/webserv/test/YoupiBanane/");
+	_env[6] = ft_strjoin("QUERY_STRING=", _request->getHttpQuery()); //Строка запроса, если есть, через которую была открыта страница
 	_env[7] = ft_strdup("REMOTE_ADDR="); //IP-адрес, с которого пользователь просматривает текущую страницу
 	_env[8] = ft_strdup("REMOTE_IDENT=");
 	_env[9] = ft_strdup("REMOTE_USER=");
