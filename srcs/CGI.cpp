@@ -17,7 +17,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_request = client->getRequest();
 	_response = client->getResponse();
 	_path = ft_strdup(path);
-	_sizeEnv = 18;
+	_sizeEnv = 19;
 	_env = (char**)calloc(_sizeEnv, sizeof(char*));
 	_env[0] = ft_strdup("AUTH_TYPE=basic");
 	_env[1] = ft_strjoin("CONTENT_LENGTH=", std::to_string(_request->getBodySize()).c_str());
@@ -36,26 +36,29 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[14] = ft_strjoin("SERVER_PORT=", client->getPort().c_str());
 	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
-	_env[17] = nullptr;
+	_env[17] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
+	_env[18] = nullptr;
 	std::cout << "PATH : " << path << std::endl;
 	setArgs();
 	execCGI(_response);
 }
 
 CGI::~CGI() {
-	for (int i = 0; i < _sizeEnv - 1; ++i) {
-		free(_env[i]);
-	}
-	free(_env);
-	free(_path);
+//	for (int i = 0; i < _sizeEnv - 1; ++i) {
+//		free(_env[i]);
+//	}
+//	free(_env);
+//	free(_path);
 }
 
 void CGI::execCGI(HTTPResponse* response) {
 	pid_t 	pid;
 	int 	file_fd;
-	char 	buf;
+	size_t 	bytes;
+	char 	buf[60001];
+	size_t size = 0;
 	int		pipe_fd[2];
-	char* 	result_buf = (char*)calloc(_request->getBodySize() + 1, sizeof(char));
+	char* 	result_buf = (char*)calloc(_request->getBodySize() + 2048, sizeof(char));
 
 	pipe(pipe_fd);
 	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0677);
@@ -83,9 +86,10 @@ void CGI::execCGI(HTTPResponse* response) {
 		std::cout << "HELLO IAM HERE" << std::endl;
 		if (!status) {
 			lseek(file_fd, 0, 0);
-			size_t size = 0;
-			while (read(file_fd, &buf, 1) > 0)
-				result_buf[size++] = buf;
+			while ((bytes = read(file_fd, &buf, 60000)) > 0) {
+				ft_memcpy(result_buf + size, buf, bytes);
+				size += bytes;
+			}
 			int pos = ft_strnstr(result_buf, (char*)"\r\n\r\n", size) + 4;
 			char* result_header = ft_substr(result_buf, 0, pos);
 			char* send_res_buf = ft_substr(result_buf, pos, size);

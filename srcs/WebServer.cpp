@@ -11,6 +11,9 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <cstring>
+#define RED "\033[1;31m"
+#define TEXT_RESET "\033[0;0m"
+size_t			countttt = 0;
 
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
@@ -43,7 +46,6 @@ std::vector<VirtualServer> WebServer::getVirtualServer() {
 void WebServer::handle() {
 	fd_set	write_fd;
 	fd_set	read_fd;
-	int		select_value;
 	struct	timeval	tv;
 
 	tv.tv_usec = 0;
@@ -51,18 +53,7 @@ void WebServer::handle() {
 		tv.tv_sec = 240;
 		initSocketSet(write_fd, read_fd);
 		addClientSocketToSet(write_fd, read_fd);
-		select_value = select(getMaxFd() + 1, &read_fd, &write_fd, 0, &tv);
-		if (select_value < 1) {
-			if (errno != EINTR)
-				std::cout << "Select error" << std::endl;
-			else
-				std::cout << "Treatment request" << std::endl;
-			continue;
-		}
-		if (select_value == 0) {
-			std::cout << "Time out" << std::endl;
-			continue;
-		}
+		select(getMaxFd() + 1, &read_fd, &write_fd, 0, &tv);
 		treatmentAccept(read_fd);
 		searchSelectSocket(write_fd, read_fd);
 	}
@@ -108,11 +99,11 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 	for (it = _clients.begin(); it != _clients.end(); ++it) {
 		if (FD_ISSET((*it)->getSocket(), &read_fd))
 			handle_requests(*it, read_fd, write_fd);
-		else if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
+		if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
 			handle_requests(*it, read_fd, write_fd);
-		else if ((*it)->getStage() == close_connection) {
+		if ((*it)->getStage() == close_connection) {
 			deleteClient(it);
-			break ;
+			break;
 		}
 		if (_clients.empty())
 			break ;
@@ -149,6 +140,8 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 	int				read_bytes;
 	int				size_buffer = 80000;
 
+	std::cout << RED << "REBYATKI, MOI NUMBER: " << countttt << " FD: " << client->getSocket() << TEXT_RESET << std::endl;
+	countttt++;
 	read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
 	buf[read_bytes] = 0;
 	try {
@@ -176,7 +169,11 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 					   client->getBytes() - client->getSendBytes(), 0);
 			if (errno != EPIPE) {
 				client->setSendBytes(client->getSendBytes() + ret);
-				return;
+				if (client->getBytes() == client->getSendBytes()) {
+					client->setStage(close_connection);
+				}
+				else
+					return;
 			}
 			errno = 0;
 		}

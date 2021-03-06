@@ -56,9 +56,10 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 				+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 				+ "Connection:" + SPACE + "keep-alive" + CRLF
 				+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF);
-	if (_headers_cgi)
-		headers.append(std::string(_headers_cgi) + CRLF);
-	headers.append(CRLF);
+	if (ft_strlen(_headers_cgi))
+		headers.append(std::string(_headers_cgi));
+	else
+		headers.append(CRLF);
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)
@@ -66,8 +67,6 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	else {
 		_buf_response = (char*)ft_memjoin(_buf_response, (char*)errorPage.c_str(), _header_size, _body_size);
 	}
-	std::cout << "BODY RESPONSE: " << _buf_response << std::endl;
-	std::cout << "SIZE RESPONSE: " << _body_size << std::endl;
 }
 
 HTTPResponse::HTTPResponse(): _body_size(0), _headers_cgi(nullptr) {

@@ -9,10 +9,17 @@
 
 int	ft_strchr(const std::string& str, int ch)
 {
-	int	index = -1;
+	char			*src;
+	int	index;
 
-	while (str[++index] != 0 && str[index] != ch);
-	return (str[index] == ch) ? index : -1;
+	src = (char *)str.c_str();
+	index = 0;
+	while (src[index] != 0)
+		if (src[index++] == ch)
+			return (index);
+	if (src[index] == ch)
+		return (index);
+	return (-1);
 }
 
 int ft_strchr(const char *str, int ch)

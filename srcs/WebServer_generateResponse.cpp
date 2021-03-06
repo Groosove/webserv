@@ -67,6 +67,7 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 	HTTPRequest*	request = client->getRequest();
 	HTTPResponse*	response = client->getResponse();
 
+	usleep(2000);
 	response->setStatusCode("200");
 	if (S_ISLNK(stat_info->st_mode) || S_ISREG(stat_info->st_mode)) {
 		if (ft_compare(request->getMethod(), "GET"))
