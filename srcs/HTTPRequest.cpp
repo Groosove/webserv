@@ -52,8 +52,10 @@ void HTTPRequest::takeHeader(char *header) {
 	free(header);
 }
 
-
+#define TEXT_RESET "\033[0;0m"
+#define GREEN "\033[1;32m"
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
+	std::cout << GREEN << buf << TEXT_RESET << std::endl;
 	addBufToRequest(buf, bytes);
 	size_t pos;
 	while (_request_size != 0 && _stage != 3) {

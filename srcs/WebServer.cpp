@@ -99,7 +99,7 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 	for (it = _clients.begin(); it != _clients.end(); ++it) {
 		if (FD_ISSET((*it)->getSocket(), &read_fd))
 			handle_requests(*it, read_fd, write_fd);
-		if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
+		else if (FD_ISSET((*it)->getSocket(), &write_fd) && ((*it)->getStage() == generate_response || (*it)->getStage() == send_response))
 			handle_requests(*it, read_fd, write_fd);
 		if ((*it)->getStage() == close_connection) {
 			deleteClient(it);
@@ -111,6 +111,7 @@ void WebServer::searchSelectSocket(fd_set &write_fd, fd_set &read_fd) {
 }
 
 void WebServer::deleteClient(std::vector<Client*>::iterator& client) {
+	std::cout << "BRATKA YA TIT I YMERAY" << std::endl;
 	close((*client)->getSocket());
 	delete *client;
 	_clients.erase(client);
@@ -162,18 +163,21 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 }
 
 void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &write_fd) {
+	usleep(1000);
 	if (client->getBytes() != client->getSendBytes()) {
-		size_t ret;
-		if (FD_ISSET(client->getSocket(), &write_fd)) {
-			ret = send(client->getSocket(), client->getReponseBuffer() + client->getSendBytes(),
-					   client->getBytes() - client->getSendBytes(), 0);
+		size_t ret = 0;
+		while (FD_ISSET(client->getSocket(), &write_fd) && client->getBytes() != client->getSendBytes()) {
+				ret = write(client->getSocket(),
+							client->getReponseBuffer() + client->getSendBytes(),
+							client->getBytes() - client->getSendBytes());
 			if (errno != EPIPE) {
 				client->setSendBytes(client->getSendBytes() + ret);
 				if (client->getBytes() == client->getSendBytes()) {
+					FD_CLR(client->getSocket(), &read_fd);
+					FD_CLR(client->getSocket(), &write_fd);
 					client->setStage(close_connection);
 				}
-				else
-					return;
+				return ;
 			}
 			errno = 0;
 		}

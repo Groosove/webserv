@@ -67,7 +67,11 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 	HTTPRequest*	request = client->getRequest();
 	HTTPResponse*	response = client->getResponse();
 
-	usleep(2000);
+	std::cout << "PATH" << path << std::endl;
+	std::cout << "PATH" << location->getIndex() << std::endl;
+	std::cout << "PATH" << location->getRoot() << std::endl;
+	std::cout << "PATH" << location->getAutoIndex() << std::endl;
+
 	response->setStatusCode("200");
 	if (S_ISLNK(stat_info->st_mode) || S_ISREG(stat_info->st_mode)) {
 		if (ft_compare(request->getMethod(), "GET"))
@@ -100,28 +104,6 @@ void WebServer::handlePutResponse(Client *client, Location *location, struct sta
 			response->setStatusCode("200");
 		else
 			response->setStatusCode("201");
-		close(fd);
-	}
-}
-
-void WebServer::handlePostReponse(Client *client, Location *location, struct stat *stat_info,
-								  std::string &path) {
-	HTTPResponse*	response = client->getResponse();
-	int				fd = 0;
-	std::cout << "Status code start: " << response->getStatusCode() << std::endl;
-	if (response->getBodySize() < location->getRequestLimits())
-		response->setStatusCode("413");
-	std::cout << "Status code second: " << response->getStatusCode() << std::endl;
-	if (S_ISDIR(stat_info->st_mode))
-		response->setStatusCode("404");
-	std::cout << "Status code third: " << response->getStatusCode() << std::endl;
-	if ((fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) < 0)
-		response->setStatusCode("500");
-	else {
-		std::cout << "Status code read body: " << response->getStatusCode() << std::endl;
-		write(fd, response->getBody(), response->getBodySize());
-		response->setStatusCode("200");
-		std::cout << "Status code complete: " << response->getStatusCode() << std::endl;
 		close(fd);
 	}
 }
