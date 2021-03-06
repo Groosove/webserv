@@ -29,7 +29,7 @@ private:
 	size_t _request_capacity;
 	size_t 		_request_size;
 	size_t 		_body_size;
-	int		_body_capacity;
+	size_t		_body_capacity;
 	size_t	_hex_size;
 
 	int			_stage;
@@ -72,6 +72,7 @@ public:
 	void								setStatusCode(const std::string& status_code);
 
 	void			addBufToRequest(char *buf, int buf_size);
-	void			addBufToBody();
-	void			ft_erase(int size);
+	void			addBufToBody(char *buf, int buf_size);
+	void			ft_erase_request(int size);
+	void			ft_erase_body(int size);
 };

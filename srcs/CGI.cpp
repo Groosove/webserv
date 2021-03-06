@@ -18,7 +18,6 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_response = client->getResponse();
 	_path = ft_strdup(path);
 	_sizeEnv = 18;
-	std::cout << "PATH : " << _request->getPath() << std::endl;
 	_env = (char**)calloc(_sizeEnv, sizeof(char*));
 	_env[0] = ft_strdup("AUTH_TYPE=basic");
 	_env[1] = ft_strjoin("CONTENT_LENGTH=", std::to_string(_request->getBodySize()).c_str());
@@ -30,15 +29,14 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[7] = ft_strdup("REMOTE_ADDR=");
 	_env[8] = ft_strdup("REMOTE_IDENT=");
 	_env[9] = ft_strdup("REMOTE_USER=");
-	_env[10] = ft_strjoin("REQUEST_METHOD=", "POST");
+	_env[10] = ft_strjoin("REQUEST_METHOD=", _request->getMethod());
 	_env[11] = ft_strjoin("REQUEST_URI=http://", (client->getHost() + ":" + client->getPort() + _request->getPath()).c_str());
 	_env[12] = ft_strjoin("SCRIPT_NAME=", _request->getPath());
 	_env[13] = ft_strjoin("SERVER_NAME=", client->getHost().c_str());
 	_env[14] = ft_strjoin("SERVER_PORT=", client->getPort().c_str());
-	_env[15] = ft_strdup("SERVER_PROTOCOL=HTTP/1.1");
+	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
-	std::cout << path << " THIS IS ENV " << _env[10] << std::endl;
 	setArgs();
 	execCGI(_response);
 }
@@ -52,11 +50,11 @@ CGI::~CGI() {
 }
 
 void CGI::execCGI(HTTPResponse* response) {
-	pid_t pid;
-	int file_fd;
-	char buf;
+	pid_t 	pid;
+	int 	file_fd;
+	char 	buf;
 	int		pipe_fd[2];
-	char* result_buf = (char*)calloc(_request->getBodySize(), sizeof(char));
+	char* 	result_buf = (char*)calloc(_request->getBodySize() + 1, sizeof(char));
 
 	pipe(pipe_fd);
 	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0677);
@@ -73,35 +71,26 @@ void CGI::execCGI(HTTPResponse* response) {
 		;//error
 	}
 	else {
-		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		write(pipe_fd[1], _request->getBody(), _request->getBodySize());
-		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		close(pipe_fd[1]);
 		close(pipe_fd[0]);
 		wait(&status);
-		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		std::pair<char *, int> result;
 		if (!status) {
 			lseek(file_fd, 0, 0);
-			int r, size = 0;
-			while ((r = read(file_fd, &buf, 1)) > 0) {
+			int size = 0;
+			while (read(file_fd, &buf, 1) > 0) {
 				result_buf[size++] = buf;
 			}
-			result_buf = ft_strjoin(result_buf, "\r\n\r\n");
-			result.first = result_buf;
-			result.second = size;
+			int pos = ft_strnstr(result_buf, "\r\n\r\n", size) + 4;
+			char* result_header = ft_substr(result_buf, 0, pos);
+			char* send_res_buf = ft_substr(result_buf, pos, size);
+			result.first = send_res_buf;
+			result.second = size - pos;
 		}
-		//delete old response
-		std::cerr << "HELLO REBYATKI, IM HERE" << std::endl;
 		response->setBody(result);
 		response->setStatusCode("200");
 	}
 	close(file_fd);
 	free(result_buf);
-}
-
-void CGI::setArgs() {
-	_argv[0] = _path;
-	_argv[1] = _path;
-	_argv[2] = nullptr;
 }

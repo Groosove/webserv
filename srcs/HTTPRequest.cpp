@@ -34,7 +34,7 @@ char *HTTPRequest::getArgument(char *dst, int start) {
 
 char * HTTPRequest::getStr(size_t pos) {
 	char *result = ft_substr(_request, 0, pos);
-	ft_erase(pos + 2);
+	ft_erase_request(pos + 2);
 	return result;
 }
 
@@ -65,18 +65,16 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
 				takeHeader(getStr(pos));
 			else if (pos == 0) {
-				ft_erase(2);
+				ft_erase_request(2);
 				if (_request_params.count("Host") == 0)
 					throw std::string ("400");
-				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST")) {
+				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST"))
 					if (_request_params.count("Content-Length") == 0 && _request_params.count("Transfer-Encoding") == 0)
 						throw std::string ("400");
-					else {
+					else
 						_stage = 2;
-						continue;
-					}
-				}
-				_stage = 3;
+				else
+					_stage = 3;
 			}
 			else break;
 		} else if (_stage == 2) {
@@ -91,12 +89,9 @@ void HTTPRequest::parse_request_http(char * buf, int bytes) {
 int HTTPRequest::parseBodyRequest() {
 	if (_request_params.count("Content-Length")) {
 		size_t size = ft_atoi(_request_params["Content-Length"].c_str());
-		_body = (char *) ft_memjoin(_body, _request, _body_size, size);
-		if (ft_strlen(_body) > size) {
-			char *tmp = ft_substr(_body, 0, size);
-			free(_body);
-			_body = tmp;
-		}
+		addBufToBody(_request, size);
+		if (_body_size > size)
+			ft_erase_body(size);
 		return 1;
 	} else if (_request_params.count("Transfer-Encoding")) {
 		size_t pos;
@@ -105,9 +100,8 @@ int HTTPRequest::parseBodyRequest() {
 				if (_hex_size == (size_t)-1) {
 					_hex_size = ft_atoi_chunk(getStr(pos));
 				} else if (_hex_size != 0) {
-					char *tmp = (char *)ft_memjoin(_body, getStr(pos), _body_size, _hex_size);
-					free(_body);
-					_body = tmp;
+					addBufToBody(_request, _hex_size);
+					ft_erase_request(pos + 2);
 					_hex_size = -1;
 				} else return 1;
 			} else return 0;
@@ -183,28 +177,42 @@ const char *HTTPRequest::getContentType() {
 }
 
 void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
-	char *_realloc_request = _request;
 	if (_request_size + buf_size >= _request_capacity) {
-		size_t new_capacity = (_request_size + buf_size) * 2;
-		free(_request);
-		_request = (char *)malloc(new_capacity);
+		_request_capacity = (_request_size + buf_size) * 2;
+		char *_realloc_request = _request;
+		_request = (char *)malloc(_request_capacity);
 		ft_memcpy(_request, _realloc_request, _request_size);
-		_request_capacity = new_capacity;
+		free(_realloc_request);
 	}
 	for (int i = 0; i < buf_size; ++i, ++_request_size)
 		_request[_request_size] = buf[i];
 	_request[_request_size] = '\0';
-
 }
 
 
-void HTTPRequest::ft_erase(int size) {
+void HTTPRequest::ft_erase_request(int size) {
 	std::memmove(_request, _request + size, _request_size);
-//	char *tmp = ft_substr(_request, size, _request_size);
-//	free(_request);
-//	_request = tmp;
 	_request_size -= size;
 }
+
+void HTTPRequest::addBufToBody(char *buf, int buf_size) {
+	if (_request_size + buf_size >= _body_capacity) {
+		_body_capacity = (_body_size + buf_size) * 2;
+		char *_realloc_body = _body;
+		_body = (char *)malloc(_body_capacity);
+		ft_memcpy(_body, _realloc_body, _body_size);
+		free(_realloc_body);
+	}
+	for (int i = 0; i < buf_size; ++i, ++_body_size)
+		_body[_body_size] = buf[i];
+	_body[_body_size] = '\0';
+}
+
+void HTTPRequest::ft_erase_body(int size) {
+	std::memmove(_body, _body + size, _body_size);
+	_body_size -= size;
+}
+
 
 
 
