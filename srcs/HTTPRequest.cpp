@@ -13,6 +13,7 @@ HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 	_request = ft_strdup("");
 	_request_size = 0;
 	_request_capacity = 0;
+	_body_capacity = 0;
 	_body = ft_strdup("");
 }
 
@@ -91,7 +92,7 @@ int HTTPRequest::parseBodyRequest() {
 		size_t size = ft_atoi(_request_params["Content-Length"].c_str());
 		addBufToBody(_request, size);
 		if (_body_size > size)
-			ft_erase_body(size);
+			ft_erase_body(_body_size - size);
 		return 1;
 	} else if (_request_params.count("Transfer-Encoding")) {
 		size_t pos;
@@ -196,7 +197,7 @@ void HTTPRequest::ft_erase_request(int size) {
 }
 
 void HTTPRequest::addBufToBody(char *buf, int buf_size) {
-	if (_request_size + buf_size >= _body_capacity) {
+	if (_body_size + buf_size >= _body_capacity) {
 		_body_capacity = (_body_size + buf_size) * 2;
 		char *_realloc_body = _body;
 		_body = (char *)malloc(_body_capacity);

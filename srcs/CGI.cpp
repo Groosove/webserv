@@ -37,6 +37,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[15] = ft_strjoin("SERVER_PROTOCOL=", _request->getVersionHTTP());
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = nullptr;
+	std::cout << "PATH : " << path << std::endl;
 	setArgs();
 	execCGI(_response);
 }
@@ -65,7 +66,10 @@ void CGI::execCGI(HTTPResponse* response) {
 		close(pipe_fd[0]);
 		dup2(file_fd, 1);
 		close(file_fd);
-		exit(execve(_argv[0], _argv, getEnv()));
+		execve(_argv[0], _argv, getEnv());
+		perror("ERRNO = ");
+		std::cout << "YA YPAL REBYATKI" << std::endl;
+		exit(0);
 	}
 	else if(pid == -1) {
 		;//error
@@ -76,15 +80,16 @@ void CGI::execCGI(HTTPResponse* response) {
 		close(pipe_fd[0]);
 		wait(&status);
 		std::pair<char *, int> result;
+		std::cout << "HELLO IAM HERE" << std::endl;
 		if (!status) {
 			lseek(file_fd, 0, 0);
-			int size = 0;
-			while (read(file_fd, &buf, 1) > 0) {
+			size_t size = 0;
+			while (read(file_fd, &buf, 1) > 0)
 				result_buf[size++] = buf;
-			}
-			int pos = ft_strnstr(result_buf, "\r\n\r\n", size) + 4;
+			int pos = ft_strnstr(result_buf, (char*)"\r\n\r\n", size) + 4;
 			char* result_header = ft_substr(result_buf, 0, pos);
 			char* send_res_buf = ft_substr(result_buf, pos, size);
+			response->setCgiHeaders(result_header);
 			result.first = send_res_buf;
 			result.second = size - pos;
 		}

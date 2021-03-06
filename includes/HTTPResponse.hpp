@@ -22,6 +22,7 @@ private:
 	char *			_body;
 	size_t 				_body_size;
 	size_t 				_header_size;
+	char *			_headers_cgi;
 
 public:
 	explicit HTTPResponse();
@@ -42,5 +43,6 @@ public:
 
 	void							setStatusCode(const std::string& status) { _status_code = status; }
 	void							setBody(std::pair<char *, int> buf);
+	void							setCgiHeaders(const char* headers) { _headers_cgi = ft_strdup(headers); }
 
 };

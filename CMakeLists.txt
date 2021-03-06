@@ -44,4 +44,3 @@ set(FILES
 		utils_function/ft_strstr.cpp)
 
 add_executable(WebServ ${UTILS} ${FILES} )
-add_executable(ERASE utils_function/ft_erase.cpp)

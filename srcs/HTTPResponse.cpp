@@ -53,10 +53,12 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	if (pos >= 400)
 		_body_size = errorPage.length();
 	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
-						+ "Server:" + SPACE + "WebServ/1.1" + CRLF
-						+ "Connection:" + SPACE + "keep-alive" + CRLF
-						+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
-						+ "Content-Type:" + SPACE + request->getHeaders().find("Content-type")->second + CRLF + CRLF);
+				+ "Server:" + SPACE + "WebServ/1.1" + CRLF
+				+ "Connection:" + SPACE + "keep-alive" + CRLF
+				+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF);
+	if (_headers_cgi)
+		headers.append(std::string(_headers_cgi) + CRLF);
+	headers.append(CRLF);
 	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)
@@ -68,9 +70,10 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	std::cout << "SIZE RESPONSE: " << _body_size << std::endl;
 }
 
-HTTPResponse::HTTPResponse(): _body_size(0) {
+HTTPResponse::HTTPResponse(): _body_size(0), _headers_cgi(nullptr) {
 	_body = ft_strdup("");
 	_buf_response = ft_strdup("");
+	_headers_cgi = ft_strdup("");
 	_header_size = 0;
 }
 
