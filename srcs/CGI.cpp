@@ -44,18 +44,18 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 }
 
 CGI::~CGI() {
-//	for (int i = 0; i < _sizeEnv - 1; ++i) {
-//		free(_env[i]);
-//	}
-//	free(_env);
-//	free(_path);
+	for (int i = 0; i < _sizeEnv - 1; ++i) {
+		free(_env[i]);
+	}
+	free(_env);
+	free(_path);
 }
 
 void CGI::execCGI(HTTPResponse* response) {
 	pid_t 	pid;
 	int 	file_fd;
 	size_t 	bytes;
-	char 	buf[60001];
+	char 	buf[600001];
 	size_t size = 0;
 	int		pipe_fd[2];
 	char* 	result_buf = (char*)calloc(_request->getBodySize() + 2048, sizeof(char));
@@ -69,10 +69,7 @@ void CGI::execCGI(HTTPResponse* response) {
 		close(pipe_fd[0]);
 		dup2(file_fd, 1);
 		close(file_fd);
-		execve(_argv[0], _argv, getEnv());
-		perror("ERRNO = ");
-		std::cout << "YA YPAL REBYATKI" << std::endl;
-		exit(0);
+		exit(execve(_argv[0], _argv, getEnv()));
 	}
 	else if(pid == -1) {
 		;//error
@@ -86,7 +83,7 @@ void CGI::execCGI(HTTPResponse* response) {
 		std::cout << "HELLO IAM HERE" << std::endl;
 		if (!status) {
 			lseek(file_fd, 0, 0);
-			while ((bytes = read(file_fd, &buf, 60000)) > 0) {
+			while ((bytes = read(file_fd, &buf, 600000)) > 0) {
 				ft_memcpy(result_buf + size, buf, bytes);
 				size += bytes;
 			}

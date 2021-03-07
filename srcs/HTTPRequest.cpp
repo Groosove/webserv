@@ -52,10 +52,7 @@ void HTTPRequest::takeHeader(char *header) {
 	free(header);
 }
 
-#define TEXT_RESET "\033[0;0m"
-#define GREEN "\033[1;32m"
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
-	std::cout << GREEN << buf << TEXT_RESET << std::endl;
 	addBufToRequest(buf, bytes);
 	size_t pos;
 	while (_request_size != 0 && _stage != 3) {
@@ -152,24 +149,8 @@ void HTTPRequest::setVersionHTTP(char *version_http) {
 	_version_http = version_http;
 }
 
-void HTTPRequest::setStatusCode(const std::string &status_code) {
-	_status_code = status_code;
-}
-char *HTTPRequest::getRequest() const {
-	return _request;
-}
-
-int HTTPRequest::getRequsetSize() const { return _request_size; }
-
 int HTTPRequest::getBodySize() const {
 	return _body_size;
-}
-
-const char *HTTPRequest::getContentLength() {
-	std::map<std::string, std::string>::iterator it = _request_params.find("Content-Length");
-	if (it != _request_params.end())
-		return it->second.c_str();
-	return "0";
 }
 
 const char *HTTPRequest::getContentType() {
@@ -194,7 +175,7 @@ void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
 
 
 void HTTPRequest::ft_erase_request(int size) {
-	std::memmove(_request, _request + size, _request_size);
+	ft_memcpy(_request, _request + size, _request_size);
 	_request_size -= size;
 }
 
@@ -214,6 +195,20 @@ void HTTPRequest::addBufToBody(char *buf, int buf_size) {
 void HTTPRequest::ft_erase_body(int size) {
 	std::memmove(_body, _body + size, _body_size);
 	_body_size -= size;
+}
+
+void HTTPRequest::clear() {
+	free(_request);
+	free(_body);
+	_request = ft_strdup("");
+	_body = ft_strdup("");
+	_request_size = 0;
+	_request_capacity = 0;
+	_body_capacity = 0;
+	_stage = false;
+	_body_size = 0;
+	_hex_size = -1;
+	_status_code.clear();
 }
 
 

@@ -45,10 +45,6 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	std::string headers;
 	std::string	errorPage = generateErrorPage();
 
-	if (_buf_response)
-		free(_buf_response);
-	std::cout << "SIZE: " << _body_size << std::endl;
-	std::cout << "STATUS CODE: " << _status_code << std::endl;
 	pos = std::stoi(_status_code);
 	if (pos >= 400)
 		_body_size = errorPage.length();
@@ -60,7 +56,7 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 		headers.append(std::string(_headers_cgi));
 	else
 		headers.append(CRLF);
-	_buf_response = (char *)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
+	_buf_response = (char*)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	pos = std::stoi(_status_code);
 	if (pos < 400)
 		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
@@ -92,6 +88,9 @@ std::string HTTPResponse::generateErrorPage() {
 			"</h1><hr><p>WebServ/0.1</p></body></html>");
 }
 
-char *HTTPResponse::getBody() const {
-	return _body;
+void HTTPResponse::clear() {
+	free(_buf_response);
+	_buf_response = ft_strdup("");
+	_body_size = 0;
+	_header_size = 0;
 }

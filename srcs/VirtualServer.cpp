@@ -68,7 +68,7 @@ void VirtualServer::preparationParams() {
 	// делаем файловый дескриптор сокета неблокирующимся
 	fcntl(_socket, F_SETFL, O_NONBLOCK);
 	// начинаем слушать порт
-	if (listen(_socket, 0) == -1) {
+	if (listen(_socket, 2048) == -1) {
 		std::cout << "Listen failed!" << std::endl;
 		return ;
 	}

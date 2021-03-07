@@ -75,4 +75,5 @@ public:
 	void			addBufToBody(char *buf, int buf_size);
 	void			ft_erase_request(int size);
 	void			ft_erase_body(int size);
+	void			clear();
 };

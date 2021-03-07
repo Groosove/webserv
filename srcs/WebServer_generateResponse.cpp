@@ -42,7 +42,6 @@ void WebServer::treatmentStageGenerate(Client *client) {
 		else if (ft_compare(request->getMethod(), "PUT"))
 			handlePutResponse(client, location, &stat_info, path, stat_info_created);
 	}
-	std::cout << "METHOD: " << request->getMethod() << std::endl;
 	response->generateResponse(request);
 	client->setResponseBuffer(response->getResponse(), response->getBodySize());
 	client->setStage(send_response);
@@ -67,11 +66,7 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 	HTTPRequest*	request = client->getRequest();
 	HTTPResponse*	response = client->getResponse();
 
-	std::cout << "PATH" << path << std::endl;
-	std::cout << "PATH" << location->getIndex() << std::endl;
-	std::cout << "PATH" << location->getRoot() << std::endl;
-	std::cout << "PATH" << location->getAutoIndex() << std::endl;
-
+	usleep(1000);
 	response->setStatusCode("200");
 	if (S_ISLNK(stat_info->st_mode) || S_ISREG(stat_info->st_mode)) {
 		if (ft_compare(request->getMethod(), "GET"))
