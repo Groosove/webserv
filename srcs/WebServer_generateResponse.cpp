@@ -66,7 +66,6 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 	HTTPRequest*	request = client->getRequest();
 	HTTPResponse*	response = client->getResponse();
 
-	usleep(1000);
 	response->setStatusCode("200");
 	if (S_ISLNK(stat_info->st_mode) || S_ISREG(stat_info->st_mode)) {
 		if (ft_compare(request->getMethod(), "GET"))
@@ -116,6 +115,7 @@ std::pair<char *, int> WebServer::readBodyResponse(const std::string& path) {
 		buf[bytes] = '\0';
 		index_html = (char *)ft_memjoin(index_html, buf, size, bytes);
 	}
+	close(fd);
 	return std::make_pair(index_html, size);
 }
 

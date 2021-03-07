@@ -27,6 +27,7 @@ WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	else
 		std::cerr << "File doesn't open!" << std::endl;
 	free(line);
+	close(fd);
 	FileParser _config(config);
 	_virtual_server = _config.getServer();
 }
@@ -71,7 +72,6 @@ void WebServer::handle() {
 			if (FD_ISSET(_virtual_server[i].getSocket(), &read_fd))
 			{
 				client_fd = accept(_virtual_server[i].getSocket(), 0, 0);
-				std::cout << GREEN << "SOCKET FD: " << client_fd << TEXT_RESET << std::endl;
 				if (client_fd > 0)
 					_clients.push_back(new Client(client_fd, _virtual_server[i].getHost(), _virtual_server[i].getPort()));
 
@@ -80,7 +80,6 @@ void WebServer::handle() {
 		std::vector<Client*>::iterator it = _clients.begin();
 		while (it != _clients.end())
 		{
-			std::cout << "SOCKET FD: " << (*it)->getSocket() << " CL " << _clients.begin() - it << std::endl;
 			if (FD_ISSET((*it)->getSocket(), &read_fd))
 				handle_requests(*it, read_fd, write_fd);
 			else if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() != parsing_request)
