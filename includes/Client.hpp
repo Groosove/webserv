@@ -44,8 +44,6 @@ public:
 	HTTPRequest*			getRequest() const { return _request; }
 	HTTPResponse*			getResponse() const { return _response; }
 	size_t					getStage() const { return _stage; }
-	char*					getReadBuffer() { return _read_buffer; }
-	char*					getWriteBuffer() { return _write_buffer; }
 	char *					getReponseBuffer() { return _response_complite; }
 
 	size_t& getSendBytes();
@@ -54,11 +52,6 @@ public:
 
 	int getBytes() const;
 
-	void					setHost(const std::string& host) { _host = host; }
-	void					setPort(const std::string& port) { _port = port; }
-	void					setSocket(int&	socket) { _socket = socket; }
-	void					setReadBuffer(char* buf) { _read_buffer = buf; }
-	void					setWriteBuffer(char* buf) { _write_buffer = buf; }
 	void					setStage(size_t stage) { _stage = stage; }
 	void 					setResponseBuffer(char * buf, int bytes );
 };

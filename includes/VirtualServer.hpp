@@ -29,10 +29,8 @@ private:
 	std::map<std::string, std::string> 	_parametr;
 	int									_socket;
 	struct sockaddr_in 					_server_addr;
-	std::string							_complete_response;
 
 	HTTPRequest*						_request;
-	HTTPResponse*						_response;
 public:
 	VirtualServer() {};
 	~VirtualServer() {};

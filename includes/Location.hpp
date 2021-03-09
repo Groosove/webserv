@@ -49,7 +49,6 @@ public:
 	std::string&				getIndex() { return _index; }
 	bool getAutoIndex() const { return _autoindex; }
 	size_t getRequestLimits() const { return _request_limits; }
-	std::vector<std::string>	getAllowMethods() { return _allow_methods; }
 	std::map<std::string, std::string>&	getCgi() { return _cgi; }
 
 	bool 						checkAllowMethod(const char* method);

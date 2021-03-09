@@ -33,13 +33,11 @@ public:
 	void							generateResponse(HTTPRequest* requestz);
 
 	static std::string				getMessagePhrase(const std::string& code);
-	const std::string&				getStatusCode() const { return (_status_code); }
 	char *							getResponse() const { return _buf_response; }
 	std::string						generateErrorPage();
 
 	int getBodySize() const;
 
-	char *getBody() const;
 
 	void							setStatusCode(const std::string& status) { _status_code = status; }
 	void							setBody(std::pair<char *, int> buf);

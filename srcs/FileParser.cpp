@@ -11,7 +11,6 @@ FileParser::FileParser(std::vector<std::string> config) {
 	for (size_t i = 0; i < size;) {
 		if (config[i].find("server:") != std::string::npos && checkIndent(config[i], 0))
 			_server.push_back(parseConfigFile(config, ++i));
-		++i;
 	};
 }
 
@@ -21,23 +20,12 @@ VirtualServer FileParser::parseConfigFile(std::vector<std::string> config, size_
 	_parseServerParam(config, index, server);
 	for (size_t i = index; i < size; ++i) {
 		if (config[i].find("location:") != std::string::npos && checkIndent(config[i], 1))
-			_parseLocationParam(config, i, server); // TODO Если директория без слеша, то нужно дополнять!
+			_parseLocationParam(config, i, server);
 		else if (config[i].empty()) continue;
 		else { std::cerr << "Error parse config file" << std::endl; break; }
 		index = i;
 		if (config[i].find("server:") != std::string::npos) break;
 	}
-	for (std::map<std::string, Location>::iterator it = server.getLocation().begin(); it != server.getLocation().end(); ++it) {
-		std::cout << it->first << std::endl;
-		std::cout << it->second.getRoot() << std::endl;
-		std::cout << it->second.getIndex() << std::endl;
-		std::cout << it->second.getRequestLimits() << std::endl;
-		std::cout << it->second.getAutoIndex() << std::endl;
-	}
-	std::cout << "KEK:" << server.getHost() << std::endl;
-	std::cout << "KEK:" << server.getPort() << std::endl;
-	std::cout << "KEK:" << server.getServerName() << std::endl;
-	std::cout << std::endl;
 	return server;
 }
 
@@ -90,7 +78,7 @@ void FileParser::_parseLocationParam(std::vector<std::string> &config, size_t &i
 		if (!checkIndent(config[i], 2)) { std::cerr << "Error parse config file" << std::endl; break; }
 		++i;
 	}
-	if (i >= config.size())
+	if (i > config.size())
 		--i;
 	if (config[i].find("location:") != std::string::npos)
 		--i;
