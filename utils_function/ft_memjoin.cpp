@@ -13,10 +13,14 @@ void *ft_memjoin(char *dst, char *src, size_t &dst_size, size_t src_size)
 	if (!dst || !src || !(result = (char *)malloc((dst_size + src_size + 1))))
 		return (nullptr);
 	count = 0;
-	while (dst_size--)
-		result[count++] = *dst++;
-	while (src_size--)
-		result[count++] = *src++;
+	ft_memcpy(result + count, dst, dst_size);
+	count += dst_size;
+	ft_memcpy(result + count, src, src_size);
+	count += src_size;
+//	while (dst_size--)
+//		result[count++] = *dst++;
+//	while (src_size--)
+//		result[count++] = *src++;
 	result[count] = 0;
 	dst_size = count;
 	return (result);

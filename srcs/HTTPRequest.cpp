@@ -175,8 +175,9 @@ void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
 
 
 void HTTPRequest::ft_erase_request(int size) {
-	ft_memcpy(_request, _request + size, _request_size);
 	_request_size -= size;
+	std::memmove(_request, _request + size, _request_size);
+	_request[_request_size] = '\0';
 }
 
 void HTTPRequest::addBufToBody(char *buf, int buf_size) {

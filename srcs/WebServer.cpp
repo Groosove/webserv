@@ -15,25 +15,6 @@
 #define TEXT_RESET "\033[0;0m"
 #define GREEN  "\033[1;32m"
 
-char *str_join(char *buf, char *add)
-{
-	char    *newbuf;
-	int        len;
-	if (buf == 0)
-		len = 0;
-	else
-		len = strlen(buf);
-	newbuf = (char*)malloc(sizeof(*newbuf) * (len + strlen(add) + 1));
-	if (newbuf == 0)
-		return (0);
-	newbuf[0] = 0;
-	if (buf != 0)
-		strcat(newbuf, buf);
-	free(buf);
-	strcat(newbuf, add);
-	return (newbuf);
-}
-
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
 	int fd = open(config_name, O_RDONLY);
