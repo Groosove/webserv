@@ -34,3 +34,10 @@
 cmake-build-debug
 .idea
 .DS_Store
+
+# Webserv trash files
+.vscode
+a.out.dSYM
+files/file_should_exist_after
+file
+files/multiple_same
