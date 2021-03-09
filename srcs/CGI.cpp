@@ -44,11 +44,11 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 }
 
 CGI::~CGI() {
-//	for (int i = 0; i < _sizeEnv - 1; ++i) {
-//		free(_env[i]);
-//	}
-//	free(_env);
-//	free(_path);
+	for (int i = 0; i < _sizeEnv - 1; ++i) {
+		free(_env[i]);
+	}
+	free(_env);
+	free(_path);
 }
 
 void CGI::execCGI(HTTPResponse* response) {
@@ -93,6 +93,7 @@ void CGI::execCGI(HTTPResponse* response) {
 			response->setCgiHeaders(result_header);
 			result.first = send_res_buf;
 			result.second = size - pos;
+			free(result_header);
 		}
 		response->setBody(result);
 		response->setStatusCode("200");

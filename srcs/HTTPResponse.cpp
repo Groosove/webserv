@@ -85,6 +85,7 @@ void HTTPResponse::setBody(std::pair<char *, int> dst) {
 	char *body = dst.first;
 	int size = dst.second;
 	_body = (char *)ft_memjoin(_body, body, _body_size, size);
+	free(dst.first);
 }
 
 int HTTPResponse::getBodySize() const { return _header_size; }

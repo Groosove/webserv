@@ -60,5 +60,5 @@ public:
 	void					setReadBuffer(char* buf) { _read_buffer = buf; }
 	void					setWriteBuffer(char* buf) { _write_buffer = buf; }
 	void					setStage(size_t stage) { _stage = stage; }
-	void 					setResponseBuffer(char * buf, int bytes ) { _response_complite = buf; _bytes = bytes; }
+	void 					setResponseBuffer(char * buf, int bytes );
 };

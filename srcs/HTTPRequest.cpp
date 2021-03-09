@@ -20,10 +20,6 @@ HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 HTTPRequest::~HTTPRequest() {
 	free(_request);
 	free(_body);
-	free(_method);
-	free(_version_http);
-	free(_http_path);
-	free(_http_query);
 }
 
 char *HTTPRequest::getArgument(char *dst, int start) {
@@ -126,27 +122,31 @@ void HTTPRequest::parseFirstLine(char *line) {
 			else std::cerr << "Error set version HTTP/1.1" << std::endl;
 		}
 	}
+	free(dst);
 	free(line);
 	++_stage;
 }
 
 void HTTPRequest::setMethod(char *method) {
-	_method = method;
+	_method = ft_strdup(method);
+	free(method);
 }
 
 void HTTPRequest::setPath(char * path) {
 	size_t pos = ft_strchr(path, '?');
 	if (pos == (size_t)-1) {
-		_http_path = path;
+		_http_path = ft_strdup(path);
 		_http_query = ft_strdup("");
 	} else {
 		_http_path = ft_substr(path, 0, pos - 1);
 		_http_query = ft_substr(path, pos + 2, ft_strlen(path));
 	}
+	free(path);
 }
 
 void HTTPRequest::setVersionHTTP(char *version_http) {
-	_version_http = version_http;
+	_version_http = ft_strdup(version_http);
+	free(version_http);
 }
 
 int HTTPRequest::getBodySize() const {
@@ -171,12 +171,13 @@ void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
 	for (int i = 0; i < buf_size; ++i, ++_request_size)
 		_request[_request_size] = buf[i];
 	_request[_request_size] = '\0';
+	free(buf);
 }
 
 
 void HTTPRequest::ft_erase_request(int size) {
 	_request_size -= size;
-	std::memmove(_request, _request + size, _request_size);
+	ft_memcpy(_request, _request + size, _request_size);
 	_request[_request_size] = '\0';
 }
 
@@ -199,6 +200,10 @@ void HTTPRequest::ft_erase_body(int size) {
 }
 
 void HTTPRequest::clear() {
+	free(_method);
+	free(_version_http);
+	free(_http_path);
+	free(_http_query);
 	free(_request);
 	free(_body);
 	_request = ft_strdup("");

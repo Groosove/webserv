@@ -125,15 +125,16 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 	int				size_buffer = 80000;
 
 	read_bytes = recv(client->getSocket(), buf, size_buffer, 0);
-	buf[read_bytes] = 0;
 	try {
 		if (read_bytes > 0) {
+			buf[read_bytes] = 0;
 			client->getRequest()->parse_request_http(buf, read_bytes);
 			if (client->getRequest()->getParsingStage() == 3)
 				client->setStage(generate_response);
 		}
 		else if (read_bytes <= 0) {
 			client->setStage(close_connection);
+			free(buf);
 		}
 	}
 	catch (const std::string& status_value) {
@@ -162,6 +163,8 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 		all_bytes -= ret;
 	}
 	if (ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close")) {
+		client->getRequest()->clear();
+		client->getResponse()->clear();
 		client->setStage(close_connection);
 	}
 	else {

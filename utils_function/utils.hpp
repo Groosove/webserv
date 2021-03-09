@@ -22,7 +22,7 @@ char	*ft_substr(char *s, unsigned int start, size_t len);
 char	*ft_strjoin(const char *s1, const char *s2);
 char	**ft_split(char const *s, char c);
 int		ft_atoi(const char *src);
-int		ft_atoi_chunk(const char *src);
+int		ft_atoi_chunk(char *src);
 size_t	ft_find(const char *str, const char *find);
 void	ft_memcpy(const void *dst, const void *src, size_t n);
 char			*ft_strtrim(char *s1, char const *set);

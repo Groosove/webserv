@@ -17,11 +17,8 @@ void *ft_memjoin(char *dst, char *src, size_t &dst_size, size_t src_size)
 	count += dst_size;
 	ft_memcpy(result + count, src, src_size);
 	count += src_size;
-//	while (dst_size--)
-//		result[count++] = *dst++;
-//	while (src_size--)
-//		result[count++] = *src++;
 	result[count] = 0;
 	dst_size = count;
+	free(dst);
 	return (result);
 }

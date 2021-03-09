@@ -26,7 +26,7 @@ private:
 
 public:
 	explicit HTTPResponse();
-	~HTTPResponse();
+	~HTTPResponse() { free(_buf_response); free(_body); free(_headers_cgi); };
 
 	static const std::string		message_phrases[count_status_code][2];
 
@@ -43,6 +43,6 @@ public:
 
 	void							setStatusCode(const std::string& status) { _status_code = status; }
 	void							setBody(std::pair<char *, int> buf);
-	void							setCgiHeaders(const char* headers) { _headers_cgi = ft_strdup(headers); }
+	void							setCgiHeaders(char* headers) { free(_headers_cgi); _headers_cgi = ft_strdup(headers);  }
 	void							clear();
 };
