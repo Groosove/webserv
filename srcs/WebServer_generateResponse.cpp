@@ -92,7 +92,6 @@ void WebServer::handlePutResponse(Client *client, Location *location, struct sta
 	if ((fd = open(path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0666)) < 0)
 		response->setStatusCode("500");
 	else {
-		std::cout << "REQUEST: " << client->getRequest()->getBody() << " " << "REQUEST SIZE: " << client->getRequest()->getBodySize() << std::endl;
 		write(fd, request->getBody(), request->getBodySize());
 		if (stat_info_created != -1)
 			response->setStatusCode("200");

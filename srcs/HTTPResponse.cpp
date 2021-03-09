@@ -48,10 +48,19 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	pos = std::stoi(_status_code);
 	if (pos >= 400)
 		_body_size = errorPage.length();
-	headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
+	if (ft_compare(request->getHeaders().find("Connection")->second.c_str(), "close")) {
+		headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
+					   + "Server:" + SPACE + "WebServ/1.1" + CRLF
+					   + "Connection:" + SPACE + "close" + CRLF
+					   + "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF);
+	}
+	else {
+		headers.append(
+				VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 				+ "Server:" + SPACE + "WebServ/1.1" + CRLF
 				+ "Connection:" + SPACE + "keep-alive" + CRLF
 				+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF);
+	}
 	if (ft_strlen(_headers_cgi))
 		headers.append(std::string(_headers_cgi));
 	else

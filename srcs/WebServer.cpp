@@ -15,6 +15,25 @@
 #define TEXT_RESET "\033[0;0m"
 #define GREEN  "\033[1;32m"
 
+char *str_join(char *buf, char *add)
+{
+	char    *newbuf;
+	int        len;
+	if (buf == 0)
+		len = 0;
+	else
+		len = strlen(buf);
+	newbuf = (char*)malloc(sizeof(*newbuf) * (len + strlen(add) + 1));
+	if (newbuf == 0)
+		return (0);
+	newbuf[0] = 0;
+	if (buf != 0)
+		strcat(newbuf, buf);
+	free(buf);
+	strcat(newbuf, add);
+	return (newbuf);
+}
+
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
 	int fd = open(config_name, O_RDONLY);
@@ -133,8 +152,6 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 				client->setStage(generate_response);
 		}
 		else if (read_bytes <= 0) {
-			client->getResponse()->clear();
-			client->getRequest()->clear();
 			client->setStage(close_connection);
 		}
 	}
@@ -153,18 +170,24 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 	while (all_bytes > 0) {
 		ret = send(client->getSocket(), client->getReponseBuffer() + bytes_send, all_bytes, 0);
 		if (ret == -1) {
-			if (errno != EPIPE && bytes_send != 0)
+			if (bytes_send != 0)
 				continue;
-			client->getResponse()->clear();
-			client->getRequest()->clear();
-			client->setStage(close_connection);
+			else {
+				client->setStage(close_connection);
+				return;
+			}
 		}
 		bytes_send += ret;
 		all_bytes -= ret;
 	}
-	client->setStage(parsing_request);
-	client->getResponse()->clear();
-	client->getRequest()->clear();
+	if (ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close")) {
+		client->setStage(close_connection);
+	}
+	else {
+		client->setStage(parsing_request);
+		client->getResponse()->clear();
+		client->getRequest()->clear();
+	}
 	static int i = 1;
 	std::cerr << RED << "sent response for request #" << i++ << TEXT_RESET << std::endl;
 	std::cerr << RED << "FD: " << client->getSocket() << std::endl;
