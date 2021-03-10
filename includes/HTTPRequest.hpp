@@ -21,7 +21,7 @@ public:
 	void								parse_request_http(char * buf, int bytes);
 
 	/* Getters */
-	std::map<std::string, std::string>&	getHeaders() { return _request_params; }
+	const std::map<std::string, std::string>& 	getHeaders() const { return _request_params; }
 	const char *						getMethod() const { return _method; };
 	const char *						getPath() const {return _http_path; }
 	const char *						getHttpQuery() const { return _http_query; }
@@ -35,6 +35,7 @@ public:
 	void								setMethod(char * method);
 	void								setPath(char * path);
 	void								setVersionHTTP(char * version_http);
+	void								setHeaders(std::string l_value, std::string r_value) { _request_params[l_value] = r_value; };
 
 	/* Modifiers */
 	void								clear();

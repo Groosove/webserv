@@ -19,14 +19,17 @@ WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
 	int fd = open(config_name, O_RDONLY);
 	char *line = nullptr;
-	if (fd > 0)
+	if (fd > 0) {
 		while (get_next_line(fd, &line) > 0) {
 			config.push_back(line);
 			free(line);
 		}
+		config.push_back(line);
+		free(line);
+	}
+
 	else
 		std::cerr << "File doesn't open!" << std::endl;
-	free(line);
 	close(fd);
 	FileParser _config(config);
 	_virtual_server = _config.getServer();
@@ -38,10 +41,6 @@ void WebServer::createVirtualServer() {
 		_virtual_server[i].preparationParams();
 	}
 	handle();
-}
-
-std::vector<VirtualServer> WebServer::getVirtualServer() {
-	return std::vector<VirtualServer>(_virtual_server);
 }
 
 void WebServer::handle() {
@@ -58,8 +57,7 @@ void WebServer::handle() {
 		for (size_t i = 0; i < _virtual_server.size(); ++i)
 			FD_SET(_virtual_server[i].getSocket(), &read_fd);
 		setMaxFd(_virtual_server.back().getSocket());
-		for (size_t i = 0; i != _clients.size(); ++i)
-		{
+		for (size_t i = 0; i != _clients.size(); ++i) {
 			FD_SET(_clients[i]->getSocket(), &read_fd);
 			if (_clients[i]->getStage() != parsing_request)
 				FD_SET(_clients[i]->getSocket(), &write_fd);
@@ -68,37 +66,25 @@ void WebServer::handle() {
 		}
 		select(getMaxFd() + 1, &read_fd, &write_fd, 0, &tv);
 		for (size_t i = 0; i < _virtual_server.size(); ++i)
-		{
-			int	client_fd = 0;
-			if (FD_ISSET(_virtual_server[i].getSocket(), &read_fd))
-			{
-				client_fd = accept(_virtual_server[i].getSocket(), 0, 0);
+			if (FD_ISSET(_virtual_server[i].getSocket(), &read_fd)) {
+				int client_fd = accept(_virtual_server[i].getSocket(), 0, 0);
 				if (client_fd > 0)
 					_clients.push_back(new Client(client_fd, _virtual_server[i].getHost(), _virtual_server[i].getPort()));
-
 			}
-		}
 		std::vector<Client*>::iterator it = _clients.begin();
 		while (it != _clients.end())
 		{
 			if (FD_ISSET((*it)->getSocket(), &read_fd) && (*it)->getStage() == parsing_request)
 				parsing_request_part(*it, read_fd, write_fd);
-			else if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == generate_response)
+			if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == generate_response)
 				treatmentStageGenerate(*it);
-			else if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == send_response)
+			if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == send_response)
 				send_response_part(*it, read_fd, write_fd);
-			if ((*it)->getStage() == close_connection)
-			{
-				close((*it)->getSocket());
+			if ((*it)->getStage() == close_connection) {
 				delete *it;
 				it = _clients.erase(it);
-				if (it == _clients.end())
-					break;
-			}
-			else
+			} else
 				++it;
-			if (_clients.empty())
-				break;
 		}
 	}
 }
@@ -138,9 +124,10 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 }
 
 void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &write_fd) {
-	size_t	ret = 0;
-	size_t	bytes_send = 0;
-	size_t	all_bytes = client->getBytes();
+	int	ret = 0;
+	int	bytes_send = 0;
+	int	all_bytes = client->getBytes();
+
 	while (all_bytes > 0) {
 		ret = send(client->getSocket(), client->getReponseBuffer() + bytes_send, all_bytes, 0);
 		if (ret == -1) {
@@ -154,26 +141,13 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 		bytes_send += ret;
 		all_bytes -= ret;
 	}
-	if (!client->getRequest()->getHeaders().empty() && ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close")) {
-		client->getRequest()->clear();
-		client->getResponse()->clear();
+	client->getResponse()->clear();
+	client->getRequest()->clear();
+	if (ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close"))
 		client->setStage(close_connection);
-	}
-	else {
+	else
 		client->setStage(parsing_request);
-		client->getResponse()->clear();
-		if (!client->getRequest()->getHeaders().empty())
-			client->getRequest()->clear();
-	}
 	static int i = 1;
 	std::cerr << RED << "sent response for request #" << i++ << TEXT_RESET << std::endl;
 	std::cerr << RED << "FD: " << client->getSocket() << std::endl;
-}
-
-int WebServer::getMaxFd() const {
-	return _max_fd;
-}
-
-void WebServer::setMaxFd(int maxFd) {
-	_max_fd = maxFd;
 }

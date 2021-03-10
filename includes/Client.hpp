@@ -51,6 +51,5 @@ private:
 	int				_socket;
 	int				_stage;
 	int				_bytes;
-	size_t 			_send_bytes;
 	char* 			_response_complite;
 };

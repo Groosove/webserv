@@ -42,21 +42,15 @@ void	HTTPResponse::check_status_code(const std::string& errorPage) {
 }
 
 void	HTTPResponse::addHeadersToResponse(HTTPRequest* request, std::string& headers) {
-	if (!request->getHeaders().empty() && ft_compare(request->getHeaders().find("Connection")->second.c_str(), "close")) {
-		headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
-					   + "Server:" + SPACE + "RaevkaTuliskiyPryanikNogotochki" + CRLF
-					   + "Connection:" + SPACE + "close" + CRLF
-					   + "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
-					   + "Date:" + SPACE + ft_get_time() + CRLF);
-	}
-	else {
-		headers.append(
-				VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
-				+ "Server:" + SPACE + "RaevkaTuliskiyPryanikNogotochki" + CRLF
-				+ "Connection:" + SPACE + "keep-alive" + CRLF
-				+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
-				+ "Date:" + SPACE + ft_get_time() + CRLF);
-	}
+	if (request->getHeaders().find("Connection") == request->getHeaders().end())
+		request->setHeaders("Connection", "keep-alive");
+	std::map<std::string, std::string>::const_iterator it = request->getHeaders().find("Connection");
+	headers.append(
+			VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
+			+ "Server:" + SPACE + "RaevkaTuliskiyPryanikNogotochki" + CRLF
+			+ it->first + ":" + SPACE + it->second + CRLF
+			+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
+			+ "Date:" + SPACE + ft_get_time() + CRLF);
 }
 
 void	HTTPResponse::addBodyToResponse(const std::string& errorPage) {

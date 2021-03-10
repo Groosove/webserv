@@ -12,6 +12,12 @@
 HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 	_body = ft_strdup("");
 	_request = ft_strdup("");
+
+	_method = ft_strdup("");
+	_version_http = ft_strdup("");
+	_http_query = ft_strdup("");
+	_http_path = ft_strdup("");
+
 	_request_size = 0;
 	_request_capacity = 0;
 	_body_capacity = 0;
@@ -20,6 +26,10 @@ HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
 HTTPRequest::~HTTPRequest() {
 	free(_request);
 	free(_body);
+	free(_version_http);
+	free(_http_query);
+	free(_http_path);
+	free(_method);
 }
 
 char *HTTPRequest::getArgument(char *dst, int start) {
@@ -76,24 +86,22 @@ int HTTPRequest::parseBodyRequest() {
 		return 1;
 	} else if (_request_params.count("Transfer-Encoding")) {
 		size_t pos;
-		while (_request) {
+		while (_request)
 			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1) {
-				if (_hex_size == (size_t)-1) {
+				if (_hex_size == (size_t)-1)
 					_hex_size = ft_atoi_chunk(getStr(pos));
-				} else if (_hex_size != 0) {
+				else if (_hex_size != 0) {
 					ft_add(_body, _request, _hex_size, _body_size, _body_capacity);
 					ft_erase(_request, pos + 2, _request_size);
 					_hex_size = -1;
 				} else return 1;
 			} else return 0;
-		}
 	}
 	return 0;
 }
 
 void HTTPRequest::parseFirstLine(char *line) {
 	char ** dst = ft_split(line, ' ');
-
 	int i = 0;
 	for (; dst[i] != nullptr; ++i)
 		if (i == 0 && (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD")))
@@ -102,11 +110,16 @@ void HTTPRequest::parseFirstLine(char *line) {
 			setPath(dst[i]);
 		else if (i == 2 && (ft_compare(dst[i], "HTTP/1.1") || ft_compare(dst[i], "HTTP/1.0")))
 				setVersionHTTP(dst[i]);
-		else throw std::string ("400");
-	if (i != 3)
-		throw std::string ("400");
-	free(dst);
+		else break;
+
 	free(line);
+	if (i != 3)  {
+		for (int j = 0; dst[j]; ++j)
+			free(dst[j]);
+		free(dst);
+		throw std::string("400");
+	}
+	free(dst);
 	++_stage;
 }
 
@@ -139,6 +152,10 @@ void HTTPRequest::clear() {
 	free(_body);
 	_request = ft_strdup("");
 	_body = ft_strdup("");
+	_method = ft_strdup("");
+	_version_http = ft_strdup("");
+	_http_query = ft_strdup("");
+	_http_path = ft_strdup("");
 	_request_size = 0;
 	_request_capacity = 0;
 	_body_capacity = 0;
@@ -149,11 +166,14 @@ void HTTPRequest::clear() {
 }
 
 void HTTPRequest::setMethod(char *method) {
+	free(_method);
 	_method = ft_strdup(method);
 	free(method);
 }
 
 void HTTPRequest::setPath(char * path) {
+	free(_http_path);
+	free(_http_query);
 	size_t pos = ft_strchr(path, '?');
 	if (pos == (size_t)-1) {
 		_http_path = ft_strdup(path);
@@ -166,6 +186,7 @@ void HTTPRequest::setPath(char * path) {
 }
 
 void HTTPRequest::setVersionHTTP(char *version_http) {
+	free(_version_http);
 	_version_http = ft_strdup(version_http);
 	free(version_http);
 }

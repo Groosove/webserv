@@ -12,14 +12,14 @@ public:
 	explicit FileParser(std::vector<std::string> vector);
 	~FileParser() {};
 
-	static VirtualServer parseConfigFile(std::vector<std::string> config, size_t &index);
-	static void _parseServerParam(std::vector<std::string> &config, size_t &index, VirtualServer &server);
-	static void _parseLocationParam(std::vector<std::string> &config, size_t &index, VirtualServer &server);
 	const std::vector<VirtualServer> &getServer() const { return _server; }
+private:
+	std::vector<VirtualServer> _server;
+	static VirtualServer 	parseConfigFile(std::vector<std::string> config, size_t &index);
+	static void 			_parseServerParam(std::vector<std::string> &config, size_t &index, VirtualServer &server);
+	static void 			_parseLocationParam(std::vector<std::string> &config, size_t &index, VirtualServer &server);
 	static std::string getArgument(const std::string &dst, int start);
 
 	static bool checkIndent(const std::string &str, int pos);
-private:
-	std::vector<VirtualServer> _server;
 };
 

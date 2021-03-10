@@ -24,9 +24,10 @@ public:
 	~WebServer() {};
 
 	/* Getters */
-	int								getMaxFd() const;
-	void							setMaxFd(int maxFd);
-	std::vector<VirtualServer>		getVirtualServer();
+	const int&						getMaxFd() const { return _max_fd; };
+
+	/* Setters */
+	void							setMaxFd(int maxFd) { _max_fd = maxFd; };
 
 	/* Handlers */
 	void							handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);

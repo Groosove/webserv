@@ -8,15 +8,15 @@
 
 #include "Client.hpp"
 
-Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port), _stage(0), _send_bytes(0) {
+Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port), _stage(0) {
 	_request = new HTTPRequest();
 	_response = new HTTPResponse();
 	_response_complite = ft_strdup("");
-	_send_bytes = 0;
 	std::cout << "Client is added" << std::endl;
 }
 
 Client::~Client() {
+	close(_socket);
 	delete _request;
 	delete _response;
 	free(_response_complite);

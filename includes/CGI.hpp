@@ -14,13 +14,14 @@
 
 class CGI {
 public:
-	CGI(Client* client, VirtualServer* virtualServer, char * path);
+	/* Constructor */
+	explicit CGI(Client* client, VirtualServer* virtualServer, char * path);
+	/* Destructor */
 	~CGI();
 
-	void execCGI(HTTPResponse* response);
-	char** getEnv() const { return _env; }
-	void setArgs() { _argv[0] = _path; _argv[1] = _path; _argv[2] = nullptr; }
-	char* getPathCGI() const { return _path; }
+	void 	execCGI(HTTPResponse* response);
+	char**	getEnv() const { return _env; }
+	void	setArgs() { _argv[0] = _path; _argv[1] = _path; _argv[2] = nullptr; }
 
 private:
 	HTTPRequest* _request;

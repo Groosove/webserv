@@ -18,12 +18,14 @@ VirtualServer FileParser::parseConfigFile(std::vector<std::string> config, size_
 	VirtualServer server;
 	size_t size = config.size();
 	_parseServerParam(config, index, server);
-	for (size_t i = index; i < size; ++i) {
+	for (size_t i = index; i <= size; ++i) {
 		if (config[i].find("location:") != std::string::npos && checkIndent(config[i], 1))
 			_parseLocationParam(config, i, server);
 		else if (config[i].empty()) continue;
-		else { std::cerr << "Error parse config file" << std::endl; break; }
+		else { throw std::string ("Error config file"); }
 		index = i;
+		if (i == size)
+			return server;
 		if (config[i].find("server:") != std::string::npos) break;
 	}
 	return server;
@@ -78,9 +80,10 @@ void FileParser::_parseLocationParam(std::vector<std::string> &config, size_t &i
 		if (!checkIndent(config[i], 2)) { std::cerr << "Error parse config file" << std::endl; break; }
 		++i;
 	}
-	if (i > config.size())
-		--i;
+	server.getLocation()[path] = location;
+	if (i == config.size())
+		return;
 	if (config[i].find("location:") != std::string::npos)
 		--i;
-	server.getLocation()[path] = location;
+
 }
