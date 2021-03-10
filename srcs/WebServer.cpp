@@ -154,7 +154,7 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 		bytes_send += ret;
 		all_bytes -= ret;
 	}
-	if (ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close")) {
+	if (!client->getRequest()->getHeaders().empty() && ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close")) {
 		client->getRequest()->clear();
 		client->getResponse()->clear();
 		client->setStage(close_connection);
@@ -162,7 +162,8 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 	else {
 		client->setStage(parsing_request);
 		client->getResponse()->clear();
-		client->getRequest()->clear();
+		if (!client->getRequest()->getHeaders().empty())
+			client->getRequest()->clear();
 	}
 	static int i = 1;
 	std::cerr << RED << "sent response for request #" << i++ << TEXT_RESET << std::endl;

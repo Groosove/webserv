@@ -15,6 +15,10 @@ bool ft_compare(const std::string &dst, const std::string& src) {
 }
 
 bool ft_compare(const char *dst, const char * src) {
+	if (dst == nullptr)
+		return false;
+	if (src == nullptr)
+		return false;
 	for (size_t i = 0; dst[i] || src[i]; ++i) {
 		if (dst[i] != src[i])
 			return false;

@@ -42,7 +42,7 @@ void	HTTPResponse::check_status_code(const std::string& errorPage) {
 }
 
 void	HTTPResponse::addHeadersToResponse(HTTPRequest* request, std::string& headers) {
-	if (ft_compare(request->getHeaders().find("Connection")->second.c_str(), "close")) {
+	if (!request->getHeaders().empty() && ft_compare(request->getHeaders().find("Connection")->second.c_str(), "close")) {
 		headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
 					   + "Server:" + SPACE + "RaevkaTuliskiyPryanikNogotochki" + CRLF
 					   + "Connection:" + SPACE + "close" + CRLF
@@ -82,6 +82,7 @@ void	HTTPResponse::generateResponse(HTTPRequest* request) {
 	_buf_response = (char*)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
 	addBodyToResponse(errorPage);
 }
+
 
 HTTPResponse::HTTPResponse(): _body_size(0), _headers_cgi(nullptr) {
 	_body = ft_strdup("");

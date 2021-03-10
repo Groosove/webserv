@@ -49,6 +49,8 @@ void HTTPRequest::takeHeader(char *header) {
 }
 
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
+	if (bytes == 0)
+		throw std::string ("400");
 	ft_add(_request, buf, bytes, _request_size, _request_capacity);
 	free(buf);
 	size_t pos;
@@ -126,6 +128,7 @@ void HTTPRequest::ft_add(char *&dst, char *buf, int buf_size, size_t& dst_size, 
 		dst[dst_size] = buf[i];
 	dst[dst_size] = '\0';
 }
+
 
 void HTTPRequest::clear() {
 	free(_method);
