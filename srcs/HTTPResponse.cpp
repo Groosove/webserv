@@ -26,10 +26,6 @@ const std::string	HTTPResponse::message_phrases[count_status_code][2] = {
 		{"501", "Not Implemented"}
 };
 
-#define VERISON (std::string)"HTTP/1.1"
-#define SPACE	" "
-#define CRLF	"\r\n"
-
 std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 	for (int i = 0; i < count_status_code; ++i) {
 		if (HTTPResponse::message_phrases[i][0] == code)
@@ -38,40 +34,53 @@ std::string		HTTPResponse::getMessagePhrase(const std::string& code) {
 	return ("Unknown code");
 }
 
-void	HTTPResponse::generateResponse(HTTPRequest* request) {
-	std::map<std::string, std::string>::const_iterator it;
-	size_t		pos = 0;
-	int size = 0;
-	std::string headers;
-	std::string	errorPage = generateErrorPage();
-
+void	HTTPResponse::check_status_code(const std::string& errorPage) {
+	int	pos = 0;
 	pos = std::stoi(_status_code);
 	if (pos >= 400)
 		_body_size = errorPage.length();
+}
+
+void	HTTPResponse::addHeadersToResponse(HTTPRequest* request, std::string& headers) {
 	if (ft_compare(request->getHeaders().find("Connection")->second.c_str(), "close")) {
 		headers.append(VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
-					   + "Server:" + SPACE + "WebServ/1.1" + CRLF
+					   + "Server:" + SPACE + "RaevkaTuliskiyPryanikNogotochki" + CRLF
 					   + "Connection:" + SPACE + "close" + CRLF
-					   + "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF);
+					   + "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
+					   + "Date:" + SPACE + ft_get_time() + CRLF);
 	}
 	else {
 		headers.append(
 				VERISON + SPACE + _status_code + SPACE + getMessagePhrase(_status_code) + CRLF
-				+ "Server:" + SPACE + "WebServ/1.1" + CRLF
+				+ "Server:" + SPACE + "RaevkaTuliskiyPryanikNogotochki" + CRLF
 				+ "Connection:" + SPACE + "keep-alive" + CRLF
-				+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF);
+				+ "Content-Length:" + SPACE + std::to_string(_body_size) + CRLF
+				+ "Date:" + SPACE + ft_get_time() + CRLF);
 	}
-	if (ft_strlen(_headers_cgi))
-		headers.append(std::string(_headers_cgi));
-	else
-		headers.append(CRLF);
-	_buf_response = (char*)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
+}
+
+void	HTTPResponse::addBodyToResponse(const std::string& errorPage) {
+	int	pos = 0;
 	pos = std::stoi(_status_code);
 	if (pos < 400)
 		_buf_response = (char *)ft_memjoin(_buf_response, _body, _header_size, _body_size);
 	else {
 		_buf_response = (char*)ft_memjoin(_buf_response, (char*)errorPage.c_str(), _header_size, _body_size);
 	}
+}
+
+void	HTTPResponse::generateResponse(HTTPRequest* request) {
+	std::string headers;
+	std::string	errorPage = generateErrorPage();
+
+	check_status_code(errorPage);
+	addHeadersToResponse(request, headers);
+	if (ft_strlen(_headers_cgi))
+		headers.append(std::string(_headers_cgi));
+	else
+		headers.append(CRLF);
+	_buf_response = (char*)ft_memjoin(_buf_response, (char *)headers.c_str(), _header_size, headers.size());
+	addBodyToResponse(errorPage);
 }
 
 HTTPResponse::HTTPResponse(): _body_size(0), _headers_cgi(nullptr) {
@@ -95,7 +104,7 @@ std::string HTTPResponse::generateErrorPage() {
 			"content=\"width=device-width, initial-scale=1.0\"><meta http-equiv=\"X-UA-Compatible\" "
 			"content=\"ie=edge\"><title>" + _status_code + " " + getMessagePhrase(_status_code) + "</title><style>h1, "
 																								"p {text-align: center;}</style></head><body><h1>" + _status_code + " " + getMessagePhrase(_status_code) +
-			"</h1><hr><p>WebServ/0.1</p></body></html>");
+			"</h1><hr><p>RaevkaTuliskiyPryanikNogotochki</p></body></html>");
 }
 
 void HTTPResponse::clear() {

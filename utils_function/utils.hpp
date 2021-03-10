@@ -29,3 +29,4 @@ char			*ft_strtrim(char *s1, char const *set);
 void 	*ft_memjoin(char *dst, char *src, size_t &dst_size, size_t src_size);
 char *ft_erase(char *&dst, int dst_size, int len);
 size_t ft_strnstr(char *s1, char *s2, size_t len);
+std::string ft_get_time();

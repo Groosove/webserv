@@ -13,6 +13,7 @@
 #include <cstring>
 #define RED "\033[1;31m"
 #define TEXT_RESET "\033[0;0m"
+#define GREEN "\033[1;32m"
 
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
@@ -49,6 +50,7 @@ void WebServer::handle() {
 	struct	timeval	tv;
 
 	tv.tv_usec = 0;
+	std::cout << GREEN << "Waiting connection... " << TEXT_RESET << std::endl;
 	while(_status) {
 		tv.tv_sec = 240;
 		FD_ZERO(&read_fd);
@@ -79,10 +81,12 @@ void WebServer::handle() {
 		std::vector<Client*>::iterator it = _clients.begin();
 		while (it != _clients.end())
 		{
-			if (FD_ISSET((*it)->getSocket(), &read_fd))
-				handle_requests(*it, read_fd, write_fd);
-			else if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() != parsing_request)
-				handle_requests(*it, read_fd, write_fd);
+			if (FD_ISSET((*it)->getSocket(), &read_fd) && (*it)->getStage() == parsing_request)
+				parsing_request_part(*it, read_fd, write_fd);
+			else if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == generate_response)
+				treatmentStageGenerate(*it);
+			else if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == send_response)
+				send_response_part(*it, read_fd, write_fd);
 			if ((*it)->getStage() == close_connection)
 			{
 				close((*it)->getSocket());
@@ -105,17 +109,6 @@ VirtualServer *WebServer::searchVirtualServer(Client *client) {
 			return &_virtual_server[i];
 	}
 	return nullptr;
-}
-
-void WebServer::handle_requests(Client *client, fd_set& read_fd, fd_set& write_fd) throw(){
-	if (client->getStage() == parsing_request) {
-		parsing_request_part(client, read_fd, write_fd);
-	}
-	else if (client->getStage() == generate_response) {
-		treatmentStageGenerate(client);
-	}
-	else if (client->getStage() == send_response)
-		send_response_part(client, read_fd, write_fd);
 }
 
 void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd) {

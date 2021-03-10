@@ -28,6 +28,7 @@ set(UTILS
 		utils_function/ft_memcpy.cpp
 		utils_function/ft_memjoin.cpp
 		utils_function/ft_erase.cpp
+		utils_function/ft_current_data.cpp
 		)
 
 set(FILES

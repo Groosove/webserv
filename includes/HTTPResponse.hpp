@@ -10,8 +10,13 @@
 
 #include "HTTPRequest.hpp"
 #include "HTTPRequest.hpp"
+#include "utils.hpp"
 #include <iostream>
 #include <iterator>
+
+#define VERISON (std::string)"HTTP/1.1"
+#define SPACE	" "
+#define CRLF	"\r\n"
 
 enum { count_status_code = 13, };
 
@@ -38,7 +43,13 @@ public:
 	void							setBody(std::pair<char *, int> buf);
 	void							setCgiHeaders(char* headers) { free(_headers_cgi); _headers_cgi = ft_strdup(headers);  }
 
+	/* Checkers */
+	void							check_status_code(const std::string& errorPage);
+
+
 	/* Modifiers */
+	void							addBodyToResponse(const std::string& errorPage);
+	void							addHeadersToResponse(HTTPRequest* request, std::string& headers);
 	void							generateResponse(HTTPRequest* request);
 	void							clear();
 

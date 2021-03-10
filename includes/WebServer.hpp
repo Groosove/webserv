@@ -31,7 +31,6 @@ public:
 	/* Handlers */
 	void							handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
 	void							handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path, int stat_info_created);
-	void							handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd) throw();
 	void							handle();
 
 	/*	Response part */
