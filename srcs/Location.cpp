@@ -26,6 +26,8 @@ void Location::setAutoIndex(const std::string &autoindex) {
 
 void Location::setRoot(const std::string &root) {
 	_root = ft_strtrim(root, " \t");
+	if (*_root.rbegin() != '/')
+		_root.push_back('/');
 }
 
 void Location::setIndex(const std::string &index) {

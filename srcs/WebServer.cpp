@@ -29,7 +29,7 @@ WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	}
 
 	else
-		std::cerr << "File doesn't open!" << std::endl;
+		throw std::string ("File doesn't open!");
 	close(fd);
 	FileParser _config(config);
 	_virtual_server = _config.getServer();

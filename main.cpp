@@ -15,7 +15,7 @@ int main(int ac, char** av) {
 		signal(SIGPIPE, SIG_IGN);
 		webServer.createVirtualServer();
 	} catch (const std::exception &e) {
-		std::cout << e.what() << std::endl;
+		std::cout << "BAD CONFIG" << std::endl;
 		return 9;
 	}
 
