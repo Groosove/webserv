@@ -18,14 +18,33 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-enum Method {
-	GET = 0,
-	POST,
-	PUT,
-	HEAD,
-};
-
 class Location {
+
+public:
+	/* Constructor */
+	Location();
+
+	/* Destructor */
+	~Location() {};
+
+	/* Setters */
+	void								setRequestLimits(const std::string& body_size);
+	void								setAutoIndex(const std::string& autoindex);
+	void								setRoot(const std::string& root);
+	void								setIndex(const std::string& index);
+	void								setAllowMethods(const std::string& allow_methods);
+	void								setCgiPath(const std::string& path_and_file);
+
+	/* Getters */
+	std::string&						getRoot() { return _root; }
+	std::string&						getIndex() { return _index; }
+	bool								getAutoIndex() const { return _autoindex; }
+	size_t								getRequestLimits() const { return _request_limits; }
+	std::map<std::string, std::string>&	getCgi() { return _cgi; }
+
+	/* Validation */
+	bool 								checkAllowMethod(const char* method);
+
 private:
 	std::map<std::string, std::string>  _cgi;
 	std::string							_root;
@@ -33,28 +52,4 @@ private:
 	std::vector<std::string>			_allow_methods;
 	bool								_autoindex;
 	size_t								_request_limits;
-
-public:
-	Location();
-	~Location() {};
-
-	void						setRequestLimits(const std::string& body_size);
-	void						setAutoIndex(const std::string& autoindex);
-	void						setRoot(const std::string& root);
-	void						setIndex(const std::string& index);
-	void						setAllowMethods(const std::string& allow_methods);
-	void						setCgiPath(const std::string& path_and_file);
-
-	std::string&				getRoot() { return _root; }
-	std::string&				getIndex() { return _index; }
-	bool getAutoIndex() const { return _autoindex; }
-	size_t getRequestLimits() const { return _request_limits; }
-	std::map<std::string, std::string>&	getCgi() { return _cgi; }
-
-	bool 						checkAllowMethod(const char* method);
-	bool						validationLocation(const char* method);
-	bool						tryOpenDir();
-	bool						tryOpenFile();
-	bool						findCgiPath(const std::string& value);
-	bool						findCgiFile(const std::string& value);
 };

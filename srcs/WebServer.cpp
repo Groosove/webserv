@@ -13,7 +13,6 @@
 #include <cstring>
 #define RED "\033[1;31m"
 #define TEXT_RESET "\033[0;0m"
-#define GREEN  "\033[1;32m"
 
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;

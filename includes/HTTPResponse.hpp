@@ -16,31 +16,37 @@
 enum { count_status_code = 13, };
 
 class HTTPResponse {
+
+public:
+	/* Constructor */
+	explicit HTTPResponse();
+
+	/* Destructor */
+	~HTTPResponse() { free(_buf_response); free(_body); free(_headers_cgi); };
+
+	/* Static massive */
+	static const std::string		message_phrases[count_status_code][2];
+
+	/* Getters */
+	static std::string				getMessagePhrase(const std::string& code);
+	std::string						generateErrorPage();
+	char *							getResponse() const { return _buf_response; }
+	int 							getBodySize() const;
+
+	/* Setters */
+	void							setStatusCode(const std::string& status) { _status_code = status; }
+	void							setBody(std::pair<char *, int> buf);
+	void							setCgiHeaders(char* headers) { free(_headers_cgi); _headers_cgi = ft_strdup(headers);  }
+
+	/* Modifiers */
+	void							generateResponse(HTTPRequest* request);
+	void							clear();
+
 private:
 	std::string 	_status_code;
 	char *			_buf_response;
 	char *			_body;
-	size_t 				_body_size;
-	size_t 				_header_size;
 	char *			_headers_cgi;
-
-public:
-	explicit HTTPResponse();
-	~HTTPResponse() { free(_buf_response); free(_body); free(_headers_cgi); };
-
-	static const std::string		message_phrases[count_status_code][2];
-
-	void							generateResponse(HTTPRequest* requestz);
-
-	static std::string				getMessagePhrase(const std::string& code);
-	char *							getResponse() const { return _buf_response; }
-	std::string						generateErrorPage();
-
-	int getBodySize() const;
-
-
-	void							setStatusCode(const std::string& status) { _status_code = status; }
-	void							setBody(std::pair<char *, int> buf);
-	void							setCgiHeaders(char* headers) { free(_headers_cgi); _headers_cgi = ft_strdup(headers);  }
-	void							clear();
+	size_t 			_body_size;
+	size_t 			_header_size;
 };

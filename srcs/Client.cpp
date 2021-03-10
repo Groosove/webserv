@@ -24,14 +24,6 @@ Client::~Client() {
 
 int Client::getBytes() const { return _bytes; }
 
-size_t& Client::getSendBytes() {
-	return _send_bytes;
-}
-
-void Client::setSendBytes(size_t sendBytes) {
-	_send_bytes = sendBytes;
-}
-
 void Client::setResponseBuffer(char *buf, int bytes) {
 	free(_response_complite);
 	_response_complite = (char *)calloc(bytes, sizeof(char));

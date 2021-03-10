@@ -16,30 +16,42 @@
 #include "sys/select.h"
 
 class WebServer {
-private:
-	std::vector<Client*>		_clients;
-	std::vector<VirtualServer>	_virtual_server;
-	bool						_status;
-	int							_max_fd;
-
-
 public:
+	/* Constructor */
 	explicit WebServer(const char *config_name = "default.conf");
+
+	/* Destructor */
 	~WebServer() {};
-	void						handle();
-	void						createVirtualServer();
-	void						handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd) throw();
-	void						treatmentStageGenerate(Client* client);
-	std::string					checkValidRequest(Location* location, Client* client, struct stat* info);
+
+	/* Getters */
+	int								getMaxFd() const;
+	void							setMaxFd(int maxFd);
+	std::vector<VirtualServer>		getVirtualServer();
+
+	/* Handlers */
+	void							handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
+	void							handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path, int stat_info_created);
+	void							handle_requests(Client* client, fd_set& read_fd, fd_set& write_fd) throw();
+	void							handle();
+
+	/*	Response part */
+	void							parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	void							send_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
+	void							treatmentStageGenerate(Client* client);
+
+	/* Validation */
+	std::string						checkValidRequest(Location* location, Client* client, struct stat* info);
 	static void						checkDirectoryOrFile(struct stat* info, Location* location, std::string& path);
-	void						handleDefaultResponse(Client* client, Location* location, struct stat* stat_info, std::string& path);
-	void						handlePutResponse(Client* client, Location* location, struct stat* stat_info, std::string& path, int stat_info_created);
-	std::pair<char *, int>		generateAutoindex(HTTPRequest* request, const std::string& path);
-	std::vector<VirtualServer>	getVirtualServer();
-	VirtualServer*				searchVirtualServer(Client* client);
-	static std::pair<char *, int>		readBodyResponse(const std::string& path);
-	void						parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd);
-	void						send_response_part(Client *client, fd_set& read_fd, fd_set& write_fd);
-	int getMaxFd() const;
-	void setMaxFd(int maxFd);
+	VirtualServer*					searchVirtualServer(Client* client);
+
+	/* Generators */
+	std::pair<char *, int>			generateAutoindex(HTTPRequest* request, const std::string& path);
+	static std::pair<char *, int>	readBodyResponse(const std::string& path);
+	void							createVirtualServer();
+
+private:
+	std::vector<Client*>			_clients;
+	std::vector<VirtualServer>		_virtual_server;
+	bool							_status;
+	int								_max_fd;
 };
