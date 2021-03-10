@@ -10,11 +10,11 @@
 #include "fcntl.h"
 
 HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
+	_body = ft_strdup("");
 	_request = ft_strdup("");
 	_request_size = 0;
 	_request_capacity = 0;
 	_body_capacity = 0;
-	_body = ft_strdup("");
 }
 
 HTTPRequest::~HTTPRequest() {
@@ -31,7 +31,7 @@ char *HTTPRequest::getArgument(char *dst, int start) {
 
 char * HTTPRequest::getStr(size_t pos) {
 	char *result = ft_substr(_request, 0, pos);
-	ft_erase_request(pos + 2);
+	ft_erase(_request, pos + 2, _request_size);
 	return result;
 }
 
@@ -49,45 +49,28 @@ void HTTPRequest::takeHeader(char *header) {
 }
 
 void HTTPRequest::parse_request_http(char * buf, int bytes) {
-	addBufToRequest(buf, bytes);
+	ft_add(_request, buf, bytes, _request_size, _request_capacity);
+	free(buf);
 	size_t pos;
 	while (_request_size != 0 && _stage != 3) {
-		if (_stage == 0) {
-			if ((pos = ft_find(_request, "\r\n")) != (size_t) -1)
-				parseFirstLine(getStr(pos));
-			else break;
-		}
-		else if (_stage == 1) {
-			if ((pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
-				takeHeader(getStr(pos));
-			else if (pos == 0) {
-				ft_erase_request(2);
-				if (_request_params.count("Host") == 0)
-					throw std::string ("400");
-				if (ft_compare(_method, "PUT") || ft_compare(_method, "POST"))
-					if (_request_params.count("Content-Length") == 0 && _request_params.count("Transfer-Encoding") == 0)
-						throw std::string ("400");
-					else
-						_stage = 2;
-				else
-					_stage = 3;
-			}
-			else break;
-		} else if (_stage == 2) {
-			if (parseBodyRequest() == 1)
+		if (_stage == 0 && (pos = ft_find(_request, "\r\n")) != (size_t) -1)
+			parseFirstLine(getStr(pos));
+		else if (_stage== 1 && (pos = ft_find(_request, "\r\n")) != (size_t)-1 && pos != 0)
+			takeHeader(getStr(pos));
+		else if (_stage == 1 && pos == 0)
+				checkHeaders();
+		else if (_stage == 2 && parseBodyRequest())
 				_stage = 3;
-			else
-				break;
-		}
+		else break;
 	}
 }
 
 int HTTPRequest::parseBodyRequest() {
 	if (_request_params.count("Content-Length")) {
 		size_t size = ft_atoi(_request_params["Content-Length"].c_str());
-		addBufToBody(_request, size);
+		ft_add(_body, _request, size, _body_size, _body_capacity);
 		if (_body_size > size)
-			ft_erase_body(_body_size - size);
+			ft_erase(_body, _body_size - size, _body_size);
 		return 1;
 	} else if (_request_params.count("Transfer-Encoding")) {
 		size_t pos;
@@ -96,8 +79,8 @@ int HTTPRequest::parseBodyRequest() {
 				if (_hex_size == (size_t)-1) {
 					_hex_size = ft_atoi_chunk(getStr(pos));
 				} else if (_hex_size != 0) {
-					addBufToBody(_request, _hex_size);
-					ft_erase_request(pos + 2);
+					ft_add(_body, _request, _hex_size, _body_size, _body_capacity);
+					ft_erase(_request, pos + 2, _request_size);
 					_hex_size = -1;
 				} else return 1;
 			} else return 0;
@@ -108,23 +91,58 @@ int HTTPRequest::parseBodyRequest() {
 
 void HTTPRequest::parseFirstLine(char *line) {
 	char ** dst = ft_split(line, ' ');
-	for (int i = 0; dst[i] != nullptr; ++i) {
-		if (i == 0) {
-			if (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD"))
+
+	int i = 0;
+	for (; dst[i] != nullptr; ++i)
+		if (i == 0 && (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD")))
 				setMethod(dst[i]);
-			else throw std::string("400");
-		}
 		else if (i == 1)
 			setPath(dst[i]);
-		else {
-			if (ft_compare(dst[i], "HTTP/1.1") || ft_compare(dst[i], "HTTP/1.0"))
+		else if (i == 2 && (ft_compare(dst[i], "HTTP/1.1") || ft_compare(dst[i], "HTTP/1.0")))
 				setVersionHTTP(dst[i]);
-			else std::cerr << "Error set version HTTP/1.1" << std::endl;
-		}
-	}
+		else throw std::string ("400");
+	if (i != 3)
+		throw std::string ("400");
 	free(dst);
 	free(line);
 	++_stage;
+}
+
+void HTTPRequest::ft_erase(char *& dst, int size, size_t& dst_size) {
+	dst_size -= size;
+	ft_memcpy(dst, dst + size, dst_size);
+	dst[dst_size] = '\0';
+}
+
+void HTTPRequest::ft_add(char *&dst, char *buf, int buf_size, size_t& dst_size, size_t& dst_capacity) {
+	if (dst_size + buf_size >= dst_capacity) {
+		dst_capacity = (dst_size + buf_size) * 2;
+		char *_realloc_body = dst;
+		dst = (char *)malloc(dst_capacity);
+		ft_memcpy(dst, _realloc_body, dst_size);
+		free(_realloc_body);
+	}
+	for (int i = 0; i < buf_size; ++i, ++dst_size)
+		dst[dst_size] = buf[i];
+	dst[dst_size] = '\0';
+}
+
+void HTTPRequest::clear() {
+	free(_method);
+	free(_version_http);
+	free(_http_path);
+	free(_http_query);
+	free(_request);
+	free(_body);
+	_request = ft_strdup("");
+	_body = ft_strdup("");
+	_request_size = 0;
+	_request_capacity = 0;
+	_body_capacity = 0;
+	_stage = false;
+	_body_size = 0;
+	_hex_size = -1;
+	_status_code.clear();
 }
 
 void HTTPRequest::setMethod(char *method) {
@@ -149,74 +167,22 @@ void HTTPRequest::setVersionHTTP(char *version_http) {
 	free(version_http);
 }
 
-int HTTPRequest::getBodySize() const {
-	return _body_size;
-}
-
-const char *HTTPRequest::getContentType() {
-	std::map<std::string, std::string>::iterator it = _request_params.find("Content-Type");
+const char *HTTPRequest::getContentType() const {
+	std::map<std::string, std::string>::const_iterator it = _request_params.find("Content-Type");
 	if (it != _request_params.end())
 		return it->second.c_str();
 	return nullptr;
 }
 
-void HTTPRequest::addBufToRequest(char *buf, int buf_size) {
-	if (_request_size + buf_size >= _request_capacity) {
-		_request_capacity = (_request_size + buf_size) * 2;
-		char *_realloc_request = _request;
-		_request = (char *)malloc(_request_capacity);
-		ft_memcpy(_request, _realloc_request, _request_size);
-		free(_realloc_request);
-	}
-	for (int i = 0; i < buf_size; ++i, ++_request_size)
-		_request[_request_size] = buf[i];
-	_request[_request_size] = '\0';
-	free(buf);
+void HTTPRequest::checkHeaders() {
+	ft_erase(_request, 2, _request_size);
+	if (_request_params.count("Host") == 0)
+		throw std::string ("400");
+	if (ft_compare(_method, "PUT") || ft_compare(_method, "POST"))
+		if (_request_params.count("Content-Length") == 0 && _request_params.count("Transfer-Encoding") == 0)
+			throw std::string ("400");
+		else
+			_stage = 2;
+	else
+		_stage = 3;
 }
-
-
-void HTTPRequest::ft_erase_request(int size) {
-	_request_size -= size;
-	ft_memcpy(_request, _request + size, _request_size);
-	_request[_request_size] = '\0';
-}
-
-void HTTPRequest::addBufToBody(char *buf, int buf_size) {
-	if (_body_size + buf_size >= _body_capacity) {
-		_body_capacity = (_body_size + buf_size) * 2;
-		char *_realloc_body = _body;
-		_body = (char *)malloc(_body_capacity);
-		ft_memcpy(_body, _realloc_body, _body_size);
-		free(_realloc_body);
-	}
-	for (int i = 0; i < buf_size; ++i, ++_body_size)
-		_body[_body_size] = buf[i];
-	_body[_body_size] = '\0';
-}
-
-void HTTPRequest::ft_erase_body(int size) {
-	std::memmove(_body, _body + size, _body_size);
-	_body_size -= size;
-}
-
-void HTTPRequest::clear() {
-	free(_method);
-	free(_version_http);
-	free(_http_path);
-	free(_http_query);
-	free(_request);
-	free(_body);
-	_request = ft_strdup("");
-	_body = ft_strdup("");
-	_request_size = 0;
-	_request_capacity = 0;
-	_body_capacity = 0;
-	_stage = false;
-	_body_size = 0;
-	_hex_size = -1;
-	_status_code.clear();
-}
-
-
-
-
