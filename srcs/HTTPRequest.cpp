@@ -103,6 +103,7 @@ int HTTPRequest::parseBodyRequest() {
 void HTTPRequest::parseFirstLine(char *line) {
 	char ** dst = ft_split(line, ' ');
 	int i = 0;
+
 	for (; dst[i] != nullptr; ++i)
 		if (i == 0 && (ft_compare(dst[i], "GET") || ft_compare(dst[i], "POST") || ft_compare(dst[i], "PUT") || ft_compare(dst[i], "HEAD")))
 				setMethod(dst[i]);
@@ -113,13 +114,10 @@ void HTTPRequest::parseFirstLine(char *line) {
 		else break;
 
 	free(line);
-	if (i != 3)  {
-		for (int j = 0; dst[j]; ++j)
-			free(dst[j]);
-		free(dst);
-		throw std::string("400");
-	}
+	for (int j = 0; dst[j]; ++j)
+		free(dst[j]);
 	free(dst);
+	if (i != 3) throw std::string("400");
 	++_stage;
 }
 
@@ -168,7 +166,6 @@ void HTTPRequest::clear() {
 void HTTPRequest::setMethod(char *method) {
 	free(_method);
 	_method = ft_strdup(method);
-	free(method);
 }
 
 void HTTPRequest::setPath(char * path) {
@@ -182,13 +179,11 @@ void HTTPRequest::setPath(char * path) {
 		_http_path = ft_substr(path, 0, pos - 1);
 		_http_query = ft_substr(path, pos + 2, ft_strlen(path));
 	}
-	free(path);
 }
 
 void HTTPRequest::setVersionHTTP(char *version_http) {
 	free(_version_http);
 	_version_http = ft_strdup(version_http);
-	free(version_http);
 }
 
 const char *HTTPRequest::getContentType() const {
