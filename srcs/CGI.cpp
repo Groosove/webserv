@@ -71,7 +71,7 @@ void CGI::execCGI(HTTPResponse* response) {
 		exit(execve(_argv[0], _argv, getEnv()));
 	}
 	else if(pid == -1) {
-		;//error
+		_response->setStatusCode("500");
 	}
 	else {
 		write(pipe_fd[1], _request->getBody(), _request->getBodySize());
@@ -95,7 +95,7 @@ void CGI::execCGI(HTTPResponse* response) {
 		}
 		response->setBody(result);
 		response->setStatusCode("200");
+		close(file_fd);
+		free(result_buf);
 	}
-	close(file_fd);
-	free(result_buf);
 }
