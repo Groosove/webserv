@@ -33,16 +33,20 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	} else {
 		checkDirectoryOrFile(&stat_info, location, path);
 		if (ft_compare(request->getMethod(), "POST")) {
-			std::cout << "YA ZAHOJU V CGI GOTOVTES" << std::endl;
-			std::map<std::string, std::string>::iterator it = location->getCgi().find(".bla");
-			CGI cgi_response(client, virtual_server, (char*)it->second.c_str());
+			if (!location->getCgi().empty()) {
+				std::cout << "YA ZAHOJU V CGI GOTOVTES" << std::endl;
+				std::map<std::string, std::string>::iterator it = location->getCgi().find(".bla");
+				CGI cgi_response(client, virtual_server, (char *) it->second.c_str());
+			}
+			else
+				handlePutResponse(client, location, &stat_info, path, stat_info_created);
 		}
 		if (ft_compare(request->getMethod(), "GET") || ft_compare(request->getMethod(), "HEAD"))
 			handleDefaultResponse(client, location, &stat_info, path);
 		else if (ft_compare(request->getMethod(), "PUT"))
 			handlePutResponse(client, location, &stat_info, path, stat_info_created);
 	}
-	response->generateResponse(request);
+	response->generateResponse(request, client->getFlagErrorPage(), path);
 	client->setResponseBuffer(response->getResponse(), response->getBodySize());
 	client->setStage(send_response);
 }
@@ -65,6 +69,7 @@ std::string WebServer::checkValidRequest(Location *location, Client *client,
 void WebServer::handleDefaultResponse(Client *client, Location *location, struct stat *stat_info, std::string& path) {
 	HTTPRequest*	request = client->getRequest();
 	HTTPResponse*	response = client->getResponse();
+	size_t			pos = 0;
 
 	response->setStatusCode("200");
 	if (S_ISLNK(stat_info->st_mode) || S_ISREG(stat_info->st_mode)) {
@@ -77,6 +82,19 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 		response->setBody(generateAutoindex(request, path));
 	else
 		response->setStatusCode("404");
+	if (response->getStatusCode() == searchVirtualServer(client)->getErrorPage().front()) {
+		int				stat_info_created;
+		pos = path.rfind("/");
+		int len = path.length() - pos;
+		path.erase(pos, len);
+		std::string tmp_path = path + "/" + searchVirtualServer(client)->getErrorPage().back();
+		path = tmp_path;
+		stat_info_created = stat(path.c_str(), stat_info);
+		if (stat_info_created != -1)
+			client->setFlagErrorPage(0);
+		else
+			client->setFlagErrorPage(1);
+	}
 }
 
 void WebServer::handlePutResponse(Client *client, Location *location, struct stat *stat_info,

@@ -63,9 +63,9 @@ void	HTTPResponse::addBodyToResponse(const std::string& errorPage) {
 	}
 }
 
-void	HTTPResponse::generateResponse(HTTPRequest* request) {
+void	HTTPResponse::generateResponse(HTTPRequest* request, int flagErrorPage, std::string& path) {
 	std::string headers;
-	std::string	errorPage = generateErrorPage();
+	std::string	errorPage = generateErrorPage(flagErrorPage, path);
 
 	check_status_code(errorPage);
 	addHeadersToResponse(request, headers);
@@ -94,12 +94,29 @@ void HTTPResponse::setBody(std::pair<char *, int> dst) {
 
 int HTTPResponse::getBodySize() const { return _header_size; }
 
-std::string HTTPResponse::generateErrorPage() {
-	return ("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" "
-			"content=\"width=device-width, initial-scale=1.0\"><meta http-equiv=\"X-UA-Compatible\" "
-			"content=\"ie=edge\"><title>" + _status_code + " " + getMessagePhrase(_status_code) + "</title><style>h1, "
-																								"p {text-align: center;}</style></head><body><h1>" + _status_code + " " + getMessagePhrase(_status_code) +
-			"</h1><hr><p>RaevkaTuliskiyPryanikNogotochki</p></body></html>");
+std::string HTTPResponse::generateErrorPage(int flagErrorPage, const std::string& path) {
+	std::string error;
+	if (flagErrorPage == 0) {
+		int fd = open(path.c_str(), O_RDONLY);
+		char buf[100];
+		bzero(buf, 100);
+		int	pos = 0;
+
+		while ((pos = read(fd, &buf, 100)) > 0)
+			error.append(buf, pos);
+		close(fd);
+	}
+	else {
+		error.append(
+				"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" "
+				"content=\"width=device-width, initial-scale=1.0\"><meta http-equiv=\"X-UA-Compatible\" "
+				"content=\"ie=edge\"><title>" + _status_code + " " +
+				getMessagePhrase(_status_code) + "</title><style>h1, "
+												 "p {text-align: center;}</style></head><body><h1>" +
+				_status_code + " " + getMessagePhrase(_status_code) +
+				"</h1><hr><p>RaevkaTuliskiyPryanikNogotochki</p></body></html>");
+	}
+	return error;
 }
 
 void HTTPResponse::clear() {

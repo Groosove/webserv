@@ -29,7 +29,12 @@ void VirtualServer::setServerName(const std::string &server_name) {
 }
 
 void VirtualServer::setErrorPage(const std::string &error_page) {
-	_error_page.push_back(error_page);
+	char** dst = ft_split(error_page.c_str(), ' ');
+	for (int i = 0; dst[i] != nullptr; ++i)
+		_error_page.push_back(dst[i]);
+	for (int i = 0; dst[i] != nullptr; ++i)
+		free(dst[i]);
+	free(dst);
 }
 
 void VirtualServer::initSocket() {

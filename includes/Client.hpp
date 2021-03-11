@@ -38,10 +38,12 @@ public:
 	int 					getBytes() const;
 	HTTPRequest*			getRequest() const { return _request; }
 	HTTPResponse*			getResponse() const { return _response; }
+	int						getFlagErrorPage() const { return _flagErrorPage; }
 
 	/* Setters */
 	void					setStage(size_t stage) { _stage = stage; }
 	void 					setResponseBuffer(char * buf, int bytes );
+	void					setFlagErrorPage(int flag) { _flagErrorPage = flag; }
 
 private:
 	HTTPRequest*	_request;
@@ -51,5 +53,6 @@ private:
 	int				_socket;
 	int				_stage;
 	int				_bytes;
+	int				_flagErrorPage;
 	char* 			_response_complite;
 };

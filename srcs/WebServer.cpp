@@ -14,6 +14,7 @@
 #define RED "\033[1;31m"
 #define TEXT_RESET "\033[0;0m"
 #define GREEN "\033[1;32m"
+#define EMPTY std::string("")
 
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
@@ -116,8 +117,9 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 		}
 	}
 	catch (const std::string& status_value) {
+		std::string path = EMPTY;
 		client->getResponse()->setStatusCode(status_value);
-		client->getResponse()->generateResponse(client->getRequest());
+		client->getResponse()->generateResponse(client->getRequest(), client->getFlagErrorPage(), path);
 		client->setResponseBuffer(client->getResponse()->getResponse(), client->getResponse()->getBodySize());
 		client->setStage(send_response);
 	}

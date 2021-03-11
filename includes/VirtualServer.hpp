@@ -9,7 +9,6 @@
 #pragma once
 #include "Location.hpp"
 #include "HTTPRequest.hpp"
-#include "HTTPResponse.hpp"
 #include "fstream"
 #include "utils.hpp"
 
@@ -47,6 +46,7 @@ public:
 	inline const std::string& 					getServerName() const { return _server_name; }
 	inline int 									getSocket() const { return _socket; }
 	HTTPRequest*								getRequest() { return _request; }
+	std::vector<std::string>					getErrorPage() { return _error_page; }
 
 private:
 	std::map<std::string, std::string> 	_parametr;

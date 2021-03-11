@@ -9,7 +9,6 @@
 #pragma once
 
 #include "HTTPRequest.hpp"
-#include "HTTPRequest.hpp"
 #include "utils.hpp"
 #include <iostream>
 #include <iterator>
@@ -34,7 +33,8 @@ public:
 
 	/* Getters */
 	static std::string				getMessagePhrase(const std::string& code);
-	std::string						generateErrorPage();
+	std::string						generateErrorPage(int flagErrorPage, const std::string& path);
+	std::string						getStatusCode() { return _status_code; }
 	char *							getResponse() const { return _buf_response; }
 	int 							getBodySize() const;
 
@@ -50,7 +50,7 @@ public:
 	/* Modifiers */
 	void							addBodyToResponse(const std::string& errorPage);
 	void							addHeadersToResponse(HTTPRequest* request, std::string& headers);
-	void							generateResponse(HTTPRequest* request);
+	void							generateResponse(HTTPRequest* request, int flagErrorPage, std::string& path);
 	void							clear();
 
 private:
