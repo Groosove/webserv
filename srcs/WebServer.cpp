@@ -11,10 +11,6 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <cstring>
-#define RED "\033[1;31m"
-#define TEXT_RESET "\033[0;0m"
-#define GREEN "\033[1;32m"
-#define EMPTY std::string("")
 
 WebServer::WebServer(const char *config_name): _status(true), _max_fd(0) {
 	std::vector<std::string> config;
@@ -143,13 +139,20 @@ void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &writ
 		bytes_send += ret;
 		all_bytes -= ret;
 	}
+	output_iteration(client);
 	client->getResponse()->clear();
 	client->getRequest()->clear();
 	if (ft_compare(client->getRequest()->getHeaders().find("Connection")->second.c_str(), "close"))
 		client->setStage(close_connection);
 	else
 		client->setStage(parsing_request);
-	static int i = 1;
-	std::cerr << RED << "sent response for request #" << i++ << TEXT_RESET << std::endl;
-	std::cerr << RED << "FD: " << client->getSocket() << std::endl;
+}
+
+void	WebServer::output_iteration(Client *client) {
+	static int i = 1, post = 1;
+	std::cerr << YELLOW << "sent response for request #" << i++ << " ( method " << client->getRequest()->getMethod()
+			  << " )" << TEXT_RESET;
+	if (ft_compare(client->getRequest()->getMethod(), "POST"))
+		std::cerr << RED << " #" << post++ << TEXT_RESET;
+	std::cerr << std::endl;
 }

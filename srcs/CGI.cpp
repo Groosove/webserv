@@ -38,7 +38,7 @@ CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
 	_env[16] = ft_strdup("SERVER_SOFTWARE=");//Строка идентификации сервера, указанная в заголовках, когда происходит ответ на запрос
 	_env[17] = ft_strdup("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	_env[18] = nullptr;
-	std::cout << "PATH : " << path << std::endl;
+	std::cout << BLUE << "PATH : " << path << TEXT_RESET << std::endl;
 	setArgs();
 	execCGI(_response);
 }
@@ -62,7 +62,6 @@ void CGI::execCGI(HTTPResponse* response) {
 
 	pipe(pipe_fd);
 	file_fd = open("file", O_CREAT | O_RDWR | O_TRUNC, 0677);
-	std::cerr << "FORK" << std::endl;
 	if ((pid = fork()) == 0) {
 		close(pipe_fd[1]);
 		dup2(pipe_fd[0], 0);
@@ -80,7 +79,6 @@ void CGI::execCGI(HTTPResponse* response) {
 		close(pipe_fd[0]);
 		wait(&status);
 		std::pair<char *, int> result;
-		std::cout << "HELLO IAM HERE" << std::endl;
 		if (!status) {
 			lseek(file_fd, 0, 0);
 			while ((bytes = read(file_fd, &buf, 60000)) > 0) {

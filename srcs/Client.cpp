@@ -12,7 +12,7 @@ Client::Client(int client_socket, const std::string &host, const std::string &po
 	_request = new HTTPRequest();
 	_response = new HTTPResponse();
 	_response_complite = ft_strdup("");
-	std::cout << "Client is added" << std::endl;
+	std::cout << PURPLE << "Client connected ... " << TEXT_RESET << std::endl;
 }
 
 Client::~Client() {

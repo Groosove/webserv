@@ -34,7 +34,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 		checkDirectoryOrFile(&stat_info, location, path);
 		if (ft_compare(request->getMethod(), "POST")) {
 			if (!location->getCgi().empty()) {
-				std::cout << "YA ZAHOJU V CGI GOTOVTES" << std::endl;
+				std::cout << BLUE << "I am coming to CGI ... " << TEXT_RESET << std::endl;
 				std::map<std::string, std::string>::iterator it = location->getCgi().find(".bla");
 				CGI cgi_response(client, virtual_server, (char *) it->second.c_str());
 			}
@@ -91,9 +91,9 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 		path = tmp_path;
 		stat_info_created = stat(path.c_str(), stat_info);
 		if (stat_info_created != -1)
-			client->setFlagErrorPage(0);
-		else
 			client->setFlagErrorPage(1);
+		else
+			client->setFlagErrorPage(2);
 	}
 }
 

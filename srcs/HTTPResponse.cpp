@@ -96,7 +96,7 @@ int HTTPResponse::getBodySize() const { return _header_size; }
 
 std::string HTTPResponse::generateErrorPage(int flagErrorPage, const std::string& path) {
 	std::string error;
-	if (flagErrorPage == 0) {
+	if (flagErrorPage == 1) {
 		int fd = open(path.c_str(), O_RDONLY);
 		char buf[100];
 		bzero(buf, 100);
