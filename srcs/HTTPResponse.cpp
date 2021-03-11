@@ -78,7 +78,7 @@ void	HTTPResponse::generateResponse(HTTPRequest* request, int flagErrorPage, std
 }
 
 
-HTTPResponse::HTTPResponse(): _body_size(0), _headers_cgi(nullptr) {
+HTTPResponse::HTTPResponse(): _headers_cgi(nullptr), _body_size(0) {
 	_body = ft_strdup("");
 	_buf_response = ft_strdup("");
 	_headers_cgi = ft_strdup("");

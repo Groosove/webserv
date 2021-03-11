@@ -72,14 +72,15 @@ void WebServer::handle() {
 		while (it != _clients.end())
 		{
 			if (FD_ISSET((*it)->getSocket(), &read_fd) && (*it)->getStage() == parsing_request)
-				parsing_request_part(*it, read_fd, write_fd);
+				parsing_request_part(*it);
 			if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == generate_response)
 				treatmentStageGenerate(*it);
 			if (FD_ISSET((*it)->getSocket(), &write_fd) && (*it)->getStage() == send_response)
-				send_response_part(*it, read_fd, write_fd);
+				send_response_part(*it);
 			if ((*it)->getStage() == close_connection) {
 				delete *it;
 				it = _clients.erase(it);
+				std::cout <<
 			} else
 				++it;
 		}
@@ -94,7 +95,7 @@ VirtualServer *WebServer::searchVirtualServer(Client *client) {
 	return nullptr;
 }
 
-void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& write_fd) {
+void WebServer::parsing_request_part(Client *client) {
 	char*			buf = (char*)calloc(80000, 1);
 	int				read_bytes;
 	int				size_buffer = 80000;
@@ -121,7 +122,7 @@ void WebServer::parsing_request_part(Client *client, fd_set& read_fd, fd_set& wr
 	}
 }
 
-void WebServer::send_response_part(Client *client, fd_set &read_fd, fd_set &write_fd) {
+void WebServer::send_response_part(Client *client) {
 	int	ret = 0;
 	int	bytes_send = 0;
 	int	all_bytes = client->getBytes();

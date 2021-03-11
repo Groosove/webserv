@@ -39,7 +39,7 @@ public:
 	std::string&						getRoot() { return _root; }
 	std::string&						getIndex() { return _index; }
 	bool								getAutoIndex() const { return _autoindex; }
-	size_t								getRequestLimits() const { return _request_limits; }
+	int 								getRequestLimits() const { return _request_limits; }
 	std::map<std::string, std::string>&	getCgi() { return _cgi; }
 
 	/* Validation */
@@ -51,5 +51,5 @@ private:
 	std::string							_index;
 	std::vector<std::string>			_allow_methods;
 	bool								_autoindex;
-	size_t								_request_limits;
+	int									_request_limits;
 };

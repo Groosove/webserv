@@ -15,7 +15,7 @@
 class CGI {
 public:
 	/* Constructor */
-	explicit CGI(Client* client, VirtualServer* virtualServer, char * path);
+	explicit CGI(Client* client, char * path);
 	/* Destructor */
 	~CGI();
 

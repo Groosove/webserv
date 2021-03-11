@@ -8,7 +8,7 @@
 
 #include "Client.hpp"
 
-Client::Client(int client_socket, const std::string &host, const std::string &port): _socket(client_socket), _request(), _response(), _host(host), _port(port), _stage(0), _flagErrorPage(0) {
+Client::Client(int client_socket, const std::string &host, const std::string &port): _request(), _response(), _host(host), _port(port), _socket(client_socket), _stage(0), _flagErrorPage(0) {
 	_request = new HTTPRequest();
 	_response = new HTTPResponse();
 	_response_complite = ft_strdup("");

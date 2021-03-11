@@ -9,7 +9,7 @@
 #include "HTTPRequest.hpp"
 #include "fcntl.h"
 
-HTTPRequest::HTTPRequest(): _stage(false), _body_size(0), _hex_size(-1) {
+HTTPRequest::HTTPRequest(): _body_size(0), _hex_size(-1), _stage(false) {
 	_body = ft_strdup("");
 	_request = ft_strdup("");
 

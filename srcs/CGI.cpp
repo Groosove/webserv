@@ -13,7 +13,7 @@
 
 int	status = 0;
 
-CGI::CGI(Client* client, VirtualServer* virtualServer, char * path) {
+CGI::CGI(Client* client, char * path) {
 	_request = client->getRequest();
 	_response = client->getResponse();
 	_path = ft_strdup(path);

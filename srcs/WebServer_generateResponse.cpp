@@ -28,7 +28,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	else
 		path = "";
 	stat_info_created  = stat(path.c_str(), &stat_info); // накидать стурктуру в которой будет значение файла, есть он или его нет, тем самым избавиться от проблемы в 15 тесте в PUT
-	if (!(error = checkValidRequest(location, client, &stat_info)).empty()) {
+	if (!(error = checkValidRequest(location, client)).empty()) {
 		response->setStatusCode(error);
 	} else {
 		checkDirectoryOrFile(&stat_info, location, path);
@@ -36,7 +36,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 			if (!location->getCgi().empty()) {
 				std::cout << BLUE << "I am coming to CGI ... " << TEXT_RESET << std::endl;
 				std::map<std::string, std::string>::iterator it = location->getCgi().find(".bla");
-				CGI cgi_response(client, virtual_server, (char *) it->second.c_str());
+				CGI cgi_response(client, (char *) it->second.c_str());
 			}
 			else
 				handlePutResponse(client, location, &stat_info, path, stat_info_created);
@@ -51,8 +51,7 @@ void WebServer::treatmentStageGenerate(Client *client) {
 	client->setStage(send_response);
 }
 
-std::string WebServer::checkValidRequest(Location *location, Client *client,
-												 struct stat *info) {
+std::string WebServer::checkValidRequest(Location *location, Client *client) {
 	if (!location)
 		return std::string("404");
 	else if (!location->checkAllowMethod(client->getRequest()->getMethod()))
@@ -60,7 +59,7 @@ std::string WebServer::checkValidRequest(Location *location, Client *client,
 	else {
 		if (location->getRequestLimits() == 0)
 			return std::string("");
-		else if (ft_strlen(client->getRequest()->getBody()) > location->getRequestLimits())
+		else if ((int)ft_strlen(client->getRequest()->getBody()) > location->getRequestLimits())
 			return std::string("413");
 	}
 	return std::string("");
@@ -79,7 +78,7 @@ void WebServer::handleDefaultResponse(Client *client, Location *location, struct
 	else if (S_ISDIR(stat_info->st_mode) && !location->getAutoIndex())
 		response->setStatusCode("404");
 	else if (S_ISDIR(stat_info->st_mode) && ft_compare(request->getMethod(), "GET") && location->getAutoIndex())
-		response->setBody(generateAutoindex(request, path));
+		response->setBody(generateAutoindex(path));
 	else
 		response->setStatusCode("404");
 	if (response->getStatusCode() == searchVirtualServer(client)->getErrorPage().front()) {
@@ -160,7 +159,7 @@ void WebServer::checkDirectoryOrFile(struct stat *info, Location *location, std:
 	}
 }
 
-std::pair<char *, int> WebServer::generateAutoindex(HTTPRequest *request, const std::string& path) {
+std::pair<char *, int> WebServer::generateAutoindex(const std::string& path) {
 	std::string 	autoindex;
 	char*			tmp = NULL;
 	DIR*			directory = opendir(path.c_str());

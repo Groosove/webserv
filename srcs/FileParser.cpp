@@ -35,7 +35,7 @@ std::string FileParser::getArgument(const std::string &dst, int start) { return 
 
 bool FileParser::checkIndent(const std::string &str, int pos) {
 	int result = 0;
-	for (int i = 0; i < str.size(); ++i) {
+	for (unsigned long i = 0; i < str.size(); ++i) {
 		if (str[i] == ' ' || str[i] == '\t')
 			result += (str[i] == ' ') ? 1 : 4;
 		else break;
