@@ -9,7 +9,7 @@
 #include "WebServer.hpp"
 
 int main(int ac, char** av) {
-	const char *config_name = (ac == 1) ? "default.conf" : av[1];
+	const char *config_name = (ac == 1) ? "configs/default.conf" : av[1];
 	try {
 		WebServer webServer(config_name);
 		signal(SIGPIPE, SIG_IGN);

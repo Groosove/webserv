@@ -80,7 +80,6 @@ void WebServer::handle() {
 			if ((*it)->getStage() == close_connection) {
 				delete *it;
 				it = _clients.erase(it);
-				std::cout <<
 			} else
 				++it;
 		}
